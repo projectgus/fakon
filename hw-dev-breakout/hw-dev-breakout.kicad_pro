@@ -404,7 +404,7 @@
     "pinned_symbol_libs": []
   },
   "meta": {
-    "filename": "STM_Nucleo64_Morpho.kicad_pro",
+    "filename": "hw-dev-breakout.kicad_pro",
     "version": 1
   },
   "net_settings": {
@@ -450,6 +450,7 @@
   },
   "schematic": {
     "annotate_start_num": 0,
+    "bom_export_filename": "",
     "bom_fmt_presets": [],
     "bom_fmt_settings": {
       "field_delimiter": ",",
@@ -562,6 +563,10 @@
     [
       "da5a1e6a-2605-436b-a30c-1027586d5c0a",
       "Root"
+    ],
+    [
+      "5ae88c9e-629b-4528-b607-9c3e739c6d33",
+      "Inputs"
     ]
   ],
   "text_variables": {}

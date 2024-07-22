@@ -8,10 +8,9 @@ Breakout board connections for development:
 | COMP CAN L/H                  | AC compressor (via EE21 pins 77,76), PTC heater | CAN pair                            |                                                                                                                                                                              |
 | Brake light switch            | Switch, EPCU (EE21 pin 4)                       | 12V Input                           |                                                                                                                                                                              |
 | Brake light test switch       | Switch, EPCU (EE21 pin 5)                       | 12V Input                           | Use SPDT switch for development, "Test" may need to become output for final board.                                                                                           |
-| IMMO                          | EPCU (EE21 pin 6)                               | K-Line (can use LIN transceiver)    |                                                                                                                                                                              |
 | SCU Park TX                   | EPCU (EE21 pin 30)                              | 5V PP Output                        | 10Hz PWM signal, maybe can be OD pulled up at EPCU                                                                                                                           |
 | SCU Park RX                   | EPCU (EE21 pin 31)                              | 5V Input                            | 10Hz PWM signal, may need pullup to 5V                                                                                                                                       |
-| SBW Button Output             | EPCU (EE21 pin 36)                             | 12V PP? Output                      | 100Hz(?) PWM. Maybe OD, Only needed if replacing OEM SBW (shift by wire).                                                                                                    |
+| SBW Button Output             | EPCU (EE21 pin 36)                              | 12V PP? Output                      | 100Hz(?) PWM. Maybe OD, Only needed if replacing OEM SBW (shift by wire).                                                                                                    |
 | SBW Input                     | EPCU (EE21 pin 10)                              | 12V Input                           | 100Hz PWM. Probably OD with pullup. Only needed if replacing OEM SBW.                                                                                                        |
 | EV Ready Input                | EPCU (EE21 pin 71)                              | 12V Input (w/ pullup)               | Redundant signal, maybe not needed in final hardware.                                                                                                                        |
 | P_STS Input                   | EPCU (EE21 pin 72)                              | 12V Input (w/ pullup)               | 50Hz PWM. Redundant gear selector signal, maybe not needed in final hardware.                                                                                                |
@@ -21,7 +20,7 @@ Breakout board connections for development:
 | Heater Interlock -            | PTC Heater LV connector                         | 5V Input                            |                                                                                                                                                                              |
 | Brake trigger output          | "Vehicle loom"                                  | 12V Output                          | Details may depend on vehicle...                                                                                                                                             |
 | Charge port door signal 5V    | Charging connector pin 2                        | 5V Power                            |                                                                                                                                                                              |
-| Charge port door signal       | Charging connector pin 2                        | 5V Power                            |                                                                                                                                                                              |
+| Charge port door signal       | Charging connector pin 2                        | 5V Input                            |                                                                                                                                                                              |
 | Charge port lock coil drive   | Relay to charging connector                     | Low side 12V relay coil driver      | Check where these relays are, do I still have them?                                                                                                                          |
 | Charge port unlock coil drive | Relay to charging connector                     | Low side 12V relay coil driver      |                                                                                                                                                                              |
 | "IG1" power sense input       | Power                                           | 12V Input                           |                                                                                                                                                                              |
@@ -33,10 +32,27 @@ Breakout board connections for development:
 | Steering button inputs        | "Vehicle loom"                                  | 12V Input                           |                                                                                                                                                                              |
 | EPCU Wake Up signal           | EPCU (EE21 pin 41)                              | Output (probably?), voltage unknown | The gateway uses this signal for something, currently unknown                                                                                                                |
 
+## Totals
+
+| Type                 | Count |
+|----------------------|-------|
+| 12V Input            | 10    |
+| 5V PP Output         | 3     |
+| 5V Input             | 4     |
+| 12V PP Output        | 2     |
+| 5V Power             | 1     |
+| Low side relay coil  | 2     |
+| High side relay coil | 1     |
+| 12V OD Output        | 1     |
+| Unknown output       | 1     |
+
 ## Additional test wiring
+
+Not on the breakout:
 
 * EE21 pin 74 Battery charging switch (active low?)
 * EE21 pin 75 Battery charging illumination output
+* IMMO signal, on standalone board (K-Line to EPCU - EE21 pin 6)
 
 
 
