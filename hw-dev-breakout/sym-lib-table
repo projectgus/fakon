@@ -1,0 +1,4 @@
+(sym_lib_table
+  (version 7)
+  (lib (name "hw-dev-breakout")(type "KiCad")(uri "${KIPRJMOD}/hw-dev-breakout.kicad_sym")(options "")(descr ""))
+)

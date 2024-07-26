@@ -188,7 +188,12 @@
     "equivalence_files": []
   },
   "erc": {
-    "erc_exclusions": [],
+    "erc_exclusions": [
+      "no_connect_connected|152400|254000|e415b6d7-9c17-4357-afc1-68bb573aaa08|116ee37b-2d3d-4e53-9113-aa378bf62ff7|/da5a1e6a-2605-436b-a30c-1027586d5c0a|/da5a1e6a-2605-436b-a30c-1027586d5c0a|",
+      "no_connect_connected|152400|609600|3b0fd1de-10ad-4719-81ce-9e128073ae42|e30884fc-a740-475f-89b2-43b6aac04b99|/da5a1e6a-2605-436b-a30c-1027586d5c0a|/da5a1e6a-2605-436b-a30c-1027586d5c0a|",
+      "no_connect_connected|355600|939800|5ff19d20-babe-4812-9a44-6ba1c869e48e|288a14ae-4b58-48b5-8061-c68897471346|/da5a1e6a-2605-436b-a30c-1027586d5c0a|/da5a1e6a-2605-436b-a30c-1027586d5c0a|",
+      "no_connect_connected|647700|1257300|66d7dff3-9caa-4a35-a1d9-8df957210a26|1ceaf847-0db8-436e-a6f9-2be448027b3a|/da5a1e6a-2605-436b-a30c-1027586d5c0a|/da5a1e6a-2605-436b-a30c-1027586d5c0a|"
+    ],
     "meta": {
       "version": 0
     },
@@ -567,6 +572,10 @@
     [
       "5ae88c9e-629b-4528-b607-9c3e739c6d33",
       "Inputs"
+    ],
+    [
+      "1f1f44b3-ef48-4473-b342-ce0161e9e20c",
+      "Outputs"
     ]
   ],
   "text_variables": {}

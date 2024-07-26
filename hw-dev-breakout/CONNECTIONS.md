@@ -28,7 +28,7 @@ Breakout board connections for development:
 | Starter signal monitor        | "Vehicle loom", EPCU (EE21 pin 7)               | 12V Input                           |                                                                                                                                                                              |
 | IG3 Relay coil output         | Relay box, common with EE21 pin 69 I think      | High side 12V relay coil driver     | Can be driven either by Fakon or by the OBC.                                                                                                                                 |
 | Airbag crash signal           | BMS connector pin NNN                           | 12V OD Output                       | 50Hz PWM, see https://openinverter.org/forum/viewtopic.php?p=62451#p62451 . On final design maybe make this a dedicated module with inertia switch fitted (to meet AU regs). |
-| Parking brake signal          | "Vehicle loom"                                  | 12V Input                           |                                                                                                                                                                              |
+g| Parking brake signal          | "Vehicle loom"                                  | 12V Input                           |                                                                                                                                                                              |
 | Steering button inputs        | "Vehicle loom"                                  | 12V Input                           |                                                                                                                                                                              |
 | EPCU Wake Up signal           | EPCU (EE21 pin 41)                              | Output (probably?), voltage unknown | The gateway uses this signal for something, currently unknown                                                                                                                |
 
@@ -43,7 +43,7 @@ Breakout board connections for development:
 | 5V Power             | 1     |
 | Low side relay coil  | 2     |
 | High side relay coil | 1     |
-| 12V OD Output        | 1     |
+| 12V OD Outputm        | 1     |
 | Unknown output       | 1     |
 
 ## Additional test wiring
