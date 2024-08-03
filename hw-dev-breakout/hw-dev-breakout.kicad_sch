@@ -1842,23 +1842,24 @@
 				)
 			)
 		)
-		(symbol "Mechanical:MountingHole"
+		(symbol "Switch:SW_Push"
+			(pin_numbers hide)
 			(pin_names
-				(offset 1.016)
-			)
-			(exclude_from_sim yes)
-			(in_bom no)
+				(offset 1.016) hide)
+			(exclude_from_sim no)
+			(in_bom yes)
 			(on_board yes)
-			(property "Reference" "H"
-				(at 0 5.08 0)
+			(property "Reference" "SW"
+				(at 1.27 2.54 0)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
+					(justify left)
 				)
 			)
-			(property "Value" "MountingHole"
-				(at 0 3.175 0)
+			(property "Value" "SW_Push"
+				(at 0 -1.524 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -1866,7 +1867,7 @@
 				)
 			)
 			(property "Footprint" ""
-				(at 0 0 0)
+				(at 0 5.08 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -1875,6 +1876,15 @@
 				)
 			)
 			(property "Datasheet" "~"
+				(at 0 5.08 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "Push button switch, generic, two pins"
 				(at 0 0 0)
 				(effects
 					(font
@@ -1883,7 +1893,7 @@
 					(hide yes)
 				)
 			)
-			(property "Description" "Mounting Hole without connection"
+			(property "ki_keywords" "switch normally-open pushbutton push-button"
 				(at 0 0 0)
 				(effects
 					(font
@@ -1892,34 +1902,87 @@
 					(hide yes)
 				)
 			)
-			(property "ki_keywords" "mounting hole"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "ki_fp_filters" "MountingHole*"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(symbol "MountingHole_0_1"
+			(symbol "SW_Push_0_1"
 				(circle
-					(center 0 0)
-					(radius 1.27)
+					(center -2.032 0)
+					(radius 0.508)
 					(stroke
-						(width 1.27)
+						(width 0)
 						(type default)
 					)
 					(fill
 						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0 1.27) (xy 0 3.048)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 2.54 1.27) (xy -2.54 1.27)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(circle
+					(center 2.032 0)
+					(radius 0.508)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(pin passive line
+					(at -5.08 0 0)
+					(length 2.54)
+					(name "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 5.08 0 180)
+					(length 2.54)
+					(name "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
 					)
 				)
 			)
@@ -2284,126 +2347,6 @@
 				)
 			)
 		)
-		(symbol "power:+BATT"
-			(power)
-			(pin_numbers hide)
-			(pin_names
-				(offset 0) hide)
-			(exclude_from_sim no)
-			(in_bom yes)
-			(on_board yes)
-			(property "Reference" "#PWR"
-				(at 0 -3.81 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Value" "+BATT"
-				(at 0 3.556 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Footprint" ""
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Datasheet" ""
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Description" "Power symbol creates a global label with name \"+BATT\""
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "ki_keywords" "global power battery"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(symbol "+BATT_0_1"
-				(polyline
-					(pts
-						(xy -0.762 1.27) (xy 0 2.54)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 0 0) (xy 0 2.54)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 0 2.54) (xy 0.762 1.27)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-			)
-			(symbol "+BATT_1_1"
-				(pin power_in line
-					(at 0 0 90)
-					(length 0)
-					(name "~"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-			)
-		)
 		(symbol "power:GND"
 			(power)
 			(pin_numbers hide)
@@ -2480,102 +2423,6 @@
 				)
 			)
 			(symbol "GND_1_1"
-				(pin power_in line
-					(at 0 0 270)
-					(length 0)
-					(name "~"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-			)
-		)
-		(symbol "power:GNDA"
-			(power)
-			(pin_numbers hide)
-			(pin_names
-				(offset 0) hide)
-			(exclude_from_sim no)
-			(in_bom yes)
-			(on_board yes)
-			(property "Reference" "#PWR"
-				(at 0 -6.35 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Value" "GNDA"
-				(at 0 -3.81 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Footprint" ""
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Datasheet" ""
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Description" "Power symbol creates a global label with name \"GNDA\" , analog ground"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "ki_keywords" "global power"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(symbol "GNDA_0_1"
-				(polyline
-					(pts
-						(xy 0 0) (xy 0 -1.27) (xy 1.27 -1.27) (xy 0 -2.54) (xy -1.27 -1.27) (xy 0 -1.27)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-			)
-			(symbol "GNDA_1_1"
 				(pin power_in line
 					(at 0 0 270)
 					(length 0)
@@ -2688,126 +2535,6 @@
 					)
 					(fill
 						(type none)
-					)
-				)
-			)
-		)
-		(symbol "power:VDD"
-			(power)
-			(pin_numbers hide)
-			(pin_names
-				(offset 0) hide)
-			(exclude_from_sim no)
-			(in_bom yes)
-			(on_board yes)
-			(property "Reference" "#PWR"
-				(at 0 -3.81 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Value" "VDD"
-				(at 0 3.556 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Footprint" ""
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Datasheet" ""
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Description" "Power symbol creates a global label with name \"VDD\""
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "ki_keywords" "global power"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(symbol "VDD_0_1"
-				(polyline
-					(pts
-						(xy -0.762 1.27) (xy 0 2.54)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 0 0) (xy 0 2.54)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 0 2.54) (xy 0.762 1.27)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-			)
-			(symbol "VDD_1_1"
-				(pin power_in line
-					(at 0 0 90)
-					(length 0)
-					(name "~"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
 					)
 				)
 			)
@@ -3018,10 +2745,6 @@
 	(no_connect
 		(at 35.56 60.96)
 		(uuid "330e219e-a20d-4ce2-83b1-5ffb3095aee2")
-	)
-	(no_connect
-		(at 50.8 38.1)
-		(uuid "3b91a97a-efab-4deb-a84b-5031b9c39de8")
 	)
 	(no_connect
 		(at 50.8 50.8)
@@ -3473,26 +3196,6 @@
 		)
 		(uuid "3f7c781f-5cbb-44e1-ba96-5a5627995e65")
 	)
-	(polyline
-		(pts
-			(xy 254 12.7) (xy 254 50.8)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "424e2126-26e6-4269-af62-24c53e5f1dff")
-	)
-	(polyline
-		(pts
-			(xy 254 50.8) (xy 284.48 50.8)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "424e2126-26e6-4269-af62-24c53e5f1e00")
-	)
 	(wire
 		(pts
 			(xy 15.24 45.72) (xy 15.24 48.26)
@@ -3595,7 +3298,7 @@
 	)
 	(wire
 		(pts
-			(xy 48.26 38.1) (xy 50.8 38.1)
+			(xy 48.26 38.1) (xy 54.61 38.1)
 		)
 		(stroke
 			(width 0)
@@ -3692,6 +3395,16 @@
 			(type default)
 		)
 		(uuid "6ca3dfdf-6a7d-4fcf-92c8-3d1f4b9aa4c9")
+	)
+	(wire
+		(pts
+			(xy 86.36 17.78) (xy 86.36 22.86)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "6e730870-8ccd-40c7-a3ec-611b25467096")
 	)
 	(wire
 		(pts
@@ -3995,13 +3708,13 @@
 	)
 	(wire
 		(pts
-			(xy 109.22 200.66) (xy 109.22 201.93)
+			(xy 86.36 33.02) (xy 86.36 36.83)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "a6a3a75b-88fc-41a4-9221-709843a162f4")
+		(uuid "a5016e27-652e-4927-97a9-d013d38ed3fe")
 	)
 	(wire
 		(pts
@@ -4637,6 +4350,16 @@
 		)
 		(uuid "110cb831-75b7-4652-a55c-dc832bbeba90")
 	)
+	(text "VDD"
+		(exclude_from_sim no)
+		(at 32.512 27.178 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "184a3dec-9975-4c97-ac7e-7a24c195e6a3")
+	)
 	(text "PB11"
 		(exclude_from_sim no)
 		(at 49.53 106.68 0)
@@ -4758,17 +4481,6 @@
 		)
 		(uuid "5e9c9da8-9d54-4522-9714-cd4445465b53")
 	)
-	(text "Mechanical\n"
-		(exclude_from_sim no)
-		(at 261.62 20.32 0)
-		(effects
-			(font
-				(size 2 2)
-			)
-			(justify left bottom)
-		)
-		(uuid "66cfa04d-4237-41ab-9b0b-42fc87cdf816")
-	)
 	(text "PC7"
 		(exclude_from_sim no)
 		(at 30.48 109.22 0)
@@ -4801,6 +4513,16 @@
 			(justify left bottom)
 		)
 		(uuid "725047c5-7af4-4f7e-857e-c2740b2029c2")
+	)
+	(text "VBATT"
+		(exclude_from_sim no)
+		(at 18.288 62.738 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "768c36f4-15a1-462c-a0e2-1427a403409b")
 	)
 	(text "PB5"
 		(exclude_from_sim no)
@@ -5164,6 +4886,16 @@
 			(justify left bottom)
 		)
 		(uuid "eb8d5e82-5d5d-4680-b83e-360f6ab8fcaa")
+	)
+	(text "GNDA"
+		(exclude_from_sim no)
+		(at 59.69 123.698 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "f9956772-2a93-40d7-aaf0-8a5e62a0c322")
 	)
 	(text "PB1"
 		(exclude_from_sim no)
@@ -5671,6 +5403,17 @@
 		)
 		(uuid "8779312d-e60b-4b6e-b39b-613c88980256")
 	)
+	(label "~{RST}"
+		(at 86.36 21.59 90)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "883df769-cfa5-4f9e-841f-1f75dd75e68f")
+	)
 	(label "IN8"
 		(at 29.21 68.58 180)
 		(fields_autoplaced yes)
@@ -6165,7 +5908,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "0321775c-598f-4069-92bd-42bdd1773283")
-		(property "Reference" "#PWR0106"
+		(property "Reference" "#PWR0110"
 			(at 59.69 43.18 0)
 			(effects
 				(font
@@ -6215,7 +5958,7 @@
 		(instances
 			(project "hw-dev-breakout"
 				(path "/da5a1e6a-2605-436b-a30c-1027586d5c0a"
-					(reference "#PWR0106")
+					(reference "#PWR0110")
 					(unit 1)
 				)
 			)
@@ -6231,7 +5974,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "06bdcb5d-4867-4f4f-9d23-94d10a2bdcf4")
-		(property "Reference" "#PWR0121"
+		(property "Reference" "#PWR0106"
 			(at 34.29 167.64 0)
 			(effects
 				(font
@@ -6281,7 +6024,7 @@
 		(instances
 			(project "hw-dev-breakout"
 				(path "/da5a1e6a-2605-436b-a30c-1027586d5c0a"
-					(reference "#PWR0121")
+					(reference "#PWR0106")
 					(unit 1)
 				)
 			)
@@ -6366,7 +6109,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "0cc4d1a3-5f92-4cff-be94-b845af39c2e5")
-		(property "Reference" "#PWR0118"
+		(property "Reference" "#PWR0126"
 			(at 208.28 45.72 0)
 			(effects
 				(font
@@ -6416,7 +6159,7 @@
 		(instances
 			(project "hw-dev-breakout"
 				(path "/da5a1e6a-2605-436b-a30c-1027586d5c0a"
-					(reference "#PWR0118")
+					(reference "#PWR0126")
 					(unit 1)
 				)
 			)
@@ -6677,7 +6420,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "1b12e44a-ecad-4ea0-ab02-3bb914aed330")
-		(property "Reference" "#PWR0107"
+		(property "Reference" "#PWR0111"
 			(at 64.77 54.61 0)
 			(effects
 				(font
@@ -6727,71 +6470,7 @@
 		(instances
 			(project "STM_Nucleo64_Morpho"
 				(path "/da5a1e6a-2605-436b-a30c-1027586d5c0a"
-					(reference "#PWR0107")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Mechanical:MountingHole")
-		(at 262.89 34.29 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "1b2c17ef-6253-4a51-9c38-3a3d64db5bcb")
-		(property "Reference" "H102"
-			(at 266.7 33.0199 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "MountingHole"
-			(at 266.7 35.5599 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "MountingHole:MountingHole_3.2mm_M3"
-			(at 262.89 34.29 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 262.89 34.29 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Mounting Hole without connection"
-			(at 262.89 34.29 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(instances
-			(project "STM_Nucleo64_Morpho"
-				(path "/da5a1e6a-2605-436b-a30c-1027586d5c0a"
-					(reference "H102")
+					(reference "#PWR0111")
 					(unit 1)
 				)
 			)
@@ -6807,7 +6486,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "1b6fd874-b54e-41d7-bf71-d4791cd8c03e")
-		(property "Reference" "RN105"
+		(property "Reference" "R105"
 			(at 100.33 168.9099 0)
 			(effects
 				(font
@@ -6861,7 +6540,7 @@
 		(instances
 			(project "hw-dev-breakout"
 				(path "/da5a1e6a-2605-436b-a30c-1027586d5c0a"
-					(reference "RN105")
+					(reference "R105")
 					(unit 1)
 				)
 			)
@@ -6877,7 +6556,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "1e5069b1-6341-467b-85cd-dbb7394c0a04")
-		(property "Reference" "RN101"
+		(property "Reference" "R101"
 			(at 36.83 167.6399 0)
 			(effects
 				(font
@@ -6931,7 +6610,7 @@
 		(instances
 			(project "hw-dev-breakout"
 				(path "/da5a1e6a-2605-436b-a30c-1027586d5c0a"
-					(reference "RN101")
+					(reference "R101")
 					(unit 1)
 				)
 			)
@@ -6946,7 +6625,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "2101b020-6ed2-4a1c-85b4-3003b04b8748")
-		(property "Reference" "#PWR0111"
+		(property "Reference" "#PWR0116"
 			(at 71.12 39.37 0)
 			(effects
 				(font
@@ -6996,71 +6675,7 @@
 		(instances
 			(project "STM_Nucleo64_Morpho"
 				(path "/da5a1e6a-2605-436b-a30c-1027586d5c0a"
-					(reference "#PWR0111")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Mechanical:MountingHole")
-		(at 262.89 40.64 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "2367451c-d7b4-4c9a-ac1b-44082a2f904a")
-		(property "Reference" "H103"
-			(at 266.7 39.3699 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "MountingHole"
-			(at 266.7 41.9099 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "MountingHole:MountingHole_3.2mm_M3"
-			(at 262.89 40.64 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 262.89 40.64 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Mounting Hole without connection"
-			(at 262.89 40.64 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(instances
-			(project "STM_Nucleo64_Morpho"
-				(path "/da5a1e6a-2605-436b-a30c-1027586d5c0a"
-					(reference "H103")
+					(reference "#PWR0116")
 					(unit 1)
 				)
 			)
@@ -7142,7 +6757,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "3b08b01f-04a3-4d98-8225-e3dc403e9e7c")
-		(property "Reference" "#PWR0119"
+		(property "Reference" "#PWR0127"
 			(at 217.17 31.75 0)
 			(effects
 				(font
@@ -7192,71 +6807,7 @@
 		(instances
 			(project "hw-dev-breakout"
 				(path "/da5a1e6a-2605-436b-a30c-1027586d5c0a"
-					(reference "#PWR0119")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Mechanical:MountingHole")
-		(at 262.89 27.94 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "3ff45407-f450-4ac2-9786-c338f7e5a0d4")
-		(property "Reference" "H101"
-			(at 266.7 26.6699 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "MountingHole"
-			(at 266.7 29.2099 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "MountingHole:MountingHole_3.2mm_M3"
-			(at 262.89 27.94 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 262.89 27.94 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Mounting Hole without connection"
-			(at 262.89 27.94 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(instances
-			(project "STM_Nucleo64_Morpho"
-				(path "/da5a1e6a-2605-436b-a30c-1027586d5c0a"
-					(reference "H101")
+					(reference "#PWR0127")
 					(unit 1)
 				)
 			)
@@ -7342,7 +6893,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "44be69ae-bf07-4e0a-8141-11552c3b0d9b")
-		(property "Reference" "#PWR0108"
+		(property "Reference" "#PWR0112"
 			(at 64.77 116.84 0)
 			(effects
 				(font
@@ -7392,7 +6943,7 @@
 		(instances
 			(project "STM_Nucleo64_Morpho"
 				(path "/da5a1e6a-2605-436b-a30c-1027586d5c0a"
-					(reference "#PWR0108")
+					(reference "#PWR0112")
 					(unit 1)
 				)
 			)
@@ -7408,7 +6959,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "476cbf14-3a61-47b2-88f7-a3d8f9341e8e")
-		(property "Reference" "#PWR0125"
+		(property "Reference" "#PWR0117"
 			(at 83.82 190.5 0)
 			(effects
 				(font
@@ -7458,7 +7009,7 @@
 		(instances
 			(project "hw-dev-breakout"
 				(path "/da5a1e6a-2605-436b-a30c-1027586d5c0a"
-					(reference "#PWR0125")
+					(reference "#PWR0117")
 					(unit 1)
 				)
 			)
@@ -7605,17 +7156,17 @@
 		)
 	)
 	(symbol
-		(lib_id "power:VDD")
-		(at 15.24 25.4 0)
+		(lib_id "power:GND")
+		(at 86.36 36.83 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "50ace880-8d5c-4840-ad43-1b147a2ed333")
+		(uuid "5f2c91ba-6db7-4ea5-b17f-e74b116e7e24")
 		(property "Reference" "#PWR0101"
-			(at 15.24 29.21 0)
+			(at 86.36 43.18 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7623,8 +7174,8 @@
 				(hide yes)
 			)
 		)
-		(property "Value" "VDD"
-			(at 15.24 19.685 0)
+		(property "Value" "GND"
+			(at 86.36 41.91 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7632,7 +7183,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 15.24 25.4 0)
+			(at 86.36 36.83 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7641,7 +7192,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 15.24 25.4 0)
+			(at 86.36 36.83 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7649,8 +7200,8 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "Power symbol creates a global label with name \"VDD\""
-			(at 15.24 25.4 0)
+		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
+			(at 86.36 36.83 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7659,10 +7210,10 @@
 			)
 		)
 		(pin "1"
-			(uuid "e415b6d7-9c17-4357-afc1-68bb573aaa08")
+			(uuid "447ddfe7-4158-4590-9e1a-d180e2ae27f9")
 		)
 		(instances
-			(project "STM_Nucleo64_Morpho"
+			(project ""
 				(path "/da5a1e6a-2605-436b-a30c-1027586d5c0a"
 					(reference "#PWR0101")
 					(unit 1)
@@ -7750,7 +7301,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "62256412-b1b6-4272-837f-702368fcedc7")
-		(property "Reference" "#PWR0114"
+		(property "Reference" "#PWR0122"
 			(at 115.57 71.12 0)
 			(effects
 				(font
@@ -7800,7 +7351,7 @@
 		(instances
 			(project ""
 				(path "/da5a1e6a-2605-436b-a30c-1027586d5c0a"
-					(reference "#PWR0114")
+					(reference "#PWR0122")
 					(unit 1)
 				)
 			)
@@ -7816,7 +7367,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "64e6a99f-fe7e-41e8-9ed4-a588ebb183da")
-		(property "Reference" "#PWR0124"
+		(property "Reference" "#PWR0109"
 			(at 53.34 189.23 0)
 			(effects
 				(font
@@ -7866,7 +7417,7 @@
 		(instances
 			(project "hw-dev-breakout"
 				(path "/da5a1e6a-2605-436b-a30c-1027586d5c0a"
-					(reference "#PWR0124")
+					(reference "#PWR0109")
 					(unit 1)
 				)
 			)
@@ -7882,7 +7433,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "6a0d68c7-5c18-42fc-b8c5-ad8e07db2ec0")
-		(property "Reference" "#PWR0122"
+		(property "Reference" "#PWR0107"
 			(at 34.29 189.23 0)
 			(effects
 				(font
@@ -7932,7 +7483,7 @@
 		(instances
 			(project "hw-dev-breakout"
 				(path "/da5a1e6a-2605-436b-a30c-1027586d5c0a"
-					(reference "#PWR0122")
+					(reference "#PWR0107")
 					(unit 1)
 				)
 			)
@@ -8037,7 +7588,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "6d436d2c-d4a3-4e83-b4fd-a4306cd92036")
-		(property "Reference" "RN103"
+		(property "Reference" "R103"
 			(at 72.39 168.9099 0)
 			(effects
 				(font
@@ -8091,7 +7642,7 @@
 		(instances
 			(project "hw-dev-breakout"
 				(path "/da5a1e6a-2605-436b-a30c-1027586d5c0a"
-					(reference "RN103")
+					(reference "R103")
 					(unit 1)
 				)
 			)
@@ -8107,7 +7658,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "6e324398-9551-492e-9f60-45647b09b022")
-		(property "Reference" "#PWR0127"
+		(property "Reference" "#PWR0118"
 			(at 97.79 190.5 0)
 			(effects
 				(font
@@ -8157,7 +7708,7 @@
 		(instances
 			(project "hw-dev-breakout"
 				(path "/da5a1e6a-2605-436b-a30c-1027586d5c0a"
-					(reference "#PWR0127")
+					(reference "#PWR0118")
 					(unit 1)
 				)
 			)
@@ -8328,7 +7879,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "7aff8bda-2327-4e90-80d4-84636a7c4153")
-		(property "Reference" "#PWR0110"
+		(property "Reference" "#PWR0114"
 			(at 66.04 43.18 0)
 			(effects
 				(font
@@ -8378,72 +7929,7 @@
 		(instances
 			(project "STM_Nucleo64_Morpho"
 				(path "/da5a1e6a-2605-436b-a30c-1027586d5c0a"
-					(reference "#PWR0110")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:+BATT")
-		(at 15.24 60.96 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "7d7494f0-6468-4ceb-bb95-42a51be8c430")
-		(property "Reference" "#PWR0103"
-			(at 15.24 64.77 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "+BATT"
-			(at 15.24 56.896 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 15.24 60.96 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 15.24 60.96 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"+BATT\""
-			(at 15.24 60.96 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "3b0fd1de-10ad-4719-81ce-9e128073ae42")
-		)
-		(instances
-			(project "STM_Nucleo64_Morpho"
-				(path "/da5a1e6a-2605-436b-a30c-1027586d5c0a"
-					(reference "#PWR0103")
+					(reference "#PWR0114")
 					(unit 1)
 				)
 			)
@@ -8459,7 +7945,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "7fef7b90-0920-4c9b-ac61-e6f9c6aa3d1b")
-		(property "Reference" "#PWR0116"
+		(property "Reference" "#PWR0124"
 			(at 166.37 31.75 0)
 			(effects
 				(font
@@ -8509,7 +7995,7 @@
 		(instances
 			(project "hw-dev-breakout"
 				(path "/da5a1e6a-2605-436b-a30c-1027586d5c0a"
-					(reference "#PWR0116")
+					(reference "#PWR0124")
 					(unit 1)
 				)
 			)
@@ -8525,7 +8011,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "7ff47b04-1b1e-488b-9eab-65eb389df8d1")
-		(property "Reference" "#PWR0123"
+		(property "Reference" "#PWR0108"
 			(at 53.34 167.64 0)
 			(effects
 				(font
@@ -8575,7 +8061,7 @@
 		(instances
 			(project ""
 				(path "/da5a1e6a-2605-436b-a30c-1027586d5c0a"
-					(reference "#PWR0123")
+					(reference "#PWR0108")
 					(unit 1)
 				)
 			)
@@ -8590,7 +8076,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "89037468-f71d-4947-84a1-c3ed4c2202b7")
-		(property "Reference" "#PWR0115"
+		(property "Reference" "#PWR0123"
 			(at 157.48 45.72 0)
 			(effects
 				(font
@@ -8640,7 +8126,7 @@
 		(instances
 			(project "hw-dev-breakout"
 				(path "/da5a1e6a-2605-436b-a30c-1027586d5c0a"
-					(reference "#PWR0115")
+					(reference "#PWR0123")
 					(unit 1)
 				)
 			)
@@ -8656,7 +8142,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "94c17886-62fb-4f0a-a71e-a7b4d2fa1fc7")
-		(property "Reference" "#PWR0128"
+		(property "Reference" "#PWR0120"
 			(at 111.76 190.5 0)
 			(effects
 				(font
@@ -8706,7 +8192,7 @@
 		(instances
 			(project "hw-dev-breakout"
 				(path "/da5a1e6a-2605-436b-a30c-1027586d5c0a"
-					(reference "#PWR0128")
+					(reference "#PWR0120")
 					(unit 1)
 				)
 			)
@@ -8722,7 +8208,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "adb115b5-e74a-409e-8280-65577db89754")
-		(property "Reference" "RN102"
+		(property "Reference" "R102"
 			(at 55.88 167.6399 0)
 			(effects
 				(font
@@ -8776,7 +8262,7 @@
 		(instances
 			(project "hw-dev-breakout"
 				(path "/da5a1e6a-2605-436b-a30c-1027586d5c0a"
-					(reference "RN102")
+					(reference "R102")
 					(unit 1)
 				)
 			)
@@ -8791,7 +8277,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "ae243cc7-23c0-43ad-80cf-c4b69c7bc577")
-		(property "Reference" "#PWR0112"
+		(property "Reference" "#PWR0119"
 			(at 106.68 45.72 0)
 			(effects
 				(font
@@ -8841,7 +8327,7 @@
 		(instances
 			(project ""
 				(path "/da5a1e6a-2605-436b-a30c-1027586d5c0a"
-					(reference "#PWR0112")
+					(reference "#PWR0119")
 					(unit 1)
 				)
 			)
@@ -8922,7 +8408,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "b944b889-78cf-4854-adb9-552a55d7dce9")
-		(property "Reference" "#PWR0120"
+		(property "Reference" "#PWR0128"
 			(at 217.17 71.12 0)
 			(effects
 				(font
@@ -8972,7 +8458,7 @@
 		(instances
 			(project "hw-dev-breakout"
 				(path "/da5a1e6a-2605-436b-a30c-1027586d5c0a"
-					(reference "#PWR0120")
+					(reference "#PWR0128")
 					(unit 1)
 				)
 			)
@@ -9059,7 +8545,7 @@
 		(fields_autoplaced yes)
 		(uuid "bf6b0c2d-037f-4981-aa4a-4f932f9c8169")
 		(property "Reference" "J102"
-			(at 41.91 79.375 0)
+			(at 41.91 80.01 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9067,7 +8553,7 @@
 			)
 		)
 		(property "Value" "CN10"
-			(at 41.91 81.915 0)
+			(at 41.91 82.55 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9389,7 +8875,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "d4a815ab-60de-4fc0-94ae-a4157f4961b1")
-		(property "Reference" "#PWR0113"
+		(property "Reference" "#PWR0121"
 			(at 115.57 31.75 0)
 			(effects
 				(font
@@ -9439,7 +8925,7 @@
 		(instances
 			(project ""
 				(path "/da5a1e6a-2605-436b-a30c-1027586d5c0a"
-					(reference "#PWR0113")
+					(reference "#PWR0121")
 					(unit 1)
 				)
 			)
@@ -9455,7 +8941,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "d634525b-f4fb-423b-8ba2-5bf8997248ad")
-		(property "Reference" "#PWR0117"
+		(property "Reference" "#PWR0125"
 			(at 166.37 71.12 0)
 			(effects
 				(font
@@ -9505,7 +8991,7 @@
 		(instances
 			(project "hw-dev-breakout"
 				(path "/da5a1e6a-2605-436b-a30c-1027586d5c0a"
-					(reference "#PWR0117")
+					(reference "#PWR0125")
 					(unit 1)
 				)
 			)
@@ -9521,7 +9007,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "dd367ab3-b759-48b8-8338-6477818906f2")
-		(property "Reference" "RN106"
+		(property "Reference" "R106"
 			(at 114.3 168.9099 0)
 			(effects
 				(font
@@ -9575,7 +9061,7 @@
 		(instances
 			(project "hw-dev-breakout"
 				(path "/da5a1e6a-2605-436b-a30c-1027586d5c0a"
-					(reference "RN106")
+					(reference "R106")
 					(unit 1)
 				)
 			)
@@ -9793,7 +9279,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "f05b2dff-f079-4076-84d0-eebb2cb01af8")
-		(property "Reference" "RN104"
+		(property "Reference" "R104"
 			(at 86.36 168.9099 0)
 			(effects
 				(font
@@ -9847,24 +9333,42 @@
 		(instances
 			(project "hw-dev-breakout"
 				(path "/da5a1e6a-2605-436b-a30c-1027586d5c0a"
-					(reference "RN104")
+					(reference "R104")
 					(unit 1)
 				)
 			)
 		)
 	)
 	(symbol
-		(lib_id "power:GNDA")
-		(at 64.77 125.73 0)
+		(lib_id "Switch:SW_Push")
+		(at 86.36 27.94 90)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "f1c3e542-9c82-4644-b59b-3b6c159d854a")
-		(property "Reference" "#PWR0109"
-			(at 64.77 132.08 0)
+		(uuid "f427a4f7-3269-42fc-94b0-9d13bba8f2d5")
+		(property "Reference" "SW101"
+			(at 87.63 26.6699 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Value" "SW_Push"
+			(at 87.63 29.2099 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Footprint" "Button_Switch_THT:SW_PUSH_6mm_H8mm"
+			(at 81.28 27.94 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9872,16 +9376,8 @@
 				(hide yes)
 			)
 		)
-		(property "Value" "GNDA"
-			(at 64.77 130.175 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 64.77 125.73 0)
+		(property "Datasheet" "~"
+			(at 81.28 27.94 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9889,17 +9385,8 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" ""
-			(at 64.77 125.73 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"GNDA\" , analog ground"
-			(at 64.77 125.73 0)
+		(property "Description" "Push button switch, generic, two pins"
+			(at 86.36 27.94 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9908,12 +9395,15 @@
 			)
 		)
 		(pin "1"
-			(uuid "66d7dff3-9caa-4a35-a1d9-8df957210a26")
+			(uuid "1a262081-47c4-4767-ae38-808535323545")
+		)
+		(pin "2"
+			(uuid "e2f7996c-8a03-467d-bfc8-ed88b30ba14d")
 		)
 		(instances
-			(project "STM_Nucleo64_Morpho"
+			(project ""
 				(path "/da5a1e6a-2605-436b-a30c-1027586d5c0a"
-					(reference "#PWR0109")
+					(reference "SW101")
 					(unit 1)
 				)
 			)
@@ -9929,7 +9419,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "f62c2be1-477d-472e-852d-28bdb9ed558c")
-		(property "Reference" "#PWR0126"
+		(property "Reference" "#PWR0115"
 			(at 69.85 190.5 0)
 			(effects
 				(font
@@ -9979,7 +9469,7 @@
 		(instances
 			(project "hw-dev-breakout"
 				(path "/da5a1e6a-2605-436b-a30c-1027586d5c0a"
-					(reference "#PWR0126")
+					(reference "#PWR0115")
 					(unit 1)
 				)
 			)
