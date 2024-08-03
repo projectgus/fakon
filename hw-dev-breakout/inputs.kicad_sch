@@ -6743,7 +6743,7 @@
 		(uuid "386a3b66-5817-4e92-9369-0d8869a0335c")
 	)
 	(label "IN8"
-		(at 82.55 177.8 0)
+		(at 82.55 172.72 0)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -7194,7 +7194,7 @@
 		(uuid "b07559c1-0e40-4fe7-bc08-901a0e4605c8")
 	)
 	(label "IN7"
-		(at 82.55 172.72 0)
+		(at 82.55 177.8 0)
 		(fields_autoplaced yes)
 		(effects
 			(font
