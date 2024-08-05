@@ -8841,7 +8841,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Package_TO_SOT_SMD:TO-252-3_TabPin2"
+		(property "Footprint" "Package_TO_SOT_SMD:TO-252-2"
 			(at 184.15 30.48 0)
 			(effects
 				(font
@@ -8914,7 +8914,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Package_TO_SOT_SMD:TO-252-3_TabPin2"
+		(property "Footprint" "Package_TO_SOT_SMD:TO-252-2"
 			(at 184.15 59.69 0)
 			(effects
 				(font
@@ -10479,7 +10479,7 @@
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(uuid "8bad1064-6873-4a0d-9f3e-5e4f1901f5f7")
 		(property "Reference" "J302"
 			(at 273.05 154.178 0)
@@ -11214,13 +11214,13 @@
 	)
 	(symbol
 		(lib_id "hw-dev-breakout:Q_PMOS_HL_4485")
-		(at 234.95 113.03 90)
+		(at 234.95 113.03 270)
+		(mirror x)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(fields_autoplaced yes)
 		(uuid "a6f64205-7a28-4d0b-8331-644b5b0fbf09")
 		(property "Reference" "Q311"
 			(at 234.95 104.14 90)
@@ -11239,7 +11239,7 @@
 			)
 		)
 		(property "Footprint" "Package_SO:SOP-8_3.9x4.9mm_P1.27mm"
-			(at 247.904 109.982 0)
+			(at 221.996 109.982 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -11248,7 +11248,7 @@
 			)
 		)
 		(property "Datasheet" "https://www.lcsc.com/datasheet/lcsc_datasheet_2310251707_HL-4485_C7499854.pdf"
-			(at 250.19 112.014 0)
+			(at 219.71 112.014 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -11257,7 +11257,7 @@
 			)
 		)
 		(property "Description" "High cell density trenched P-ch MOSFET"
-			(at 248.666 111.76 0)
+			(at 221.234 111.76 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12486,7 +12486,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "hw-dev-breakout:CONN-TH_250-220"
+		(property "Footprint" "hw-dev-breakout:WAGO 250-22"
 			(at 275.59 52.07 0)
 			(effects
 				(font

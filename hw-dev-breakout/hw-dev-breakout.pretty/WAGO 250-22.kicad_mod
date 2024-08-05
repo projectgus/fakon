@@ -1,4 +1,4 @@
-(footprint "CONN-TH_250-220"
+(footprint "WAGO 250-22"
 	(version 20240108)
 	(generator "pcbnew")
 	(generator_version "8.0")
@@ -3473,7 +3473,7 @@
 		(remove_unused_layers no)
 		(uuid "d75cdca7-fff6-4b70-93ba-ffb206152956")
 	)
-	(model "${KIPRJMOD}/kicad_lceda.3dshapes/CONN-TH_250-220.step"
+	(model "${KIPRJMOD}/hw-dev-breakout.3dshapes/WAGO-250-220.wrl"
 		(offset
 			(xyz -1 -1.185 -4)
 		)
