@@ -5105,6 +5105,17 @@
 		)
 		(uuid "359088e0-3a57-4bc3-a004-dc876af18e2e")
 	)
+	(text "Note: Selected non-FD speed rated CAN transceivers for ease of JLC assembly,\nbut these are pin compatible with TCAN332G (which can do 5Mbps) if needed."
+		(exclude_from_sim no)
+		(at 93.98 74.676 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "5796800d-bce8-47e1-914e-09749372af94")
+	)
 	(text "PC4*"
 		(exclude_from_sim no)
 		(at 30.48 129.54 0)
@@ -6727,7 +6738,7 @@
 				(justify right)
 			)
 		)
-		(property "Value" "GREEN"
+		(property "Value" "LED_GREEN"
 			(at 73.66 181.9274 90)
 			(effects
 				(font
@@ -6736,7 +6747,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "LED_SMD:LED_0603_1608Metric"
+		(property "Footprint" "LED_SMD:LED_0805_2012Metric"
 			(at 69.85 179.07 0)
 			(effects
 				(font
@@ -6755,6 +6766,24 @@
 			)
 		)
 		(property "Description" "Light emitting diode"
+			(at 69.85 179.07 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" "C2297"
+			(at 69.85 179.07 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 69.85 179.07 0)
 			(effects
 				(font
@@ -6862,7 +6891,7 @@
 				(justify right)
 			)
 		)
-		(property "Value" "GREEN"
+		(property "Value" "LED_GREEN"
 			(at 87.63 181.9274 90)
 			(effects
 				(font
@@ -6871,7 +6900,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "LED_SMD:LED_0603_1608Metric"
+		(property "Footprint" "LED_SMD:LED_0805_2012Metric"
 			(at 83.82 179.07 0)
 			(effects
 				(font
@@ -6890,6 +6919,24 @@
 			)
 		)
 		(property "Description" "Light emitting diode"
+			(at 83.82 179.07 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" "C2297"
+			(at 83.82 179.07 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 83.82 179.07 0)
 			(effects
 				(font
@@ -6958,6 +7005,24 @@
 			)
 		)
 		(property "Description" "Generic connector, double row, 02x19, odd/even pin numbering scheme (row 1 odd numbers, row 2 even numbers), script generated (kicad-library-utils/schlib/autogen/connector/)"
+			(at 40.64 45.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" "C18905898"
+			(at 40.64 45.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 40.64 45.72 0)
 			(effects
 				(font
@@ -7209,6 +7274,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C23138"
+			(at 97.79 170.18 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 97.79 170.18 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "2"
 			(uuid "2c376f21-1e13-458b-a3ec-07e115718f65")
 		)
@@ -7271,6 +7354,24 @@
 			)
 		)
 		(property "Description" "Resistor"
+			(at 34.29 168.91 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" "C23138"
+			(at 34.29 168.91 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 34.29 168.91 0)
 			(effects
 				(font
@@ -7612,6 +7713,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C14663"
+			(at 106.68 34.29 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 106.68 34.29 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "1"
 			(uuid "422195cb-b7d5-454e-afcd-0a11309beaa9")
 		)
@@ -7880,6 +7999,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C1848"
+			(at 214.63 101.6 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 214.63 101.6 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "1"
 			(uuid "f7c035ab-8ddd-495f-91b3-230ea2d05a5b")
 		)
@@ -7950,6 +8087,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C1848"
+			(at 185.42 148.59 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 185.42 148.59 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "1"
 			(uuid "dc5dcd07-af2c-48de-b3c3-3b4947769054")
 		)
@@ -7984,7 +8139,7 @@
 				(justify right)
 			)
 		)
-		(property "Value" "RED"
+		(property "Value" "LED_RED"
 			(at 38.1 180.6574 90)
 			(effects
 				(font
@@ -8012,6 +8167,24 @@
 			)
 		)
 		(property "Description" "Light emitting diode"
+			(at 34.29 177.8 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" "C2286"
+			(at 34.29 177.8 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 34.29 177.8 0)
 			(effects
 				(font
@@ -8054,7 +8227,7 @@
 				(justify right)
 			)
 		)
-		(property "Value" "GREEN"
+		(property "Value" "LED_GREEN"
 			(at 115.57 181.9274 90)
 			(effects
 				(font
@@ -8063,7 +8236,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "LED_SMD:LED_0603_1608Metric"
+		(property "Footprint" "LED_SMD:LED_0805_2012Metric"
 			(at 111.76 179.07 0)
 			(effects
 				(font
@@ -8082,6 +8255,24 @@
 			)
 		)
 		(property "Description" "Light emitting diode"
+			(at 111.76 179.07 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" "C2297"
+			(at 111.76 179.07 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 111.76 179.07 0)
 			(effects
 				(font
@@ -8152,6 +8343,24 @@
 			)
 		)
 		(property "Description" "Positive 1.5A 35V Linear Regulator, Fixed Output 5V, TO-220/TO-263/TO-252"
+			(at 233.68 95.25 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" "C58069"
+			(at 233.68 95.25 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 233.68 95.25 0)
 			(effects
 				(font
@@ -8363,6 +8572,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C182308"
+			(at 257.81 95.25 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 257.81 95.25 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "2"
 			(uuid "4269d264-1853-42cf-b583-f696f29e6945")
 		)
@@ -8425,6 +8652,24 @@
 			)
 		)
 		(property "Description" "Unpolarized capacitor"
+			(at 208.28 34.29 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" "C14663"
+			(at 208.28 34.29 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 208.28 34.29 0)
 			(effects
 				(font
@@ -8797,7 +9042,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "TCAN332"
+		(property "Value" "SN65HVD232DR"
 			(at 117.7641 41.91 0)
 			(effects
 				(font
@@ -8826,6 +9071,24 @@
 			)
 		)
 		(property "Description" "High-Speed CAN Transceiver, 1Mbps, 3.3V supply, SOT-23-8/SOIC-8"
+			(at 115.57 52.07 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" "C30530"
+			(at 115.57 52.07 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 115.57 52.07 0)
 			(effects
 				(font
@@ -8914,6 +9177,24 @@
 			)
 		)
 		(property "Description" "Resistor"
+			(at 69.85 170.18 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" "C23138"
+			(at 69.85 170.18 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 69.85 170.18 0)
 			(effects
 				(font
@@ -9022,7 +9303,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "TCAN332"
+		(property "Value" "SN65HVD232DR"
 			(at 168.5641 41.91 0)
 			(effects
 				(font
@@ -9051,6 +9332,24 @@
 			)
 		)
 		(property "Description" "High-Speed CAN Transceiver, 1Mbps, 3.3V supply, SOT-23-8/SOIC-8"
+			(at 166.37 52.07 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" "C30530"
+			(at 166.37 52.07 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 166.37 52.07 0)
 			(effects
 				(font
@@ -9206,6 +9505,24 @@
 			)
 		)
 		(property "Description" "Unpolarized capacitor"
+			(at 245.11 102.87 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" "C1848"
+			(at 245.11 102.87 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 245.11 102.87 0)
 			(effects
 				(font
@@ -9678,6 +9995,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C25804"
+			(at 53.34 168.91 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 53.34 168.91 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "2"
 			(uuid "c0344515-dabd-4177-8cd6-5d016d2032b5")
 		)
@@ -9974,7 +10309,7 @@
 				(justify right)
 			)
 		)
-		(property "Value" "GREEN"
+		(property "Value" "LED_GREEN"
 			(at 101.6 181.9274 90)
 			(effects
 				(font
@@ -9983,7 +10318,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "LED_SMD:LED_0603_1608Metric"
+		(property "Footprint" "LED_SMD:LED_0805_2012Metric"
 			(at 97.79 179.07 0)
 			(effects
 				(font
@@ -10002,6 +10337,24 @@
 			)
 		)
 		(property "Description" "Light emitting diode"
+			(at 97.79 179.07 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" "C2297"
+			(at 97.79 179.07 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 97.79 179.07 0)
 			(effects
 				(font
@@ -10070,6 +10423,24 @@
 			)
 		)
 		(property "Description" "Generic connector, double row, 02x19, odd/even pin numbering scheme (row 1 odd numbers, row 2 even numbers), script generated (kicad-library-utils/schlib/autogen/connector/)"
+			(at 40.64 109.22 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" "C18905898"
+			(at 40.64 109.22 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 40.64 109.22 0)
 			(effects
 				(font
@@ -10274,7 +10645,7 @@
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(fields_autoplaced yes)
 		(uuid "c91ded2d-a238-4a71-b40e-5446ee31dc4c")
 		(property "Reference" "TP101"
@@ -10322,6 +10693,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" ""
+			(at 134.62 170.18 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 134.62 170.18 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "1"
 			(uuid "4cc7e48c-196c-41ce-8515-6ea1782b1dc0")
 		)
@@ -10353,7 +10742,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "TCAN332"
+		(property "Value" "SN65HVD232DR"
 			(at 219.3641 41.91 0)
 			(effects
 				(font
@@ -10382,6 +10771,24 @@
 			)
 		)
 		(property "Description" "High-Speed CAN Transceiver, 1Mbps, 3.3V supply, SOT-23-8/SOIC-8"
+			(at 217.17 52.07 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" "C30530"
+			(at 217.17 52.07 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 217.17 52.07 0)
 			(effects
 				(font
@@ -10742,6 +11149,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C23138"
+			(at 111.76 170.18 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 111.76 170.18 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "2"
 			(uuid "f63d204d-bb49-474f-a5f3-b2136a5f8777")
 		)
@@ -10812,6 +11237,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C1848"
+			(at 204.47 148.59 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 204.47 148.59 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "1"
 			(uuid "8542e1ca-1c65-49ee-9aee-1f555435a4e6")
 		)
@@ -10846,7 +11289,7 @@
 				(justify right)
 			)
 		)
-		(property "Value" "RED"
+		(property "Value" "LED_RED"
 			(at 57.15 180.6574 90)
 			(effects
 				(font
@@ -10874,6 +11317,24 @@
 			)
 		)
 		(property "Description" "Light emitting diode"
+			(at 53.34 177.8 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" "C2286"
+			(at 53.34 177.8 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 53.34 177.8 0)
 			(effects
 				(font
@@ -11084,6 +11545,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C23138"
+			(at 83.82 170.18 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 83.82 170.18 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "2"
 			(uuid "23e4c13a-b003-4906-8bc8-681aaf43124f")
 		)
@@ -11154,6 +11633,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C2889015"
+			(at 86.36 27.94 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 86.36 27.94 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "1"
 			(uuid "1a262081-47c4-4767-ae38-808535323545")
 		)
@@ -11176,7 +11673,7 @@
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(fields_autoplaced yes)
 		(uuid "f4fab96c-bbed-462f-af11-c43b149e441c")
 		(property "Reference" "TP102"
@@ -11216,6 +11713,24 @@
 			)
 		)
 		(property "Description" "test point"
+			(at 149.86 170.18 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" ""
+			(at 149.86 170.18 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 149.86 170.18 0)
 			(effects
 				(font
@@ -11423,6 +11938,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C14663"
+			(at 157.48 34.29 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 157.48 34.29 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "1"
 			(uuid "fcedd51e-6d84-418e-b135-46a4ff9672ea")
 		)
@@ -11485,6 +12018,24 @@
 			)
 		)
 		(property "Description" "Unpolarized capacitor"
+			(at 222.25 148.59 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" "C1848"
+			(at 222.25 148.59 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 222.25 148.59 0)
 			(effects
 				(font

@@ -28,3 +28,6 @@ fp-info-cache
 # Exported BOM files
 *.xml
 *.csv
+
+# JLC Fab Toolkit Plugin's output directory
+production/

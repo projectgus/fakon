@@ -7198,6 +7198,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C23138"
+			(at 154.94 38.1 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 154.94 38.1 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "2"
 			(uuid "c7e09a73-c2c7-49c6-a480-1aa07f1cc98a")
 		)
@@ -7260,6 +7278,24 @@
 			)
 		)
 		(property "Description" "Schottky diode"
+			(at 196.85 62.23 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" "C22452"
+			(at 196.85 62.23 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 196.85 62.23 0)
 			(effects
 				(font
@@ -7338,6 +7374,33 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C4747969"
+			(at 220.98 83.82 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "'JLCPCB Rotation Offset" "-180"
+			(at 220.98 83.82 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 220.98 83.82 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "2"
 			(uuid "2027809e-f777-4c7a-b536-753437029295")
 		)
@@ -7398,6 +7461,24 @@
 			)
 		)
 		(property "Description" "Resettable fuse, polymeric positive temperature coefficient"
+			(at 248.92 77.47 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" "C262045"
+			(at 248.92 77.47 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 248.92 77.47 0)
 			(effects
 				(font
@@ -7542,6 +7623,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C8545"
+			(at 100.33 165.1 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 100.33 165.1 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "2"
 			(uuid "a4532445-acc8-4364-a952-7e913af82f04")
 		)
@@ -7579,7 +7678,7 @@
 				(justify right)
 			)
 		)
-		(property "Value" "ORANGE"
+		(property "Value" "LED_YELLOW"
 			(at 190.5 152.7174 90)
 			(effects
 				(font
@@ -7607,6 +7706,24 @@
 			)
 		)
 		(property "Description" "Light emitting diode"
+			(at 194.31 149.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" "C72038"
+			(at 194.31 149.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 194.31 149.86 0)
 			(effects
 				(font
@@ -7749,6 +7866,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C23140"
+			(at 34.29 106.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 34.29 106.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "1"
 			(uuid "f95bd513-dc14-4979-846a-7e320c600655")
 		)
@@ -7772,7 +7907,7 @@
 		(exclude_from_sim yes)
 		(in_bom no)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(uuid "11650903-5086-401b-bf2e-e0c526d0e966")
 		(property "Reference" "JP306"
 			(at 104.14 92.7099 90)
@@ -7811,6 +7946,24 @@
 			)
 		)
 		(property "Description" "Solder Jumper, 2-pole, open"
+			(at 106.68 93.98 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" ""
+			(at 106.68 93.98 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 106.68 93.98 0)
 			(effects
 				(font
@@ -7954,6 +8107,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C23140"
+			(at 88.9 165.1 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 88.9 165.1 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "1"
 			(uuid "ee92d277-93ec-4ac4-8e61-2874dd8d069c")
 		)
@@ -8081,6 +8252,24 @@
 			)
 		)
 		(property "Description" "Resistor"
+			(at 86.36 60.96 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" "C25804"
+			(at 86.36 60.96 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 86.36 60.96 0)
 			(effects
 				(font
@@ -8223,6 +8412,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C23140"
+			(at 34.29 163.83 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 34.29 163.83 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "1"
 			(uuid "ca041118-12f2-460f-89da-ad3e50e4dbde")
 		)
@@ -8323,7 +8530,7 @@
 				(justify right)
 			)
 		)
-		(property "Value" "ORANGE"
+		(property "Value" "LED_YELLOW"
 			(at 151.13 49.8474 90)
 			(effects
 				(font
@@ -8359,6 +8566,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C72038"
+			(at 154.94 46.99 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 154.94 46.99 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "1"
 			(uuid "e22945fd-6b91-4614-9150-07a6b9927563")
 		)
@@ -8384,15 +8609,15 @@
 		(dnp no)
 		(uuid "2b321d4f-9f31-4e51-bea7-1bad9caa481d")
 		(property "Reference" "F301"
-			(at 248.92 68.58 90)
+			(at 248.92 67.818 90)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 			)
 		)
-		(property "Value" "12H1100C 1A"
-			(at 248.92 71.12 90)
+		(property "Value" "12H1100C  (1A)"
+			(at 248.92 70.104 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8418,6 +8643,24 @@
 			)
 		)
 		(property "Description" "Fuse"
+			(at 248.92 72.39 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" "C182308"
+			(at 248.92 72.39 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 248.92 72.39 0)
 			(effects
 				(font
@@ -8554,6 +8797,24 @@
 			)
 		)
 		(property "Description" "N-MOSFET transistor, gate/source/drain"
+			(at 104.14 107.95 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" "C8545"
+			(at 104.14 107.95 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 104.14 107.95 0)
 			(effects
 				(font
@@ -8701,6 +8962,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C8545"
+			(at 45.72 163.83 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 45.72 163.83 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "2"
 			(uuid "5dfc8f0c-4803-40e6-8843-cee78f3e21ab")
 		)
@@ -8738,7 +9017,7 @@
 				(justify right)
 			)
 		)
-		(property "Value" "ORANGE"
+		(property "Value" "LED_YELLOW"
 			(at 152.4 79.0574 90)
 			(effects
 				(font
@@ -8766,6 +9045,24 @@
 			)
 		)
 		(property "Description" "Light emitting diode"
+			(at 156.21 76.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" "C72038"
+			(at 156.21 76.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 156.21 76.2 0)
 			(effects
 				(font
@@ -8844,6 +9141,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C23138"
+			(at 156.21 67.31 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 156.21 67.31 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "1"
 			(uuid "5df7227b-8719-4f5c-be35-8ac7ca5f2c0c")
 		)
@@ -8878,7 +9193,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "HL 20N04"
+		(property "Value" "HD60N03"
 			(at 185.42 34.2899 0)
 			(effects
 				(font
@@ -8906,6 +9221,24 @@
 			)
 		)
 		(property "Description" "N-MOSFET transistor, gate/drain/source"
+			(at 179.07 33.02 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" "C216259"
+			(at 179.07 33.02 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" "NTD5867NL"
 			(at 179.07 33.02 0)
 			(effects
 				(font
@@ -8951,7 +9284,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "HL 20N04"
+		(property "Value" "HD60N03"
 			(at 185.42 63.4999 0)
 			(effects
 				(font
@@ -8979,6 +9312,24 @@
 			)
 		)
 		(property "Description" "N-MOSFET transistor, gate/drain/source"
+			(at 179.07 62.23 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" "C216259"
+			(at 179.07 62.23 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" "NTD5867NL"
 			(at 179.07 62.23 0)
 			(effects
 				(font
@@ -9127,6 +9478,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C8545"
+			(at 154.94 165.1 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 154.94 165.1 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "2"
 			(uuid "98b70bc6-85cf-4167-b370-d8eb7fc1dc54")
 		)
@@ -9192,6 +9561,24 @@
 			)
 		)
 		(property "Description" "Schottky diode"
+			(at 243.84 119.38 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" "C22452"
+			(at 243.84 119.38 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 243.84 119.38 0)
 			(effects
 				(font
@@ -9270,6 +9657,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C25804"
+			(at 86.36 114.3 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 86.36 114.3 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "1"
 			(uuid "1c3c4150-85b0-475c-bb3e-1b5694f74992")
 		)
@@ -9338,6 +9743,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C175280"
+			(at 116.84 44.45 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 116.84 44.45 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "1"
 			(uuid "775a794e-161f-45b7-b641-015762e2ece6")
 		)
@@ -9398,6 +9821,24 @@
 			)
 		)
 		(property "Description" "Resistor"
+			(at 167.64 154.94 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" "C175280"
+			(at 167.64 154.94 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 167.64 154.94 0)
 			(effects
 				(font
@@ -9540,6 +9981,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C23140"
+			(at 143.51 165.1 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 143.51 165.1 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "1"
 			(uuid "4a5a42e5-c317-4bb4-9643-371901868cd9")
 		)
@@ -9602,6 +10061,24 @@
 			)
 		)
 		(property "Description" "Resistor"
+			(at 194.31 140.97 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" "C23138"
+			(at 194.31 140.97 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 194.31 140.97 0)
 			(effects
 				(font
@@ -9680,6 +10157,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C21190"
+			(at 218.44 116.84 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 218.44 116.84 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "1"
 			(uuid "4e2760c8-5900-436c-bba0-e9a7d82329a5")
 		)
@@ -9742,6 +10237,24 @@
 			)
 		)
 		(property "Description" "Resistor"
+			(at 157.48 140.97 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" "C21190"
+			(at 157.48 140.97 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 157.48 140.97 0)
 			(effects
 				(font
@@ -9820,6 +10333,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C8545"
+			(at 45.72 106.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 45.72 106.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "2"
 			(uuid "7d1ab87e-711b-47fe-82f6-0479f9a19c37")
 		)
@@ -9846,7 +10377,7 @@
 		(exclude_from_sim yes)
 		(in_bom no)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(uuid "62312ec6-7a92-4d96-82fc-e4502297f372")
 		(property "Reference" "JP304"
 			(at 100.33 149.8599 90)
@@ -9885,6 +10416,24 @@
 			)
 		)
 		(property "Description" "Solder Jumper, 2-pole, open"
+			(at 102.87 151.13 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" ""
+			(at 102.87 151.13 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 102.87 151.13 0)
 			(effects
 				(font
@@ -9953,6 +10502,24 @@
 			)
 		)
 		(property "Description" "Resistor"
+			(at 92.71 107.95 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" "C23140"
+			(at 92.71 107.95 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 92.71 107.95 0)
 			(effects
 				(font
@@ -10087,6 +10654,24 @@
 			)
 		)
 		(property "Description" "Resistor"
+			(at 113.03 154.94 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" "C175280"
+			(at 113.03 154.94 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 113.03 154.94 0)
 			(effects
 				(font
@@ -10297,6 +10882,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C25804"
+			(at 137.16 171.45 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 137.16 171.45 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "1"
 			(uuid "295e9d58-ef91-4a78-a9bd-ec0cd6af2086")
 		)
@@ -10320,7 +10923,7 @@
 		(exclude_from_sim yes)
 		(in_bom no)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(uuid "7b4bdf66-e1ac-455a-810a-e6a635c67f69")
 		(property "Reference" "JP302"
 			(at 45.72 91.4399 90)
@@ -10359,6 +10962,24 @@
 			)
 		)
 		(property "Description" "Solder Jumper, 2-pole, open"
+			(at 48.26 92.71 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" ""
+			(at 48.26 92.71 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 48.26 92.71 0)
 			(effects
 				(font
@@ -10435,6 +11056,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C7499854"
+			(at 237.49 80.01 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 237.49 80.01 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "7"
 			(uuid "8e509743-3f2d-4f31-a227-f722a2a64af5")
 		)
@@ -10476,7 +11115,7 @@
 		(exclude_from_sim yes)
 		(in_bom no)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(uuid "81283904-0bf9-475c-a20c-f6ca21b94905")
 		(property "Reference" "JP307"
 			(at 154.94 149.8599 90)
@@ -10515,6 +11154,24 @@
 			)
 		)
 		(property "Description" "Solder Jumper, 2-pole, open"
+			(at 157.48 151.13 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" ""
+			(at 157.48 151.13 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 157.48 151.13 0)
 			(effects
 				(font
@@ -10658,6 +11315,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" ""
+			(at 275.59 125.73 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 275.59 125.73 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "20"
 			(uuid "d4e75ebf-1431-4d39-8f67-8034d7beab50")
 		)
@@ -10780,6 +11455,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C23140"
+			(at 204.47 135.89 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 204.47 135.89 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "1"
 			(uuid "65141dce-e4cd-48a3-846a-c34a774418c5")
 		)
@@ -10840,6 +11533,24 @@
 			)
 		)
 		(property "Description" "Resistor"
+			(at 92.71 54.61 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" "C23140"
+			(at 92.71 54.61 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 92.71 54.61 0)
 			(effects
 				(font
@@ -10910,6 +11621,24 @@
 			)
 		)
 		(property "Description" "Resistor"
+			(at 161.29 38.1 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" "C25804"
+			(at 161.29 38.1 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 161.29 38.1 0)
 			(effects
 				(font
@@ -11055,6 +11784,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C21190"
+			(at 48.26 82.55 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 48.26 82.55 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "1"
 			(uuid "528e323d-8225-423e-9ed6-ac85b88dc477")
 		)
@@ -11191,6 +11938,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C21190"
+			(at 48.26 139.7 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 48.26 139.7 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "1"
 			(uuid "3d6c8860-2479-438f-93ee-b1b2b33942ea")
 		)
@@ -11253,6 +12018,24 @@
 			)
 		)
 		(property "Description" "Resistor"
+			(at 27.94 113.03 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" "C25804"
+			(at 27.94 113.03 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 27.94 113.03 0)
 			(effects
 				(font
@@ -11329,6 +12112,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C23140"
+			(at 167.64 33.02 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 167.64 33.02 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "1"
 			(uuid "0aa4274d-2f93-440c-a783-d239423ced0f")
 		)
@@ -11390,6 +12191,24 @@
 		)
 		(property "Description" "High cell density trenched P-ch MOSFET"
 			(at 221.234 111.76 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" "C7499854"
+			(at 234.95 113.03 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 234.95 113.03 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -11485,6 +12304,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C25804"
+			(at 82.55 171.45 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 82.55 171.45 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "1"
 			(uuid "ee3c3b24-ea02-4045-8d73-2ae310cb554f")
 		)
@@ -11508,7 +12345,7 @@
 		(exclude_from_sim yes)
 		(in_bom no)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(uuid "ac11ec5c-00fb-4d19-bd7a-cb158a065687")
 		(property "Reference" "JP303"
 			(at 45.72 148.5899 90)
@@ -11547,6 +12384,24 @@
 			)
 		)
 		(property "Description" "Solder Jumper, 2-pole, open"
+			(at 48.26 149.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" ""
+			(at 48.26 149.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 48.26 149.86 0)
 			(effects
 				(font
@@ -11623,6 +12478,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C175280"
+			(at 58.42 153.67 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 58.42 153.67 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "1"
 			(uuid "3f031cc6-d35b-48ac-86e9-4b1e79a3b032")
 		)
@@ -11685,6 +12558,24 @@
 			)
 		)
 		(property "Description" "Resistor"
+			(at 102.87 140.97 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" "C21190"
+			(at 102.87 140.97 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 102.87 140.97 0)
 			(effects
 				(font
@@ -11820,6 +12711,24 @@
 			)
 		)
 		(property "Description" "Resistor"
+			(at 34.29 53.34 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" "C23140"
+			(at 34.29 53.34 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 34.29 53.34 0)
 			(effects
 				(font
@@ -12030,6 +12939,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C8545"
+			(at 104.14 54.61 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 104.14 54.61 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "2"
 			(uuid "717daba3-b45f-42ea-a811-6707e20683e4")
 		)
@@ -12095,6 +13022,24 @@
 			)
 		)
 		(property "Description" "Schottky diode"
+			(at 196.85 33.02 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" "C22452"
+			(at 196.85 33.02 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 196.85 33.02 0)
 			(effects
 				(font
@@ -12258,7 +13203,7 @@
 		(exclude_from_sim yes)
 		(in_bom no)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(uuid "d2d4ad08-cbd3-4b7d-ba6e-421d033211f1")
 		(property "Reference" "JP301"
 			(at 45.72 38.0999 90)
@@ -12297,6 +13242,24 @@
 			)
 		)
 		(property "Description" "Solder Jumper, 2-pole, open"
+			(at 48.26 39.37 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" ""
+			(at 48.26 39.37 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 48.26 39.37 0)
 			(effects
 				(font
@@ -12573,6 +13536,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C8545"
+			(at 45.72 53.34 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 45.72 53.34 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "2"
 			(uuid "b49624aa-88f7-494e-9544-abfeaf7f2253")
 		)
@@ -12637,6 +13618,24 @@
 			)
 		)
 		(property "Description" "Generic screw terminal, single row, 01x20, script generated (kicad-library-utils/schlib/autogen/connector/)"
+			(at 275.59 52.07 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" "C2833599"
+			(at 275.59 52.07 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 275.59 52.07 0)
 			(effects
 				(font
@@ -12769,6 +13768,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C25804"
+			(at 27.94 170.18 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 27.94 170.18 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "1"
 			(uuid "dfd2d3d9-4d81-4613-87f2-6e7d26c2ff2c")
 		)
@@ -12831,6 +13848,24 @@
 			)
 		)
 		(property "Description" "Resistor"
+			(at 106.68 83.82 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" "C21190"
+			(at 106.68 83.82 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 106.68 83.82 0)
 			(effects
 				(font
@@ -12929,7 +13964,7 @@
 		(exclude_from_sim yes)
 		(in_bom no)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(uuid "e7c34673-2880-48e4-bc6f-621eb44686c4")
 		(property "Reference" "JP305"
 			(at 104.14 39.3699 90)
@@ -12968,6 +14003,24 @@
 			)
 		)
 		(property "Description" "Solder Jumper, 2-pole, open"
+			(at 106.68 40.64 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" ""
+			(at 106.68 40.64 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 106.68 40.64 0)
 			(effects
 				(font
@@ -13044,6 +14097,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C175280"
+			(at 116.84 97.79 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 116.84 97.79 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "1"
 			(uuid "0e2affd0-0383-47f7-abdb-b5e1fe358171")
 		)
@@ -13104,6 +14175,24 @@
 			)
 		)
 		(property "Description" "Resistor"
+			(at 167.64 62.23 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" "C23140"
+			(at 167.64 62.23 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 167.64 62.23 0)
 			(effects
 				(font
@@ -13174,6 +14263,24 @@
 			)
 		)
 		(property "Description" "N-MOSFET transistor, gate/source/drain"
+			(at 215.9 135.89 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" "C8545"
+			(at 215.9 135.89 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 215.9 135.89 0)
 			(effects
 				(font
@@ -13321,6 +14428,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C25804"
+			(at 198.12 140.97 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 198.12 140.97 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "2"
 			(uuid "dc325562-c195-4f4f-806a-6ae0b038aa23")
 		)
@@ -13457,6 +14582,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C25804"
+			(at 27.94 59.69 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 27.94 59.69 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "2"
 			(uuid "9f5b6896-fa46-4542-8e7f-247d4962f538")
 		)
@@ -13517,6 +14660,24 @@
 			)
 		)
 		(property "Description" "Resistor"
+			(at 58.42 96.52 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" "C175280"
+			(at 58.42 96.52 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 58.42 96.52 0)
 			(effects
 				(font
@@ -13595,6 +14756,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C21190"
+			(at 106.68 30.48 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 106.68 30.48 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "1"
 			(uuid "1e0eab62-2b6a-42d6-b453-48486309032e")
 		)
@@ -13657,6 +14836,24 @@
 			)
 		)
 		(property "Description" "Resistor"
+			(at 48.26 29.21 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" "C21190"
+			(at 48.26 29.21 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 48.26 29.21 0)
 			(effects
 				(font
@@ -13799,6 +14996,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C175280"
+			(at 58.42 43.18 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 58.42 43.18 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "1"
 			(uuid "8b4ecfe5-3b11-468c-994d-516ad74c4e04")
 		)
@@ -13861,6 +15076,24 @@
 			)
 		)
 		(property "Description" "Resistor"
+			(at 161.29 67.31 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" "C25804"
+			(at 161.29 67.31 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 161.29 67.31 0)
 			(effects
 				(font

@@ -7741,7 +7741,7 @@
 		(exclude_from_sim yes)
 		(in_bom no)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(fields_autoplaced yes)
 		(uuid "03554446-75a6-44b5-b94e-a1fc69373dd1")
 		(property "Reference" "JP205"
@@ -7783,6 +7783,24 @@
 			)
 		)
 		(property "Description" "Solder Jumper, 2-pole, closed/bridged"
+			(at 102.87 76.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" ""
+			(at 102.87 76.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 102.87 76.2 0)
 			(effects
 				(font
@@ -7861,6 +7879,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C21190"
+			(at 71.12 123.19 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 71.12 123.19 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "2"
 			(uuid "918a5b49-a306-41ad-8548-c94a83e2fb67")
 		)
@@ -7923,6 +7959,24 @@
 			)
 		)
 		(property "Description" "Low capacitance ESD diode / steering Diode Array, SOT23-6"
+			(at 105.41 172.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" "C393377"
+			(at 105.41 172.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 105.41 172.72 0)
 			(effects
 				(font
@@ -8005,6 +8059,24 @@
 			)
 		)
 		(property "Description" "Resistor, small symbol"
+			(at 134.62 123.19 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" "C21190"
+			(at 134.62 123.19 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 134.62 123.19 0)
 			(effects
 				(font
@@ -8148,6 +8220,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C21190"
+			(at 134.62 43.18 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 134.62 43.18 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "2"
 			(uuid "3b951762-3853-49f3-ac0d-52a5675bbcf8")
 		)
@@ -8217,6 +8307,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C25804"
+			(at 166.37 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 166.37 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "2"
 			(uuid "7dc005be-7685-4afd-8ecc-fddccc4c734b")
 		)
@@ -8239,7 +8347,7 @@
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(fields_autoplaced yes)
 		(uuid "0a9b87c2-f499-4d46-b9eb-a7741fda7710")
 		(property "Reference" "C205"
@@ -8279,6 +8387,24 @@
 			)
 		)
 		(property "Description" "Unpolarized capacitor, small symbol"
+			(at 109.22 99.06 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" ""
+			(at 109.22 99.06 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 109.22 99.06 0)
 			(effects
 				(font
@@ -8357,6 +8483,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C14663"
+			(at 45.72 186.69 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 45.72 186.69 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "1"
 			(uuid "b1fdc22f-548c-49a7-a5e6-a9678c5c6cd3")
 		)
@@ -8379,7 +8523,7 @@
 		(exclude_from_sim yes)
 		(in_bom no)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(fields_autoplaced yes)
 		(uuid "126c453d-3b57-4680-bfad-6698b826c6b1")
 		(property "Reference" "JP216"
@@ -8421,6 +8565,24 @@
 			)
 		)
 		(property "Description" "Solder Jumper, 2-pole, closed/bridged"
+			(at 232.41 76.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" ""
+			(at 232.41 76.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 232.41 76.2 0)
 			(effects
 				(font
@@ -8499,6 +8661,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C21190"
+			(at 166.37 123.19 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 166.37 123.19 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "2"
 			(uuid "1e800d51-f0cf-413d-a5d8-d5a8caa4e31d")
 		)
@@ -8521,7 +8701,7 @@
 		(exclude_from_sim yes)
 		(in_bom no)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(fields_autoplaced yes)
 		(uuid "14e84dd6-d811-46d1-bd5e-95bda903d3c6")
 		(property "Reference" "JP204"
@@ -8563,6 +8743,24 @@
 			)
 		)
 		(property "Description" "Solder Jumper, 2-pole, closed/bridged"
+			(at 102.87 35.56 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" ""
+			(at 102.87 35.56 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 102.87 35.56 0)
 			(effects
 				(font
@@ -8705,6 +8903,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C25804"
+			(at 134.62 138.43 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 134.62 138.43 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "2"
 			(uuid "21a92e5e-bc54-4fd8-b9dc-1473e1cfb2ac")
 		)
@@ -8766,6 +8982,24 @@
 			)
 		)
 		(property "Description" "Resistor, small symbol"
+			(at 166.37 138.43 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" "C25804"
+			(at 166.37 138.43 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 166.37 138.43 0)
 			(effects
 				(font
@@ -8975,6 +9209,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C23212"
+			(at 134.62 130.81 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 134.62 130.81 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "2"
 			(uuid "389572fe-fc0a-4b21-ac90-729b643e7ca8")
 		)
@@ -8997,7 +9249,7 @@
 		(exclude_from_sim yes)
 		(in_bom no)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(fields_autoplaced yes)
 		(uuid "2bfeb2a1-b9ee-4a51-9f5d-73696e4233de")
 		(property "Reference" "JP209"
@@ -9039,6 +9291,24 @@
 			)
 		)
 		(property "Description" "Solder Jumper, 2-pole, closed/bridged"
+			(at 134.62 115.57 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" ""
+			(at 134.62 115.57 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 134.62 115.57 0)
 			(effects
 				(font
@@ -9117,6 +9387,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C4216"
+			(at 102.87 50.8 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 102.87 50.8 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "2"
 			(uuid "f67b8d2b-8c8d-45cd-9925-5ade7ebf8bf9")
 		)
@@ -9179,6 +9467,24 @@
 			)
 		)
 		(property "Description" "Resistor, small symbol"
+			(at 134.62 91.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" "C4216"
+			(at 134.62 91.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 134.62 91.44 0)
 			(effects
 				(font
@@ -9322,6 +9628,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C25804"
+			(at 102.87 99.06 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 102.87 99.06 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "2"
 			(uuid "4cf72da6-c7c0-49b7-ba2f-b0ff4d4e3ad6")
 		)
@@ -9344,7 +9668,7 @@
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(fields_autoplaced yes)
 		(uuid "344cf4e8-e9cf-448f-bc68-1cc079aa3be9")
 		(property "Reference" "C214"
@@ -9384,6 +9708,24 @@
 			)
 		)
 		(property "Description" "Unpolarized capacitor, small symbol"
+			(at 205.74 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" ""
+			(at 205.74 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 205.74 58.42 0)
 			(effects
 				(font
@@ -9479,7 +9821,7 @@
 		(exclude_from_sim yes)
 		(in_bom no)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(fields_autoplaced yes)
 		(uuid "3a148c75-f595-4f6f-98d4-6ca5323fc299")
 		(property "Reference" "JP206"
@@ -9521,6 +9863,24 @@
 			)
 		)
 		(property "Description" "Solder Jumper, 2-pole, closed/bridged"
+			(at 102.87 115.57 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" ""
+			(at 102.87 115.57 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 102.87 115.57 0)
 			(effects
 				(font
@@ -9616,7 +9976,7 @@
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(fields_autoplaced yes)
 		(uuid "416c556e-3de7-4d4b-b00c-e25a5ee2bf85")
 		(property "Reference" "C215"
@@ -9656,6 +10016,24 @@
 			)
 		)
 		(property "Description" "Unpolarized capacitor, small symbol"
+			(at 237.49 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" ""
+			(at 237.49 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 237.49 58.42 0)
 			(effects
 				(font
@@ -9800,6 +10178,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C4216"
+			(at 71.12 90.17 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 71.12 90.17 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "2"
 			(uuid "0af79a63-16bf-4d7e-bc01-1230c3d4921a")
 		)
@@ -9822,7 +10218,7 @@
 		(exclude_from_sim yes)
 		(in_bom no)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(fields_autoplaced yes)
 		(uuid "444b6192-98e1-4543-9492-ed67a114fcf3")
 		(property "Reference" "JP210"
@@ -9864,6 +10260,24 @@
 			)
 		)
 		(property "Description" "Solder Jumper, 2-pole, closed/bridged"
+			(at 166.37 35.56 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" ""
+			(at 166.37 35.56 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 166.37 35.56 0)
 			(effects
 				(font
@@ -9942,6 +10356,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C21190"
+			(at 166.37 43.18 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 166.37 43.18 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "2"
 			(uuid "42754457-a23b-42e5-8580-f7fda29b5da2")
 		)
@@ -9964,7 +10396,7 @@
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(fields_autoplaced yes)
 		(uuid "4659c15a-5ba1-4622-a2ed-d1412ff9b860")
 		(property "Reference" "C204"
@@ -10012,6 +10444,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" ""
+			(at 109.22 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 109.22 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "1"
 			(uuid "fa873a10-d1bc-427e-9d13-9fe2455e52dd")
 		)
@@ -10034,7 +10484,7 @@
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(fields_autoplaced yes)
 		(uuid "476a277f-563a-4701-b1ef-30a4ac2a2d4b")
 		(property "Reference" "C202"
@@ -10074,6 +10524,24 @@
 			)
 		)
 		(property "Description" "Unpolarized capacitor, small symbol"
+			(at 77.47 97.79 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" ""
+			(at 77.47 97.79 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 77.47 97.79 0)
 			(effects
 				(font
@@ -10144,6 +10612,24 @@
 			)
 		)
 		(property "Description" "Resistor, small symbol"
+			(at 102.87 91.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" "C4216"
+			(at 102.87 91.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 102.87 91.44 0)
 			(effects
 				(font
@@ -10304,7 +10790,7 @@
 		(exclude_from_sim yes)
 		(in_bom no)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(fields_autoplaced yes)
 		(uuid "50792f26-f58b-4f83-a4ba-d16790f32671")
 		(property "Reference" "JP211"
@@ -10346,6 +10832,24 @@
 			)
 		)
 		(property "Description" "Solder Jumper, 2-pole, closed/bridged"
+			(at 166.37 76.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" ""
+			(at 166.37 76.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 166.37 76.2 0)
 			(effects
 				(font
@@ -10424,6 +10928,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C21190"
+			(at 166.37 83.82 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 166.37 83.82 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "2"
 			(uuid "bef1215c-860c-48cd-a4f8-c6713ba727c2")
 		)
@@ -10494,6 +11016,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C4216"
+			(at 198.12 91.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 198.12 91.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "2"
 			(uuid "45a29400-4d2c-49a7-af1f-40edff75f504")
 		)
@@ -10516,7 +11056,7 @@
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(fields_autoplaced yes)
 		(uuid "5ab89145-5ba1-4fc2-aa74-9e8de0b014c7")
 		(property "Reference" "C209"
@@ -10556,6 +11096,24 @@
 			)
 		)
 		(property "Description" "Unpolarized capacitor, small symbol"
+			(at 140.97 138.43 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" ""
+			(at 140.97 138.43 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 140.97 138.43 0)
 			(effects
 				(font
@@ -10699,6 +11257,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C21190"
+			(at 102.87 123.19 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 102.87 123.19 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "2"
 			(uuid "4db5a373-7b8b-467a-8854-fade3176e8ba")
 		)
@@ -10760,6 +11336,24 @@
 			)
 		)
 		(property "Description" "Resistor, small symbol"
+			(at 71.12 138.43 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" "C25804"
+			(at 71.12 138.43 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 71.12 138.43 0)
 			(effects
 				(font
@@ -10837,6 +11431,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C25804"
+			(at 232.41 99.06 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 232.41 99.06 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "2"
 			(uuid "ee8a3877-6548-4768-8298-bc70271ca375")
 		)
@@ -10859,7 +11471,7 @@
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(fields_autoplaced yes)
 		(uuid "6187886b-9f3c-4b2f-806d-ca99cae9767f")
 		(property "Reference" "C210"
@@ -10899,6 +11511,24 @@
 			)
 		)
 		(property "Description" "Unpolarized capacitor, small symbol"
+			(at 172.72 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" ""
+			(at 172.72 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 172.72 58.42 0)
 			(effects
 				(font
@@ -11125,7 +11755,7 @@
 		(exclude_from_sim yes)
 		(in_bom no)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(fields_autoplaced yes)
 		(uuid "652aa546-a618-4759-8d90-1ac65a1a7ffc")
 		(property "Reference" "JP212"
@@ -11175,6 +11805,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" ""
+			(at 166.37 115.57 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 166.37 115.57 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "1"
 			(uuid "c8c31342-e8ca-4b48-acda-848b58dbff82")
 		)
@@ -11197,7 +11845,7 @@
 		(exclude_from_sim yes)
 		(in_bom no)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(fields_autoplaced yes)
 		(uuid "65699dcc-5301-49e2-adf1-c8446e0cd4e9")
 		(property "Reference" "JP202"
@@ -11239,6 +11887,24 @@
 			)
 		)
 		(property "Description" "Solder Jumper, 2-pole, closed/bridged"
+			(at 71.12 74.93 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" ""
+			(at 71.12 74.93 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 71.12 74.93 0)
 			(effects
 				(font
@@ -11317,6 +11983,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C21190"
+			(at 232.41 83.82 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 232.41 83.82 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "2"
 			(uuid "8f55b6cf-4572-4410-ada6-1c7f144f23b4")
 		)
@@ -11379,6 +12063,24 @@
 			)
 		)
 		(property "Description" "Resistor, small symbol"
+			(at 71.12 130.81 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" "C23212"
+			(at 71.12 130.81 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 71.12 130.81 0)
 			(effects
 				(font
@@ -11523,6 +12225,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C21190"
+			(at 198.12 83.82 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 198.12 83.82 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "2"
 			(uuid "bb24e59b-1ad2-4c54-b5b9-e81a4e6010a6")
 		)
@@ -11545,7 +12265,7 @@
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(fields_autoplaced yes)
 		(uuid "731574d6-d617-4aaa-b986-935de9e071a2")
 		(property "Reference" "C203"
@@ -11585,6 +12305,24 @@
 			)
 		)
 		(property "Description" "Unpolarized capacitor, small symbol"
+			(at 77.47 138.43 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" ""
+			(at 77.47 138.43 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 77.47 138.43 0)
 			(effects
 				(font
@@ -11925,6 +12663,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C21190"
+			(at 102.87 43.18 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 102.87 43.18 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "2"
 			(uuid "b19e28f1-41bd-4945-a303-1d5b7cc82e55")
 		)
@@ -12079,7 +12835,7 @@
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(fields_autoplaced yes)
 		(uuid "8235d768-d9bb-4498-b0ff-3e98e95634f9")
 		(property "Reference" "C216"
@@ -12119,6 +12875,24 @@
 			)
 		)
 		(property "Description" "Unpolarized capacitor, small symbol"
+			(at 238.76 99.06 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" ""
+			(at 238.76 99.06 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 238.76 99.06 0)
 			(effects
 				(font
@@ -12261,6 +13035,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C25804"
+			(at 102.87 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 102.87 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "2"
 			(uuid "3e8dd30c-4d46-4df6-b6bb-2cac76970636")
 		)
@@ -12283,7 +13075,7 @@
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(fields_autoplaced yes)
 		(uuid "8724a69b-a550-49b4-86e3-3274fa18a4a3")
 		(property "Reference" "C208"
@@ -12323,6 +13115,24 @@
 			)
 		)
 		(property "Description" "Unpolarized capacitor, small symbol"
+			(at 140.97 99.06 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" ""
+			(at 140.97 99.06 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 140.97 99.06 0)
 			(effects
 				(font
@@ -12393,6 +13203,24 @@
 			)
 		)
 		(property "Description" "Resistor, small symbol"
+			(at 102.87 130.81 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" "C23212"
+			(at 102.87 130.81 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 102.87 130.81 0)
 			(effects
 				(font
@@ -12601,6 +13429,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C21190"
+			(at 231.14 43.18 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 231.14 43.18 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "2"
 			(uuid "66febc4b-2877-4380-b2f6-66dad2a583e0")
 		)
@@ -12688,7 +13534,7 @@
 		(exclude_from_sim yes)
 		(in_bom no)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(fields_autoplaced yes)
 		(uuid "911e5f37-1ed0-485b-85ca-66f5d5b69df2")
 		(property "Reference" "JP208"
@@ -12730,6 +13576,24 @@
 			)
 		)
 		(property "Description" "Solder Jumper, 2-pole, closed/bridged"
+			(at 134.62 76.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" ""
+			(at 134.62 76.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 134.62 76.2 0)
 			(effects
 				(font
@@ -12808,6 +13672,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C4216"
+			(at 231.14 50.8 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 231.14 50.8 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "2"
 			(uuid "37b21359-e910-4aeb-a143-c731d9929f5c")
 		)
@@ -12870,6 +13752,24 @@
 			)
 		)
 		(property "Description" "Resistor, small symbol"
+			(at 166.37 91.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" "C4216"
+			(at 166.37 91.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 166.37 91.44 0)
 			(effects
 				(font
@@ -13013,6 +13913,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C25804"
+			(at 71.12 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 71.12 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "2"
 			(uuid "3deb6734-5bb6-47ce-a7eb-1d216dd4b42f")
 		)
@@ -13035,7 +13953,7 @@
 		(exclude_from_sim yes)
 		(in_bom no)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(fields_autoplaced yes)
 		(uuid "97cadb83-4fcc-4596-aa4d-dd677077c1ad")
 		(property "Reference" "JP201"
@@ -13085,6 +14003,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" ""
+			(at 71.12 35.56 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 71.12 35.56 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "1"
 			(uuid "6a3da949-e277-435a-888b-51685d71ab2e")
 		)
@@ -13107,7 +14043,7 @@
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(fields_autoplaced yes)
 		(uuid "97e9f1c8-0cd7-4b08-a98c-f2fdf19a12a4")
 		(property "Reference" "C211"
@@ -13155,6 +14091,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" ""
+			(at 172.72 99.06 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 172.72 99.06 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "1"
 			(uuid "a6bef733-0570-443a-90f9-05c6fd3de7c3")
 		)
@@ -13177,7 +14131,7 @@
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(fields_autoplaced yes)
 		(uuid "995c20c6-8231-47aa-9cce-a60672be6b7a")
 		(property "Reference" "C201"
@@ -13217,6 +14171,24 @@
 			)
 		)
 		(property "Description" "Unpolarized capacitor, small symbol"
+			(at 77.47 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" ""
+			(at 77.47 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 77.47 58.42 0)
 			(effects
 				(font
@@ -13359,6 +14331,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C25804"
+			(at 134.62 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 134.62 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "2"
 			(uuid "86af714d-9957-4551-9e40-ae0f9c803256")
 		)
@@ -13381,7 +14371,7 @@
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(fields_autoplaced yes)
 		(uuid "9bdd9a57-657b-4aa7-9ac8-ffd720106b5d")
 		(property "Reference" "C207"
@@ -13421,6 +14411,24 @@
 			)
 		)
 		(property "Description" "Unpolarized capacitor, small symbol"
+			(at 140.97 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" ""
+			(at 140.97 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 140.97 58.42 0)
 			(effects
 				(font
@@ -13629,6 +14637,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C25804"
+			(at 134.62 99.06 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 134.62 99.06 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "2"
 			(uuid "7d13f035-1cbb-4e44-b584-3030669d9291")
 		)
@@ -13763,6 +14789,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C25804"
+			(at 71.12 97.79 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 71.12 97.79 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "2"
 			(uuid "904ea68b-ae1b-4287-9f9a-d8bf7126dac9")
 		)
@@ -13833,6 +14877,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C14663"
+			(at 83.82 186.69 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 83.82 186.69 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "1"
 			(uuid "0032ecce-d73e-4a33-8d12-c6b73480277c")
 		)
@@ -13855,7 +14917,7 @@
 		(exclude_from_sim yes)
 		(in_bom no)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(fields_autoplaced yes)
 		(uuid "a1d1719a-b4e4-4962-9145-9d938fad5ed2")
 		(property "Reference" "JP207"
@@ -13897,6 +14959,24 @@
 			)
 		)
 		(property "Description" "Solder Jumper, 2-pole, closed/bridged"
+			(at 134.62 35.56 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" ""
+			(at 134.62 35.56 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 134.62 35.56 0)
 			(effects
 				(font
@@ -13975,6 +15055,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C21190"
+			(at 102.87 83.82 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 102.87 83.82 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "2"
 			(uuid "0fc548e3-b394-44ac-8fd2-bac6182bae4e")
 		)
@@ -13997,7 +15095,7 @@
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(fields_autoplaced yes)
 		(uuid "a8bba3d2-4e81-4c15-a86a-bf47280a6e62")
 		(property "Reference" "C212"
@@ -14037,6 +15135,24 @@
 			)
 		)
 		(property "Description" "Unpolarized capacitor, small symbol"
+			(at 172.72 138.43 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" ""
+			(at 172.72 138.43 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 172.72 138.43 0)
 			(effects
 				(font
@@ -14181,6 +15297,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C4216"
+			(at 71.12 50.8 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 71.12 50.8 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "2"
 			(uuid "eee562a9-0c5a-44bc-9837-2d942b45bab1")
 		)
@@ -14243,6 +15377,24 @@
 			)
 		)
 		(property "Description" "Resistor, small symbol"
+			(at 71.12 43.18 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" "C21190"
+			(at 71.12 43.18 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 71.12 43.18 0)
 			(effects
 				(font
@@ -14339,7 +15491,7 @@
 		(exclude_from_sim yes)
 		(in_bom no)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(fields_autoplaced yes)
 		(uuid "b5562084-26e0-410a-a071-080f909ea38d")
 		(property "Reference" "JP203"
@@ -14389,6 +15541,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" ""
+			(at 71.12 115.57 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 71.12 115.57 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "1"
 			(uuid "75d4609a-da47-4295-ac9c-42b656afb0de")
 		)
@@ -14411,7 +15581,7 @@
 		(exclude_from_sim yes)
 		(in_bom no)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(fields_autoplaced yes)
 		(uuid "b6b2685c-6590-47da-b12c-341f96c03f8e")
 		(property "Reference" "JP213"
@@ -14453,6 +15623,24 @@
 			)
 		)
 		(property "Description" "Solder Jumper, 2-pole, closed/bridged"
+			(at 198.12 76.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" ""
+			(at 198.12 76.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 198.12 76.2 0)
 			(effects
 				(font
@@ -14523,6 +15711,24 @@
 			)
 		)
 		(property "Description" "Low capacitance ESD diode / steering Diode Array, SOT23-6"
+			(at 68.58 172.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" "C393377"
+			(at 68.58 172.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 68.58 172.72 0)
 			(effects
 				(font
@@ -14744,6 +15950,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C21190"
+			(at 199.39 43.18 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 199.39 43.18 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "2"
 			(uuid "1550690d-8bb7-418e-a755-99c4da97fbfd")
 		)
@@ -14831,7 +16055,7 @@
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(fields_autoplaced yes)
 		(uuid "beb4ef5b-0d72-4e7c-947c-d7191fb7c096")
 		(property "Reference" "C206"
@@ -14871,6 +16095,24 @@
 			)
 		)
 		(property "Description" "Unpolarized capacitor, small symbol"
+			(at 109.22 138.43 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" ""
+			(at 109.22 138.43 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 109.22 138.43 0)
 			(effects
 				(font
@@ -15014,6 +16256,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C25804"
+			(at 231.14 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 231.14 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "2"
 			(uuid "df944e8c-2b3d-4202-ab76-64ea5e3c8eb6")
 		)
@@ -15074,6 +16334,24 @@
 			)
 		)
 		(property "Description" "Generic screw terminal, single row, 01x20, script generated (kicad-library-utils/schlib/autogen/connector/)"
+			(at 21.59 43.18 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" "C2833599"
+			(at 21.59 43.18 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 21.59 43.18 0)
 			(effects
 				(font
@@ -15206,6 +16484,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C4216"
+			(at 134.62 50.8 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 134.62 50.8 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "2"
 			(uuid "e39086d9-e927-424f-b8e1-bc8e9226a87e")
 		)
@@ -15267,6 +16563,24 @@
 			)
 		)
 		(property "Description" "Resistor, small symbol"
+			(at 199.39 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" "C25804"
+			(at 199.39 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 199.39 58.42 0)
 			(effects
 				(font
@@ -15411,6 +16725,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C4216"
+			(at 232.41 91.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 232.41 91.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "2"
 			(uuid "33888a5f-9403-495e-a9c2-8f9f71e3c275")
 		)
@@ -15546,6 +16878,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C393377"
+			(at 30.48 172.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 30.48 172.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "3"
 			(uuid "239bb744-882c-4a9b-b1f6-3d28c8980b97")
 		)
@@ -15619,6 +16969,24 @@
 			)
 		)
 		(property "Description" "Resistor, small symbol"
+			(at 166.37 99.06 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" "C25804"
+			(at 166.37 99.06 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 166.37 99.06 0)
 			(effects
 				(font
@@ -15909,7 +17277,7 @@
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(fields_autoplaced yes)
 		(uuid "ddeea24d-f401-45d6-825a-ae4ee7038cf6")
 		(property "Reference" "C213"
@@ -15949,6 +17317,24 @@
 			)
 		)
 		(property "Description" "Unpolarized capacitor, small symbol"
+			(at 204.47 99.06 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" ""
+			(at 204.47 99.06 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 204.47 99.06 0)
 			(effects
 				(font
@@ -16026,6 +17412,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C25804"
+			(at 198.12 99.06 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 198.12 99.06 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "2"
 			(uuid "866df07f-c34a-451e-8c5a-7332ea1fd672")
 		)
@@ -16086,6 +17490,24 @@
 			)
 		)
 		(property "Description" "Generic connector, single row, 01x20, script generated (kicad-library-utils/schlib/autogen/connector/)"
+			(at 21.59 107.95 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" ""
+			(at 21.59 107.95 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 21.59 107.95 0)
 			(effects
 				(font
@@ -16170,7 +17592,7 @@
 		(exclude_from_sim yes)
 		(in_bom no)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(fields_autoplaced yes)
 		(uuid "e034b7ca-b6c4-48a4-a722-3469ea36e816")
 		(property "Reference" "JP215"
@@ -16212,6 +17634,24 @@
 			)
 		)
 		(property "Description" "Solder Jumper, 2-pole, closed/bridged"
+			(at 231.14 35.56 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" ""
+			(at 231.14 35.56 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 231.14 35.56 0)
 			(effects
 				(font
@@ -16355,6 +17795,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C25804"
+			(at 102.87 138.43 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 102.87 138.43 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "2"
 			(uuid "270a5090-d889-41cd-9a2d-043d8284ce73")
 		)
@@ -16490,6 +17948,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C21190"
+			(at 71.12 82.55 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 71.12 82.55 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "2"
 			(uuid "65ddb520-3eb5-4720-ba03-caa52a06377c")
 		)
@@ -16552,6 +18028,24 @@
 			)
 		)
 		(property "Description" "Resistor, small symbol"
+			(at 199.39 50.8 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" "C4216"
+			(at 199.39 50.8 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 199.39 50.8 0)
 			(effects
 				(font
@@ -16754,6 +18248,24 @@
 			)
 		)
 		(property "Description" "Resistor, small symbol"
+			(at 134.62 83.82 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" "C21190"
+			(at 134.62 83.82 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 134.62 83.82 0)
 			(effects
 				(font
@@ -17092,6 +18604,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C23212"
+			(at 166.37 130.81 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 166.37 130.81 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "2"
 			(uuid "770dcd52-9766-42e6-9981-fcc4323137fe")
 		)
@@ -17162,6 +18692,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC Part #" "C4216"
+			(at 166.37 50.8 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
+			(at 166.37 50.8 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "2"
 			(uuid "9e6abc15-9142-43bc-bcbf-83385b9daa04")
 		)
@@ -17184,7 +18732,7 @@
 		(exclude_from_sim yes)
 		(in_bom no)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(fields_autoplaced yes)
 		(uuid "f868f826-74b1-448a-bf94-b95c86ea1b10")
 		(property "Reference" "JP214"
@@ -17226,6 +18774,24 @@
 			)
 		)
 		(property "Description" "Solder Jumper, 2-pole, closed/bridged"
+			(at 199.39 35.56 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" ""
+			(at 199.39 35.56 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 199.39 35.56 0)
 			(effects
 				(font
@@ -17296,6 +18862,24 @@
 			)
 		)
 		(property "Description" "Low capacitance ESD diode / steering Diode Array, SOT23-6"
+			(at 143.51 172.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC Part #" "C393377"
+			(at 143.51 172.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Alternate" ""
 			(at 143.51 172.72 0)
 			(effects
 				(font
