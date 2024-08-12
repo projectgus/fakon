@@ -6,8 +6,7 @@ use defmt_brtt as _; // global logger
 
 use panic_probe as _;
 
-// TODO(6) Import your HAL
-use some_hal as _; // memory layout
+use stm32g4xx_hal as _; // memory layout
 
 // same panicking *behavior* as `panic-probe` but doesn't print a panic message
 // this prevents the panic message being printed *twice* when `defmt::panic` is invoked

@@ -2,15 +2,12 @@
 #![no_std]
 #![feature(type_alias_impl_trait)]
 
-use test_app as _; // global logger + panicking-behavior + memory layout
+use stm32g4xx_hal as _; // global logger + panicking-behavior + memory layout
+use fakon as _;
 
-// TODO(7) Configure the `rtic::app` macro
 #[rtic::app(
-    // TODO: Replace `some_hal::pac` with the path to the PAC
-    device = some_hal::pac,
-    // TODO: Replace the `FreeInterrupt1, ...` with free interrupt vectors if software tasks are used
-    // You can usually find the names of the interrupt vectors in the some_hal::pac::interrupt enum.
-    dispatchers = [FreeInterrupt1, ...]
+    device = stm32g4xx_hal::stm32,
+    dispatchers = [USBWAKEUP]
 )]
 mod app {
     // Shared resources go here
