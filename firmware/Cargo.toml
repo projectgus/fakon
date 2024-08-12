@@ -1,0 +1,63 @@
+[package]
+# TODO fix `authors` and `name` if you didn't use `cargo-generate`
+name = "test-app"
+edition = "2021"
+version = "0.1.0"
+
+[dependencies]
+cortex-m = { version = "0.7", features = ["critical-section-single-core"] }
+defmt = { version = "0.3", features = ["encoding-rzcobs"] }
+defmt-brtt = { version = "0.1", default-features = false, features = ["rtt"] }
+panic-probe = { version = "0.3", features = ["print-defmt"] }
+# TODO(4) Select the correct rtic backend
+rtic = { version = "2.0.0", features = [ "$RTIC_BACKEND" ] }
+# TODO(5) Add hal as dependency
+some-hal = "1.2.3"
+# TODO add a monotonic if you use scheduling
+# rtic-monotonics = { version = "1.0.0", features = [ "cortex-m-systick" ]}
+
+# cargo build/run
+[profile.dev]
+codegen-units = 1
+debug = 2
+debug-assertions = true # <-
+incremental = false
+opt-level = "s" # <-
+overflow-checks = true # <-
+
+# cargo test
+[profile.test]
+codegen-units = 1
+debug = 2
+debug-assertions = true # <-
+incremental = false
+opt-level = "s" # <-
+overflow-checks = true # <-
+
+# cargo build/run --release
+[profile.release]
+codegen-units = 1
+debug = 2
+debug-assertions = false # <-
+incremental = false
+lto = 'fat'
+opt-level = "s" # <-
+overflow-checks = false # <-
+
+# cargo test --release
+[profile.bench]
+codegen-units = 1
+debug = 2
+debug-assertions = false # <-
+incremental = false
+lto = 'fat'
+opt-level = "s" # <-
+overflow-checks = false # <-
+
+# uncomment this to switch from the crates.io version of defmt to its git version
+# check app-template's README for instructions
+# [patch.crates-io]
+# defmt = { git = "https://github.com/knurling-rs/defmt", rev = "use defmt version supported by probe-rs (see changelog)" }
+# defmt-rtt = { git = "https://github.com/knurling-rs/defmt", rev = "use defmt version supported by probe-rs (see changelog)" }
+# defmt-test = { git = "https://github.com/knurling-rs/defmt", rev = "use defmt version supported by probe-rs (see changelog)" }
+# panic-probe = { git = "https://github.com/knurling-rs/defmt", rev = "use defmt version supported by probe-rs (see changelog)" }
