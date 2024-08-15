@@ -10,6 +10,7 @@ use fakon as _;
     dispatchers = [USBWAKEUP]
 )]
 mod app {
+    use fugit::RateExtU32;
     use stm32g4xx_hal::pwr::PwrExt;
     use stm32g4xx_hal::rcc::{PllConfig, RccExt};
 
@@ -36,9 +37,9 @@ mod app {
         let mut pll_config = PllConfig::default();
 
         // Sysclock is based on PLL_R
-        pll_config.mux = stm32g4xx_hal::rcc::PllSrc::HSI; // 16MHz
+        pll_config.mux = stm32g4xx_hal::rcc::PllSrc::HSE(24_u32.MHz()); // Nucleo board X3 OSC
         pll_config.n = stm32g4xx_hal::rcc::PllNMul::MUL_32;
-        pll_config.m = stm32g4xx_hal::rcc::PllMDiv::DIV_2; // f(vco) = 16MHz*32/2 = 256MHz
+        pll_config.m = stm32g4xx_hal::rcc::PllMDiv::DIV_3; // f(vco) = 24MHz*32/3 = 256MHz
         pll_config.r = Some(stm32g4xx_hal::rcc::PllRDiv::DIV_2); // f(sysclock) = 256MHz/2 = 128MHz
 
         let clock_config = stm32g4xx_hal::rcc::Config::default()

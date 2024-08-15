@@ -13,6 +13,7 @@ rtic = { version = "2.1", features = [ "thumbv7-backend" ] }
 stm32g4xx-hal = { git = "https://github.com/stm32-rs/stm32g4xx-hal.git", rev = "0c2ed52", features = [ "stm32g474" ] }
 rtic-monotonics = { version = "2.0", features = ["cortex-m-systick"] }
 panic-abort = "0.3.2"
+fugit = "0.3.7"
 
 # cargo build/run
 [profile.dev]
