@@ -10,6 +10,9 @@ use fakon as _;
     dispatchers = [USBWAKEUP]
 )]
 mod app {
+    use stm32g4xx_hal::pwr::PwrExt;
+    use stm32g4xx_hal::rcc::{PllConfig, RccExt};
+
     // Shared resources go here
     #[shared]
     struct Shared {
@@ -25,6 +28,40 @@ mod app {
     #[init]
     fn init(cx: init::Context) -> (Shared, Local) {
         defmt::info!("init");
+
+        let dp = cx.device;
+        let cp = cx.core;
+
+        let rcc = dp.RCC.constrain();
+        let mut pll_config = PllConfig::default();
+
+        // Sysclock is based on PLL_R
+        pll_config.mux = stm32g4xx_hal::rcc::PllSrc::HSI; // 16MHz
+        pll_config.n = stm32g4xx_hal::rcc::PllNMul::MUL_32;
+        pll_config.m = stm32g4xx_hal::rcc::PllMDiv::DIV_2; // f(vco) = 16MHz*32/2 = 256MHz
+        pll_config.r = Some(stm32g4xx_hal::rcc::PllRDiv::DIV_2); // f(sysclock) = 256MHz/2 = 128MHz
+
+        let clock_config = stm32g4xx_hal::rcc::Config::default()
+            .pll_cfg(pll_config)
+            .clock_src(stm32g4xx_hal::rcc::SysClockSrc::PLL);
+
+        let pwr = dp.PWR.constrain().freeze();
+        let rcc = rcc.freeze(clock_config, pwr);
+
+        // After clock configuration, the following should be true:
+        // Sysclock is 128MHz
+        // AHB clock is 128MHz
+        // APB1 clock is 128MHz
+        // APB2 clock is 128MHz
+        // The ADC will ultimately be put into synchronous mode and will derive
+        // its clock from the AHB bus clock, with a prescalar of 2 or 4.
+
+        unsafe {
+            let flash = &(*stm32g4xx_hal::stm32::FLASH::ptr());
+            flash.acr.modify(|_, w| {
+                w.latency().bits(0b1000) // 8 wait states
+            });
+        }
 
         // TODO setup monotonic if used
         // let sysclk = { /* clock setup + returning sysclk as an u32 */ };
