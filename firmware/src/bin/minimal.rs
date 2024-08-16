@@ -18,16 +18,22 @@ mod app {
     use crate::{PCAN, PwmSrsCrashOutput};
     use fakon::can_queue;
     use fakon::can_queue::Tx;
-    use fugit::RateExtU32;
+    use fugit::{ExtU32, RateExtU32};
     use hex_literal::hex;
     use stm32g4xx_hal::can::CanExt;
     use stm32g4xx_hal::gpio::Speed;
     use stm32g4xx_hal::gpio::GpioExt;
+    use stm32g4xx_hal::prelude::OutputPin;
     use stm32g4xx_hal::pwm::PwmExt;
     use stm32g4xx_hal::pwr::PwrExt;
     use stm32g4xx_hal::rcc::{PllConfig, RccExt};
     use stm32g4xx_hal::stm32;
     use stm32g4xx_hal::rcc;
+    use rtic_monotonics;
+    use rtic_monotonics::Monotonic;
+
+    pub const MONOTONIC_FREQUENCY: u32 = 1_000;
+    rtic_monotonics::systick_monotonic!(Systick, MONOTONIC_FREQUENCY);
 
     // Shared resources go here
     #[shared]
@@ -80,7 +86,7 @@ mod app {
         }
 
         //let token = rtic_monotonics::create_systick_token!();
-        //rtic_monotonics::systick::Systick::new(cx.core.SYST, rcc.clocks.sysclk, token);
+        //Systick::new(cx.core.SYST, rcc.clocks.sysclk, token);
 
         let gpioa = dp.GPIOA.split(&mut rcc);
         let gpiob = dp.GPIOB.split(&mut rcc);
@@ -206,9 +212,26 @@ mod app {
         // 1Hz CAN message (constant)
         // 50Hz PWM output, 80% high for "not crashed"
         let can_1hz = can_queue::QueuedFrame::new_std(0x5a0, &hex!("000000C025029101"));
+        let duty_pct = 80;
+        // TODO: calculate this from a Rate in a less icky way
+        //let cycle_time = 50.Hz().try_into_duration().unwrap();
+        //let time_high = Systick::delay(cycle_time * duty_pct / 100);
+        //let time_low = Systick::delay(cycle_time * (100 - duty_pct) / 100);
+        let time_high = (20_u32 * duty_pct / 100).millis();
+        let time_low = (20_u32 * duty_pct / 100).millis();
+
+        let crash_out = &mut cx.local.srs_crash_out;
 
         loop {
+            // Every 1Hz
             cx.shared.pcan_tx.lock(|tx| tx.transmit(&can_1hz));
+
+            for _ in 0..50 {
+                crash_out.set_low().unwrap();
+                Systick::delay(time_low).await;
+                crash_out.set_high().unwrap();
+                Systick::delay(time_high).await;
+            }
         }
     }
 
