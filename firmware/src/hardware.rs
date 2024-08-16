@@ -1,0 +1,159 @@
+// "Board level" hardware abstractions, ie pin assignments, etc.
+
+use defmt::info;
+use can_bit_timings;
+use fdcan::ConfigMode;
+use fdcan::FdCan;
+use fugit::RateExtU32;
+use stm32g4xx_hal as hal;
+use stm32g4xx_hal::can::CanExt;
+use stm32g4xx_hal::gpio::Speed;
+use stm32g4xx_hal::gpio::GpioExt;
+use stm32g4xx_hal::pwm::PwmExt;
+use stm32g4xx_hal::pwr::PwrExt;
+use stm32g4xx_hal::rcc::{PllConfig, RccExt};
+use stm32g4xx_hal::stm32;
+use stm32g4xx_hal::rcc;
+
+
+// Type aliases for hardware peripherals, to move into a hardware module
+pub type PCAN = hal::can::Can<hal::stm32::FDCAN1>;
+
+// Type aliases for I/O pins
+pub type PwmSrsCrashOutput = hal::gpio::gpioa::PA4::<hal::gpio::Output<hal::gpio::PushPull>>;
+
+// Struct to encompass all the board resources, as their functions
+pub struct Board {
+    pub pcan_config: FdCan<PCAN, ConfigMode>,
+    pub srs_crash_out: PwmSrsCrashOutput,
+    pub can_timing_500kbps: can_bit_timings::CanBitTiming,
+}
+
+// Hardware init function
+pub fn init(dp: stm32::Peripherals) -> Board {
+    info!("hardware init");
+
+    let rcc = dp.RCC.constrain();
+    let mut pll_config = PllConfig::default();
+
+    // Sysclock is based on PLL_R
+    pll_config.mux = rcc::PllSrc::HSE(24_u32.MHz()); // Nucleo board X3 OSC
+    pll_config.n = rcc::PllNMul::MUL_32;
+    pll_config.m = rcc::PllMDiv::DIV_3; // f(vco) = 24MHz*32/3 = 256MHz
+    pll_config.r = Some(rcc::PllRDiv::DIV_2); // f(sysclock) = 256MHz/2 = 128MHz
+
+    let clock_config = rcc::Config::default()
+        .pll_cfg(pll_config)
+        .clock_src(rcc::SysClockSrc::PLL)
+        .ahb_psc(rcc::Prescaler::Div2)
+        .apb1_psc(rcc::Prescaler::Div2)
+        .apb2_psc(rcc::Prescaler::Div2);
+
+    let pwr = dp.PWR.constrain().freeze();
+    let mut rcc = rcc.freeze(clock_config, pwr);
+
+    // After clock configuration, the following should be true:
+    // Sysclock is 128MHz
+    // AHB clock is 64MHz
+    // APB1 clock is 64MHz
+    // APB2 clock is 64MHz
+
+    unsafe {
+        let flash = &(*stm32::FLASH::ptr());
+        flash.acr.modify(|_, w| {
+            w.latency().bits(0b1000) // 8 wait states
+        });
+    }
+
+    let gpioa = dp.GPIOA.split(&mut rcc);
+    let gpiob = dp.GPIOB.split(&mut rcc);
+    let gpioc = dp.GPIOC.split(&mut rcc);
+    let gpiod = dp.GPIOD.split(&mut rcc);
+
+    // Based on 64MHz APB1 (see above)
+    let can_timing_500kbps = can_bit_timings::can_timings!(64.mhz(), 500.khz());
+
+    // CAN1
+    let can1_config = {
+        let rx = gpioa.pa11.into_alternate().set_speed(Speed::VeryHigh);
+        let tx = gpioa.pa12.into_alternate().set_speed(Speed::VeryHigh);
+        dp.FDCAN1.fdcan(tx, rx, &rcc)
+    };
+
+    // CAN2
+    let _can2_config = {
+        let rx = gpiob.pb12.into_alternate().set_speed(Speed::VeryHigh);
+        let tx = gpiob.pb13.into_alternate().set_speed(Speed::VeryHigh);
+        dp.FDCAN2.fdcan(tx, rx, &rcc)
+    };
+
+    // CAN3
+    let _can3_config = {
+        let rx = gpiob.pb3.into_alternate().set_speed(Speed::VeryHigh);
+        let tx = gpiob.pb4.into_alternate().set_speed(Speed::VeryHigh);
+        dp.FDCAN3.fdcan(tx, rx, &rcc)
+    };
+
+    // GPIOs from the dev board assignment
+    // TODO: abstract this into a hardware module somehow
+
+    // Signal Inputs
+    let _pin_in1 = gpioc.pc9; // 12V
+    let _pin_in2 = gpiob.pb8; // 12V
+    let _pin_in3 = gpiob.pb9; // 12V
+    let _pin_in4 = gpioa.pa5; // 12V
+    let _pin_in5 = gpioa.pa6; // 12V
+    let _pin_in6 = gpioa.pa7; // 12V
+    let _pin_in7 = gpioc.pc7; // 12V
+    let _pin_in8 = gpioa.pa9; // 12V
+    let _pin_in9 = gpioa.pa8; // 12V
+    let _pin_in10 = gpioa.pa0; // 12V
+    let _pin_in11 = gpiob.pb7; // 12V
+    let _pin_in12 = gpioa.pa15; // 12V
+    let pin_in13 = gpiod.pd2; // 5V
+    let _pin_in14 = gpioc.pc12; // 5V
+    let _pin_in15 = gpioc.pc11; // 5V
+    let _pin_in16 = gpioc.pc10; // 5V
+
+    // Signal outputs
+    let pin_out1 = gpioa.pa4; // 12V, TIM3_CH2
+    let _pin_out2 = gpiob.pb0; // 12V, TIM3_CH3
+    let _pin_out3 = gpioc.pc1; // 12V, TIM1_CH2
+    let _pin_out4 = gpioc.pc0; // 12V, TIM1_CH1
+    let pin_out5 = gpioc.pc3; // 5V, TIM1_CH4
+    let _pin_out6 = gpioc.pc2; // 5V, TIM1_CH3
+    let _pin_out7 = gpioa.pa1; // 5V, TIM2_CH2 or TIM5_CH2
+
+    // Relay coil drivers
+    let _pin_coil_l1 = gpiob.pb6;
+    let _pin_coil_l2 = gpioc.pc4; // also LED4, oops
+    let _pin_coil_h = gpioc.pc5;
+
+    // LEDs, all green, all active high
+    let _led1 = gpiob.pb10.into_push_pull_output();
+    let _led2 = gpiob.pb5.into_push_pull_output();
+    let _led3 = gpioa.pa10.into_push_pull_output();
+    // led4 accidentally shared with pin_coil_l2
+
+    // Functions assigned to pins
+
+    // OUT5 => SCU Park TX PWM
+    let _pwm_scu_park_tx = {
+        let pin = pin_out5.into_alternate();
+        let pwm = dp.TIM1.pwm(pin, 1000.Hz(), &mut rcc);
+        pwm
+    };
+
+    // IN13 => SCU Park RX (soft PWM)
+    let _scu_park_rx = pin_in13;
+
+    // OUT1 => SRS Crash signal, 50Hz soft PWM
+    let srs_crash_out = pin_out1.into_push_pull_output();
+
+
+    Board {
+        pcan_config: can1_config,
+        srs_crash_out,
+        can_timing_500kbps,
+    }
+}

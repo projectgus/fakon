@@ -9,6 +9,7 @@ use panic_probe as _;
 use stm32g4xx_hal as _; // memory layout
 
 pub mod can_queue;
+pub mod hardware;
 
 // same panicking *behavior* as `panic-probe` but doesn't print a panic message
 // this prevents the panic message being printed *twice* when `defmt::panic` is invoked
