@@ -2,7 +2,7 @@ use core::cmp::{min, Ordering};
 use core::mem::size_of;
 use defmt::{info, warn};
 use fdcan::config::FrameTransmissionConfig::ClassicCanOnly;
-use fdcan::id::Id;
+use fdcan::id::{Id, StandardId};
 use heapless::binary_heap::Max;
 use heapless::BinaryHeap;
 use rtic_sync::{channel, make_channel};
@@ -12,12 +12,16 @@ use fdcan::{
     filter::{StandardFilter, StandardFilterSlot},
     frame::{RxFrameInfo, TxFrameHeader},
 };
-use can_bit_timings;
+use can_bit_timings::CanBitTiming;
 
 // Module to support software TX and RX queued CAN on rtic
 //
 // TX side uses a binary heap to send out messages in priority order.
 // RX side writes messages into an RTIC channel for processing by the app.
+//
+// Currently not very abstract: uses STM32G4 FDCAN peripheral directly,
+// hard-codes CAN baud rate, etc.
+
 
 // CAN TX and RX software queue sizes
 const RX_CAPACITY: usize = 8;
@@ -27,12 +31,9 @@ const TX_CAPACITY: usize = 16;
 pub type RxReceiver = channel::Receiver<'static, QueuedFrame, RX_CAPACITY>;
 type RxSender = channel::Sender<'static, QueuedFrame, RX_CAPACITY>;
 
-pub fn init<I: fdcan::Instance>(mut can: fdcan::FdCan<I, fdcan::ConfigMode>) -> (Rx<I>, RxReceiver, TxQueue<I>)
+pub fn init<I: fdcan::Instance>(mut can: fdcan::FdCan<I, fdcan::ConfigMode>, bit_timings: &CanBitTiming) -> (Rx<I>, RxReceiver, TxQueue<I>)
 {
-    // Setup CAN
-
-    // APB1 (PCLK1): 64MHz, Bit rate: 500kBit/s, stick with defaults for others
-    let bit_timings = can_bit_timings::can_timings!(64.mhz(), 500.khz());
+    // Convert the generic bit timings to FDCAN bit timings
     let btr = NominalBitTiming {
         prescaler: bit_timings.prescaler.try_into().unwrap(),
         seg1: bit_timings.bs1.try_into().unwrap(),
@@ -61,8 +62,8 @@ pub fn init<I: fdcan::Instance>(mut can: fdcan::FdCan<I, fdcan::ConfigMode>) -> 
 
 #[derive(Clone, Debug)]
 pub struct QueuedFrame {
-    header: TxFrameHeader, // Note: used for TX and RX direction
-    data: [u8; 8], // Fixed size array, see header.len for 'real' length
+    pub header: TxFrameHeader, // Note: used for TX and RX direction
+    pub data: [u8; 8], // Fixed size array, see header.len for 'real' length
 }
 
 // TODO: Figure out how to use fdcan::frame::FramePriority here, currently
@@ -110,10 +111,25 @@ impl PartialEq for QueuedFrame {
 }
 
 impl QueuedFrame {
+    // Create a new QueuedFrame with a standard CAN ID
+    pub fn new_std(id_raw: u16, data: &[u8]) -> Self {
+        let id = StandardId::new(id_raw).unwrap();
+        assert!(data.len() <= 8);
+        Self::new_tx(TxFrameHeader {
+            len: data.len() as u8,
+            frame_format: fdcan::frame::FrameFormat::Standard,
+            id: Id::Standard(id),
+            bit_rate_switching: false,
+            marker: None,
+        }, data)
+    }
+
+    // Internal constructor for queue receiver
     fn new_rx(info: &RxFrameInfo, data: &[u8]) -> Self {
         Self::new_tx(info.to_tx_header(None), data) 
     }
 
+    // Internal constructor for re-queue on transmit
     fn new_tx(header: TxFrameHeader, tx_data: &[u8]) -> Self {
         let mut data = [0_u8; 8];
         let dlen = min(header.len, 8) as usize;
