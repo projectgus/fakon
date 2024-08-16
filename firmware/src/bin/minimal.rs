@@ -10,9 +10,14 @@ use fakon as _;
     dispatchers = [USBWAKEUP]
 )]
 mod app {
+    use fakon::can_queue;
     use fugit::RateExtU32;
+    use stm32g4xx_hal::can::CanExt;
+    use stm32g4xx_hal::gpio::Speed;
+    use stm32g4xx_hal::gpio::GpioExt;
     use stm32g4xx_hal::pwr::PwrExt;
     use stm32g4xx_hal::rcc::{PllConfig, RccExt};
+
 
     // Shared resources go here
     #[shared]
@@ -31,7 +36,6 @@ mod app {
         defmt::info!("init");
 
         let dp = cx.device;
-        let cp = cx.core;
 
         let rcc = dp.RCC.constrain();
         let mut pll_config = PllConfig::default();
@@ -44,18 +48,19 @@ mod app {
 
         let clock_config = stm32g4xx_hal::rcc::Config::default()
             .pll_cfg(pll_config)
-            .clock_src(stm32g4xx_hal::rcc::SysClockSrc::PLL);
+            .clock_src(stm32g4xx_hal::rcc::SysClockSrc::PLL)
+            .ahb_psc(stm32g4xx_hal::rcc::Prescaler::Div2)
+            .apb1_psc(stm32g4xx_hal::rcc::Prescaler::Div2)
+            .apb2_psc(stm32g4xx_hal::rcc::Prescaler::Div2);
 
         let pwr = dp.PWR.constrain().freeze();
-        let rcc = rcc.freeze(clock_config, pwr);
+        let mut rcc = rcc.freeze(clock_config, pwr);
 
         // After clock configuration, the following should be true:
         // Sysclock is 128MHz
-        // AHB clock is 128MHz
-        // APB1 clock is 128MHz
-        // APB2 clock is 128MHz
-        // The ADC will ultimately be put into synchronous mode and will derive
-        // its clock from the AHB bus clock, with a prescalar of 2 or 4.
+        // AHB clock is 64MHz
+        // APB1 clock is 64MHz
+        // APB2 clock is 64MHz
 
         unsafe {
             let flash = &(*stm32g4xx_hal::stm32::FLASH::ptr());
@@ -64,11 +69,37 @@ mod app {
             });
         }
 
-        // TODO setup monotonic if used
-        // let sysclk = { /* clock setup + returning sysclk as an u32 */ };
-        // let token = rtic_monotonics::create_systick_token!();
-        // rtic_monotonics::systick::Systick::new(cx.core.SYST, sysclk, token);
+        //let token = rtic_monotonics::create_systick_token!();
+        //rtic_monotonics::systick::Systick::new(cx.core.SYST, rcc.clocks.sysclk, token);
 
+        let gpioa = dp.GPIOA.split(&mut rcc);
+        let gpiob = dp.GPIOB.split(&mut rcc);
+
+        // CAN1
+        let (_can1_rx, _can1_receiver, _can1_tx) = {
+            let rx = gpioa.pa11.into_alternate().set_speed(Speed::VeryHigh);
+            let tx = gpioa.pa12.into_alternate().set_speed(Speed::VeryHigh);
+            let can = dp.FDCAN1.fdcan(tx, rx, &rcc);
+            can_queue::init(can)
+        };
+
+        // CAN2
+        let (_can2_rx, _can2_receiver, _can2_tx) = {
+            let rx = gpiob.pb12.into_alternate().set_speed(Speed::VeryHigh);
+            let tx = gpiob.pb13.into_alternate().set_speed(Speed::VeryHigh);
+
+            let can = dp.FDCAN2.fdcan(tx, rx, &rcc);
+            can_queue::init(can)
+        };
+
+        // CAN3
+        let (_can3_rx, _can3_receiver, _can3_tx) = {
+            let rx = gpiob.pb3.into_alternate().set_speed(Speed::VeryHigh);
+            let tx = gpiob.pb4.into_alternate().set_speed(Speed::VeryHigh);
+
+            let can = dp.FDCAN3.fdcan(tx, rx, &rcc);
+            can_queue::init(can)
+        };
 
         task1::spawn().ok();
 
