@@ -29,18 +29,25 @@ pub struct Board {
     pub can_timing_500kbps: can_bit_timings::CanBitTiming,
 }
 
+// Systick Based Timer
+pub const MONOTONIC_FREQUENCY: u32 = 1_000;
+rtic_monotonics::systick_monotonic!(Mono, MONOTONIC_FREQUENCY);
+
 // Hardware init function
-pub fn init(dp: stm32::Peripherals) -> Board {
+pub fn init(core: cortex_m::Peripherals, dp: stm32::Peripherals) -> Board {
     info!("hardware init");
 
     let rcc = dp.RCC.constrain();
-    let mut pll_config = PllConfig::default();
 
     // Sysclock is based on PLL_R
-    pll_config.mux = rcc::PllSrc::HSE(24_u32.MHz()); // Nucleo board X3 OSC
-    pll_config.n = rcc::PllNMul::MUL_32;
-    pll_config.m = rcc::PllMDiv::DIV_3; // f(vco) = 24MHz*32/3 = 256MHz
-    pll_config.r = Some(rcc::PllRDiv::DIV_2); // f(sysclock) = 256MHz/2 = 128MHz
+    let pll_config = PllConfig {
+        mux: rcc::PllSrc::HSE(24_u32.MHz()), // Nucleo board X3 OSC
+        n: rcc::PllNMul::MUL_32,
+        m: rcc::PllMDiv::DIV_3, // f(vco) = 24MHz*32/3 = 256MHz
+        r: Some(rcc::PllRDiv::DIV_2), // f(sysclock) = 256MHz/2 = 128MHz
+        q: None,
+        p: None,
+    };
 
     let clock_config = rcc::Config::default()
         .pll_cfg(pll_config)
@@ -58,6 +65,8 @@ pub fn init(dp: stm32::Peripherals) -> Board {
     // APB1 clock is 64MHz
     // APB2 clock is 64MHz
 
+    Mono::start(core.SYST, rcc.clocks.sys_clk.to_Hz());
+
     unsafe {
         let flash = &(*stm32::FLASH::ptr());
         flash.acr.modify(|_, w| {
@@ -70,7 +79,7 @@ pub fn init(dp: stm32::Peripherals) -> Board {
     let gpioc = dp.GPIOC.split(&mut rcc);
     let gpiod = dp.GPIOD.split(&mut rcc);
 
-    // Based on 64MHz APB1 (see above)
+    assert!(rcc.clocks.apb1_clk.to_MHz() == 64); // Macro requires literal
     let can_timing_500kbps = can_bit_timings::can_timings!(64.mhz(), 500.khz());
 
     // CAN1
@@ -94,8 +103,7 @@ pub fn init(dp: stm32::Peripherals) -> Board {
         dp.FDCAN3.fdcan(tx, rx, &rcc)
     };
 
-    // GPIOs from the dev board assignment
-    // TODO: abstract this into a hardware module somehow
+    // GPIOs from the dev board assignments
 
     // Signal Inputs
     let _pin_in1 = gpioc.pc9; // 12V
@@ -140,8 +148,7 @@ pub fn init(dp: stm32::Peripherals) -> Board {
     // OUT5 => SCU Park TX PWM
     let _pwm_scu_park_tx = {
         let pin = pin_out5.into_alternate();
-        let pwm = dp.TIM1.pwm(pin, 1000.Hz(), &mut rcc);
-        pwm
+        dp.TIM1.pwm(pin, 1000.Hz(), &mut rcc)
     };
 
     // IN13 => SCU Park RX (soft PWM)

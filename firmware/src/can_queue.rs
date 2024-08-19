@@ -1,5 +1,4 @@
 use core::cmp::{min, Ordering};
-use core::mem::size_of;
 use defmt::{info, warn};
 use fdcan::config::FrameTransmissionConfig::ClassicCanOnly;
 use fdcan::id::{Id, StandardId};
@@ -139,6 +138,18 @@ impl QueuedFrame {
             data,
         }
     }
+
+    // Function to pass to transmit_pending(), dequeues a pending
+    // message as QueuedFrame
+    fn from_pending_transmit(_: fdcan::Mailbox, header: TxFrameHeader, data32: &[u32]) -> Self {
+        // Awkward workaround for fdcan passing these values as &[u32]
+        let mut data = [0_u8; 8];
+        let dlen = min(min(header.len as usize, core::mem::size_of_val(data32)), 8);
+        unsafe {
+            data[..dlen].copy_from_slice(&data32.align_to::<u8>().1[..dlen]);
+        }
+        QueuedFrame{ header, data }
+    }
 }
 
 impl Eq for QueuedFrame {}
@@ -162,7 +173,7 @@ impl<I: fdcan::Instance> TxQueue<I> {
 
     pub fn on_tx_irq(&mut self) {
         if let Some(msg) = self.queue.pop() {
-            self.transmit(&msg.into());
+            self.transmit(&msg);
         }
     }
 }
@@ -170,15 +181,7 @@ impl<I: fdcan::Instance> TxQueue<I> {
 impl<I: fdcan::Instance> Tx for TxQueue<I> {
     fn transmit(&mut self, msg: &QueuedFrame) {
         let maybe_queue = match self.can.transmit_preserve(msg.header, &msg.data,
-            &mut |_mailbox, header, data32| ({
-                // Awkward workaround for fdcan passing these values as &[u32]
-                let mut data = [0_u8; 8];
-                let dlen = min(min(header.len as usize, data32.len() * size_of::<u32>()), 8);
-                unsafe {
-                    data[..dlen].copy_from_slice(&data32.align_to::<u8>().1[..dlen]);
-                }
-                QueuedFrame{ header, data }
-            })) {
+            &mut QueuedFrame::from_pending_transmit) {
                 // Preserve the pending TX message that was replaced in hardware
                 Ok(Some(dequeued)) => Some(dequeued),
                 // Rather than blocking on fdcan, queue this message for later transmit
