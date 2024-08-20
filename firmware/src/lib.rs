@@ -12,8 +12,11 @@ use stm32g4xx_hal as _; // memory layout
 pub mod can_periodic;
 pub mod can_queue;
 pub mod hardware;
+pub mod car;
 pub mod ieb;
+pub mod igpm;
 pub mod srscm;
+
 
 // same panicking *behavior* as `panic-probe` but doesn't print a panic message
 // this prevents the panic message being printed *twice* when `defmt::panic` is invoked

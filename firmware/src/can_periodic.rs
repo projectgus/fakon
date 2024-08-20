@@ -60,9 +60,9 @@ pub fn counter_update<const MASK: u8>(data: &mut u8) {
 //
 // Currently the skipped value is the same as the masked value (i.e.
 // all bits set).
-pub fn counter_update_skip<const MASK: u8>(data: &mut u8) {
+pub fn counter_update_skip<const MASK: u8, const SKIP: u8>(data: &mut u8) {
     counter_update::<MASK>(data);
-    if *data & MASK == MASK {
+    if *data & MASK == SKIP {
         counter_update::<MASK>(data);
     }
 }

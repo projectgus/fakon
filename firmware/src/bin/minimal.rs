@@ -10,6 +10,7 @@ use fakon as _;
 )]
 mod app {
     use fakon;
+    use fakon::car;
     use fakon::can_queue;
     use fakon::hardware;
 
@@ -17,6 +18,7 @@ mod app {
     #[shared]
     struct Shared {
         pcan_tx: can_queue::TxQueue<hardware::PCAN>,
+        car: fakon::car::CarState,
     }
 
     // Local resources go here
@@ -41,10 +43,21 @@ mod app {
             pcan_config,
             &can_timing_500kbps);
 
+        let car = car::CarState {
+            charge_port_locked: false,
+            ignition_on: false,
+        };
+
         srscm::spawn().ok();
+        ieb_100_hz::spawn().ok();
+        ieb_50_hz::spawn().ok();
+        ieb_10_hz::spawn().ok();
+        igpm_10_hz::spawn().ok();
+        igpm_5_hz::spawn().ok();
+        igpm_1_hz::spawn().ok();
 
         (
-            Shared { pcan_tx },
+            Shared { pcan_tx, car },
             Local {
                 brake_input,
                 srs_crash_out
@@ -60,6 +73,31 @@ mod app {
     #[task(shared = [pcan_tx], local = [brake_input], priority = 3)]
     async fn ieb_100_hz(cx: ieb_100_hz::Context) {
         fakon::ieb::task_ieb_100_hz(cx.shared.pcan_tx, cx.local.brake_input).await;
+    }
+
+    #[task(shared = [pcan_tx], priority = 3)]
+    async fn ieb_50_hz(cx: ieb_50_hz::Context) {
+        fakon::ieb::task_ieb_50_hz(cx.shared.pcan_tx).await;
+    }
+
+    #[task(shared = [pcan_tx], priority = 3)]
+    async fn ieb_10_hz(cx: ieb_10_hz::Context) {
+        fakon::ieb::task_ieb_10_hz(cx.shared.pcan_tx).await;
+    }
+
+    #[task(shared = [pcan_tx, car], priority = 3)]
+    async fn igpm_10_hz(cx: igpm_10_hz::Context) {
+        fakon::igpm::task_igpm_10_hz(cx.shared.pcan_tx, cx.shared.car).await;
+    }
+
+    #[task(shared = [pcan_tx], priority = 3)]
+    async fn igpm_5_hz(cx: igpm_5_hz::Context) {
+        fakon::igpm::task_igpm_5_hz(cx.shared.pcan_tx).await;
+    }
+
+    #[task(shared = [pcan_tx], priority = 3)]
+    async fn igpm_1_hz(cx: igpm_1_hz::Context) {
+        fakon::igpm::task_igpm_1_hz(cx.shared.pcan_tx).await;
     }
 
     // FIXME: Enable and process FDCAN interrupts
