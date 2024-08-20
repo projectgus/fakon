@@ -22,6 +22,7 @@ mod app {
     // Local resources go here
     #[local]
     struct Local {
+        brake_input: hardware::BrakeInput,
         srs_crash_out: hardware::PwmSrsCrashOutput,
     }
 
@@ -33,6 +34,7 @@ mod app {
             pcan_config,
             srs_crash_out,
             can_timing_500kbps,
+            brake_input,
         } = hardware::init(cx.core, cx.device);
 
         let (_pcan_rx, _pcan_receive, pcan_tx) = can_queue::init(
@@ -44,6 +46,7 @@ mod app {
         (
             Shared { pcan_tx },
             Local {
+                brake_input,
                 srs_crash_out
             },
         )
@@ -52,6 +55,11 @@ mod app {
     #[task(shared = [pcan_tx], local = [srs_crash_out], priority = 3)]
     async fn srscm(cx: srscm::Context) {
         fakon::srscm::task(cx.shared.pcan_tx, cx.local.srs_crash_out).await;
+    }
+
+    #[task(shared = [pcan_tx], local = [brake_input], priority = 3)]
+    async fn ieb_100_hz(cx: ieb_100_hz::Context) {
+        fakon::ieb::task_ieb_100_hz(cx.shared.pcan_tx, cx.local.brake_input).await;
     }
 
     // FIXME: Enable and process FDCAN interrupts

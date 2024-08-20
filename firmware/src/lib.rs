@@ -9,8 +9,10 @@ use panic_probe as _;
 
 use stm32g4xx_hal as _; // memory layout
 
+pub mod can_periodic;
 pub mod can_queue;
 pub mod hardware;
+pub mod ieb;
 pub mod srscm;
 
 // same panicking *behavior* as `panic-probe` but doesn't print a panic message
