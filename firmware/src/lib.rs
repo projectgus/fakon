@@ -9,9 +9,10 @@ use panic_probe as _;
 
 use stm32g4xx_hal as _; // memory layout
 
-pub mod can_periodic;
 pub mod can_queue;
+pub mod can_utils;
 pub mod hardware;
+pub mod periodic;
 pub mod car;
 pub mod ieb;
 pub mod igpm;

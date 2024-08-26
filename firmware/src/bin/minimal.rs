@@ -49,12 +49,8 @@ mod app {
         };
 
         srscm::spawn().ok();
-        ieb_100_hz::spawn().ok();
-        ieb_50_hz::spawn().ok();
-        ieb_10_hz::spawn().ok();
-        igpm_10_hz::spawn().ok();
-        igpm_5_hz::spawn().ok();
-        igpm_1_hz::spawn().ok();
+        ieb::spawn().ok();
+        igpm::spawn().ok();
 
         (
             Shared { pcan_tx, car },
@@ -71,33 +67,13 @@ mod app {
     }
 
     #[task(shared = [pcan_tx], local = [brake_input], priority = 3)]
-    async fn ieb_100_hz(cx: ieb_100_hz::Context) {
-        fakon::ieb::task_ieb_100_hz(cx.shared.pcan_tx, cx.local.brake_input).await;
-    }
-
-    #[task(shared = [pcan_tx], priority = 3)]
-    async fn ieb_50_hz(cx: ieb_50_hz::Context) {
-        fakon::ieb::task_ieb_50_hz(cx.shared.pcan_tx).await;
-    }
-
-    #[task(shared = [pcan_tx], priority = 3)]
-    async fn ieb_10_hz(cx: ieb_10_hz::Context) {
-        fakon::ieb::task_ieb_10_hz(cx.shared.pcan_tx).await;
+    async fn ieb(cx: ieb::Context) {
+        fakon::ieb::task_ieb(cx.shared.pcan_tx, cx.local.brake_input).await;
     }
 
     #[task(shared = [pcan_tx, car], priority = 3)]
-    async fn igpm_10_hz(cx: igpm_10_hz::Context) {
-        fakon::igpm::task_igpm_10_hz(cx.shared.pcan_tx, cx.shared.car).await;
-    }
-
-    #[task(shared = [pcan_tx], priority = 3)]
-    async fn igpm_5_hz(cx: igpm_5_hz::Context) {
-        fakon::igpm::task_igpm_5_hz(cx.shared.pcan_tx).await;
-    }
-
-    #[task(shared = [pcan_tx], priority = 3)]
-    async fn igpm_1_hz(cx: igpm_1_hz::Context) {
-        fakon::igpm::task_igpm_1_hz(cx.shared.pcan_tx).await;
+    async fn igpm(cx: igpm::Context) {
+        fakon::igpm::task_igpm(cx.shared.pcan_tx, cx.shared.car).await;
     }
 
     // FIXME: Enable and process FDCAN interrupts
