@@ -14,14 +14,12 @@ mod app {
     use fakon::car;
     use fakon::hardware;
 
-    // Shared resources go here
     #[shared]
     struct Shared {
         pcan_tx: can_queue::Tx<hardware::PCAN>,
-        car: fakon::car::CarState,
+        car: car::CarState,
     }
 
-    // Local resources go here
     #[local]
     struct Local {
         pcan_control: can_queue::Control<hardware::PCAN>,
@@ -91,7 +89,7 @@ mod app {
     }
 
     #[task(binds = FDCAN1_INTR0_IT, shared = [pcan_tx], local=[pcan_control], priority = 5)]
-    fn pcan_int(cx: pcan_int::Context) {
+    fn pcan_irq(cx: pcan_irq::Context) {
         cx.local.pcan_control.on_irq(cx.shared.pcan_tx);
     }
 }
