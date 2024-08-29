@@ -1,5 +1,4 @@
 use crate::can_queue;
-use crate::can_queue::Tx;
 use crate::hardware;
 use crate::hardware::Mono;
 use fugit::RateExtU32;
@@ -10,7 +9,7 @@ use stm32g4xx_hal::prelude::OutputPin;
 
 pub async fn task<M>(mut pcan_tx: M, crash_out: &mut hardware::PwmSrsCrashOutput) -> !
 where
-    M: Mutex<T = can_queue::TxQueue<hardware::PCAN>>,
+    M: Mutex<T = can_queue::Tx<hardware::PCAN>>,
 {
     // SRS/Airbag control system task. Currently very simple:
     // 1Hz CAN message (constant)

@@ -10,22 +10,22 @@ use fakon as _;
 )]
 mod app {
     use fakon;
-    use fakon::car;
     use fakon::can_queue;
+    use fakon::car;
     use fakon::hardware;
 
     // Shared resources go here
     #[shared]
     struct Shared {
-        pcan_tx: can_queue::TxQueue<hardware::PCAN>,
+        pcan_tx: can_queue::Tx<hardware::PCAN>,
         car: fakon::car::CarState,
     }
 
     // Local resources go here
     #[local]
     struct Local {
-        pcan_control: fdcan::FdCanControl<hardware::PCAN, fdcan::NormalOperationMode>,
-        pcan_rx: can_queue::Rx<hardware::PCAN>,
+        pcan_control: can_queue::Control<hardware::PCAN>,
+        pcan_rx: can_queue::Rx,
         brake_input: hardware::BrakeInput,
         srs_crash_out: hardware::PwmSrsCrashOutput,
     }
@@ -41,18 +41,18 @@ mod app {
             brake_input,
         } = hardware::init(cx.core, cx.device);
 
-        let (pcan_control, pcan_rx, _pcan_receive, pcan_tx) = can_queue::init(
-            pcan_config,
-            &can_timing_500kbps);
+        let (pcan_control, pcan_rx, pcan_tx) =
+            can_queue::Control::init(pcan_config, &can_timing_500kbps);
 
         let car = car::CarState {
             charge_port_locked: false,
             ignition_on: false,
         };
 
-        srscm::spawn().ok();
-        ieb::spawn().ok();
-        igpm::spawn().ok();
+        pcan_rx::spawn().unwrap();
+        srscm::spawn().unwrap();
+        ieb::spawn().unwrap();
+        igpm::spawn().unwrap();
 
         (
             Shared { pcan_tx, car },
@@ -60,9 +60,19 @@ mod app {
                 pcan_control,
                 pcan_rx,
                 brake_input,
-                srs_crash_out
+                srs_crash_out,
             },
         )
+    }
+
+    #[task(local = [pcan_rx], priority = 2)]
+    async fn pcan_rx(cx: pcan_rx::Context) {
+        let pcan_rx = cx.local.pcan_rx;
+        loop {
+            let frame = pcan_rx.recv().await.unwrap();
+            // TODO: actually handle received CAN messages!
+            defmt::debug!("PCAN RX {:?}", frame);
+        }
     }
 
     #[task(shared = [pcan_tx], local = [srs_crash_out], priority = 3)]
@@ -80,24 +90,8 @@ mod app {
         fakon::igpm::task_igpm(cx.shared.pcan_tx, cx.shared.car).await;
     }
 
-    // FIXME: Enable and process FDCAN interrupts
-
-    #[task(binds = FDCAN1_INTR0_IT, shared = [pcan_tx], local=[pcan_control, pcan_rx], priority = 5)]
-    fn pcan_int(mut cx: pcan_int::Context) {
-        let control = &mut cx.local.pcan_control;
-        if control.has_interrupt(fdcan::interrupt::Interrupt::TxComplete) {
-            cx.shared.pcan_tx.lock(|pcan_tx| { pcan_tx.on_tx_irq(); });
-        } else if control.has_interrupt(fdcan::interrupt::Interrupt::RxFifo0NewMsg) {
-            cx.local.pcan_rx.on_rx_irq();
-        } else {
-            // TODO: handle error interrupts
-        }
-        control.clear_interrupts(fdcan::interrupt::Interrupts::all);
+    #[task(binds = FDCAN1_INTR0_IT, shared = [pcan_tx], local=[pcan_control], priority = 5)]
+    fn pcan_int(cx: pcan_int::Context) {
+        cx.local.pcan_control.on_irq(cx.shared.pcan_tx);
     }
-
-    // #[task(binds = USB_LP_CAN_RX0, local = [can_rx], priority = 5)]
-    // fn can1_rx(cx: can1_rx::Context) {
-    //     cx.local.can_rx.on_rx_irq();
-    // }
-
 }

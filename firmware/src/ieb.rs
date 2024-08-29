@@ -1,9 +1,9 @@
 use crate::can_utils::{
     byte_checksum_simple, counter_update, counter_update_skip,
 };
-use crate::periodic::PeriodicGroup;
-use crate::can_queue::{self, QueuedFrame, Tx};
 use crate::hardware;
+use crate::periodic::PeriodicGroup;
+use crate::can_queue::{self, QueuedFrame};
 use fugit::RateExtU32;
 use hex_literal::hex;
 use rtic::Mutex;
@@ -12,7 +12,7 @@ use stm32g4xx_hal::prelude::InputPin;
 // TODO: Add the other brake pedal signal gpio
 pub async fn task_ieb<M>(mut pcan_tx: M, brake_input: &mut hardware::BrakeInput) -> !
 where
-    M: Mutex<T = can_queue::TxQueue<hardware::PCAN>>,
+    M: Mutex<T = can_queue::Tx<hardware::PCAN>>,
 {
     let mut tcs_153 = QueuedFrame::new_std(0x153, &hex!("208010FF00FF0000"));
     let mut ieb_2a2 = QueuedFrame::new_std(0x2a2, &hex!("0500001C1000005E"));
