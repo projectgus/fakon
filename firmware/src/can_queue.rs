@@ -1,6 +1,7 @@
 use core::cmp::{min, Ordering};
 use defmt::{info, warn};
 use fdcan::config::FrameTransmissionConfig::ClassicCanOnly;
+use fdcan::config::Interrupts;
 use fdcan::id::{Id, StandardId};
 use heapless::binary_heap::Max;
 use heapless::BinaryHeap;
@@ -30,7 +31,7 @@ const TX_CAPACITY: usize = 16;
 pub type RxReceiver = channel::Receiver<'static, QueuedFrame, RX_CAPACITY>;
 type RxSender = channel::Sender<'static, QueuedFrame, RX_CAPACITY>;
 
-pub fn init<I: fdcan::Instance>(mut can: fdcan::FdCan<I, fdcan::ConfigMode>, bit_timings: &CanBitTiming) -> (Rx<I>, RxReceiver, TxQueue<I>)
+pub fn init<I: fdcan::Instance>(mut can: fdcan::FdCan<I, fdcan::ConfigMode>, bit_timings: &CanBitTiming) -> (fdcan::FdCanControl<I, fdcan::NormalOperationMode>, Rx<I>, RxReceiver, TxQueue<I>)
 {
     // Convert the generic bit timings to FDCAN bit timings
     let btr = NominalBitTiming {
@@ -47,16 +48,18 @@ pub fn init<I: fdcan::Instance>(mut can: fdcan::FdCan<I, fdcan::ConfigMode>, bit
         StandardFilter::accept_all_into_fifo0(),
     );
     can.set_frame_transmit(ClassicCanOnly); // Currently no FD long frame support
+    can.enable_interrupts(Interrupts::RX_FIFO0_NEW_MSG | Interrupts::ERR_PASSIVE | Interrupts::BUS_OFF | Interrupts::TX_COMPLETE);
+    can.select_interrupt_line_1(Interrupts::TX_COMPLETE);
     info!("-- Current Config: {:#?}", can.get_config());
     let can = can.into_normal();
 
     //nb::block!(can.enable_non_blocking()).unwrap(); // TODO
 
-    let (_, can_tx, can_rx, _can_rx1) = can.split();
+    let (can_control, can_tx, can_rx, _can_rx1) = can.split();
 
     let (rx, rx_receiver) = Rx::new(can_rx);
 
-    (rx, rx_receiver, TxQueue::new(can_tx))
+    (can_control, rx, rx_receiver, TxQueue::new(can_tx))
 }
 
 #[derive(Clone, Debug)]

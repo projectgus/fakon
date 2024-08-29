@@ -24,6 +24,8 @@ mod app {
     // Local resources go here
     #[local]
     struct Local {
+        pcan_control: fdcan::FdCanControl<hardware::PCAN, fdcan::NormalOperationMode>,
+        pcan_rx: can_queue::Rx<hardware::PCAN>,
         brake_input: hardware::BrakeInput,
         srs_crash_out: hardware::PwmSrsCrashOutput,
     }
@@ -39,7 +41,7 @@ mod app {
             brake_input,
         } = hardware::init(cx.core, cx.device);
 
-        let (_pcan_rx, _pcan_receive, pcan_tx) = can_queue::init(
+        let (pcan_control, pcan_rx, _pcan_receive, pcan_tx) = can_queue::init(
             pcan_config,
             &can_timing_500kbps);
 
@@ -55,6 +57,8 @@ mod app {
         (
             Shared { pcan_tx, car },
             Local {
+                pcan_control,
+                pcan_rx,
                 brake_input,
                 srs_crash_out
             },
@@ -78,10 +82,18 @@ mod app {
 
     // FIXME: Enable and process FDCAN interrupts
 
-    // #[task(binds = USB_HP_CAN_TX, shared = [can_tx], priority = 5)]
-    // fn can1_tx(mut cx: can1_tx::Context) {
-    //     cx.shared.can_tx.lock(|can_tx| can_tx.on_tx_irq());
-    // }
+    #[task(binds = FDCAN1_INTR0_IT, shared = [pcan_tx], local=[pcan_control, pcan_rx], priority = 5)]
+    fn pcan_int(mut cx: pcan_int::Context) {
+        let control = &mut cx.local.pcan_control;
+        if control.has_interrupt(fdcan::interrupt::Interrupt::TxComplete) {
+            cx.shared.pcan_tx.lock(|pcan_tx| { pcan_tx.on_tx_irq(); });
+        } else if control.has_interrupt(fdcan::interrupt::Interrupt::RxFifo0NewMsg) {
+            cx.local.pcan_rx.on_rx_irq();
+        } else {
+            // TODO: handle error interrupts
+        }
+        control.clear_interrupts(fdcan::interrupt::Interrupts::all);
+    }
 
     // #[task(binds = USB_LP_CAN_RX0, local = [can_rx], priority = 5)]
     // fn can1_rx(cx: can1_rx::Context) {
