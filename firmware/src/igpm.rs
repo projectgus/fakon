@@ -59,7 +59,7 @@ where
         if period_10hz.due(&group) {
             // IGPM 541
             {
-                if car_state.ignition_on {
+                if car_state.ignition_on() {
                     igpm_541.data[0] = 0x03;
                     igpm_541.data[7] = 0x0C;  // note : parking brake switch also in this byte
                 } else {
@@ -80,7 +80,7 @@ where
             // IGPM 5EC
             {
                 // Is charge port locked?
-                igpm_5ec.data[0] = if car_state.charge_port_locked { 1 } else { 0 };
+                igpm_5ec.data[0] = if car_state.charge_port_locked() { 1 } else { 0 };
             }
 
             pcan_tx.lock(|tx| {

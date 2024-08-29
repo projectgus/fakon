@@ -2,17 +2,18 @@ use crate::can_utils::{
     byte_checksum_simple, counter_update, counter_update_skip,
 };
 use crate::hardware;
+use crate::car;
 use crate::periodic::PeriodicGroup;
 use crate::can_queue::{self, QueuedFrame};
 use fugit::RateExtU32;
 use hex_literal::hex;
 use rtic::Mutex;
-use stm32g4xx_hal::prelude::InputPin;
 
 // TODO: Add the other brake pedal signal gpio
-pub async fn task_ieb<M>(mut pcan_tx: M, brake_input: &mut hardware::BrakeInput) -> !
+pub async fn task_ieb<MPCAN, MCAR>(mut pcan_tx: MPCAN, mut car: MCAR) -> !
 where
-    M: Mutex<T = can_queue::Tx<hardware::PCAN>>,
+    MPCAN: Mutex<T = can_queue::Tx<hardware::PCAN>>,
+    MCAR: Mutex<T = car::CarState>,
 {
     let mut tcs_153 = QueuedFrame::new_std(0x153, &hex!("208010FF00FF0000"));
     let mut ieb_2a2 = QueuedFrame::new_std(0x2a2, &hex!("0500001C1000005E"));
@@ -29,7 +30,8 @@ where
     loop {
         group.next_poll().await;
 
-        let braking = brake_input.is_high().unwrap();
+        // Read once per loop for consistency
+        let braking = car.lock(|car| car.is_braking() );
 
         if every_100hz.due(&group) {
             // TCS 153

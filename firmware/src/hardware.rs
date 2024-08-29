@@ -6,6 +6,7 @@ use fdcan::ConfigMode;
 use fdcan::FdCan;
 use fugit::RateExtU32;
 use hal::gpio::gpioa;
+use hal::gpio::gpiob;
 use hal::gpio::gpioc;
 use hal::gpio::Floating;
 use hal::gpio::Input;
@@ -27,7 +28,9 @@ pub type PCAN = hal::can::Can<hal::stm32::FDCAN1>;
 // Type aliases for I/O pins
 pub type PwmSrsCrashOutput = gpioa::PA4<Output<PushPull>>;
 
-pub type BrakeInput = gpioc::PC9<Input<Floating>>;
+pub type IG1OnInput = gpioc::PC9<Input<Floating>>;
+
+pub type BrakeInput = gpiob::PB8<Input<Floating>>;
 
 // Struct to encompass all the board resources, as their functions
 pub struct Board {
@@ -35,6 +38,7 @@ pub struct Board {
     pub srs_crash_out: PwmSrsCrashOutput,
     pub can_timing_500kbps: can_bit_timings::CanBitTiming,
     pub brake_input: BrakeInput,
+    pub ig1_on_input: IG1OnInput,
 }
 
 // Systick Based Timer
@@ -115,7 +119,7 @@ pub fn init(core: cortex_m::Peripherals, dp: stm32::Peripherals) -> Board {
 
     // Signal Inputs
     let pin_in1 = gpioc.pc9; // 12V
-    let _pin_in2 = gpiob.pb8; // 12V
+    let pin_in2 = gpiob.pb8; // 12V
     let _pin_in3 = gpiob.pb9; // 12V
     let _pin_in4 = gpioa.pa5; // 12V
     let _pin_in5 = gpioa.pa6; // 12V
@@ -165,13 +169,17 @@ pub fn init(core: cortex_m::Peripherals, dp: stm32::Peripherals) -> Board {
     // OUT1 => SRS Crash signal, 50Hz soft PWM
     let srs_crash_out = pin_out1.into_push_pull_output();
 
-    // Brake pedal input signal
-    let brake_input = pin_in1.into_floating_input();
+    // IN1 => IG1 ignition on input
+    let ig1_on_input = pin_in1.into_floating_input();
+
+    // IN2 => Brake pedal input signal
+    let brake_input = pin_in2.into_floating_input();
 
     Board {
         pcan_config: can1_config,
         srs_crash_out,
         can_timing_500kbps,
+        ig1_on_input,
         brake_input,
     }
 }
