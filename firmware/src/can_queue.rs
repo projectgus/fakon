@@ -70,7 +70,7 @@ impl<I: fdcan::Instance> Control<I> {
                 | Interrupts::BUS_OFF
                 | Interrupts::TX_COMPLETE,
         );
-        defmt::info!("-- Current Config: {:#?}", can.get_config());
+        defmt::info!("Configuring fdcan...");
 
         // Make the RTIC channel for received messages
         let (rx_sender, rx_receiver) = make_channel!(QueuedFrame, RX_CAPACITY);
@@ -138,6 +138,22 @@ impl<I: fdcan::Instance> Control<I> {
 pub struct QueuedFrame {
     pub header: TxFrameHeader, // Note: TxFrameHeader is used for TX and RX directions
     pub data: [u8; 8],         // Fixed size array, see header.len for 'real' length
+}
+
+impl defmt::Format for QueuedFrame {
+    fn format(&self, f: defmt::Formatter) {
+        // format the bitfields of the register as struct fields
+        defmt::write!(
+           f,
+            "CAN Frame (id={=u32:x}, dlen={}, data={=[u8]:x})",
+            match self.header.id {
+                Id::Standard(sid) => sid.as_raw().into(),
+                Id::Extended(eid) => eid.as_raw(),
+            },
+            self.header.len,
+            self.data,
+        )
+    }
 }
 
 // TODO: Figure out how to use fdcan::frame::FramePriority here, currently

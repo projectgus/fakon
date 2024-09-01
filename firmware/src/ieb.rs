@@ -42,7 +42,7 @@ where
 
             // 2A2 Brake pedal data. Includes pedal force field and other brake-proportional field.
             {
-                ieb_2a2.data[0] ^= 0x01; // LSB of byte 0 is a heartbit bit TODO:confirm LSB not MSB
+                ieb_2a2.data[0] ^= 0x01; // LSB of byte 0 is a heartbit bit
 
                 if braking {
                     ieb_2a2.data[3] = 0x1C; // 3,4 BrakePedalForce 16-bit
