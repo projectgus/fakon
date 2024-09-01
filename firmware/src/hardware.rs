@@ -64,7 +64,7 @@ pub fn init(core: cortex_m::Peripherals, dp: stm32::Peripherals) -> Board {
     let clock_config = rcc::Config::default()
         .pll_cfg(pll_config)
         .clock_src(rcc::SysClockSrc::PLL)
-        .ahb_psc(rcc::Prescaler::Div2)
+        .ahb_psc(rcc::Prescaler::NotDivided)
         .apb1_psc(rcc::Prescaler::Div2)
         .apb2_psc(rcc::Prescaler::Div2);
 
@@ -73,7 +73,7 @@ pub fn init(core: cortex_m::Peripherals, dp: stm32::Peripherals) -> Board {
 
     // After clock configuration, the following should be true:
     // Sysclock is 128MHz
-    // AHB clock is 64MHz
+    // AHB clock is 128MHz
     // APB1 clock is 64MHz
     // APB2 clock is 64MHz
 

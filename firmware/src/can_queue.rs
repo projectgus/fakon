@@ -45,6 +45,11 @@ impl<I: fdcan::Instance> Control<I> {
         bit_timings: &CanBitTiming,
     ) -> (Self, Rx, Tx<I>) {
         // Convert the generic bit timings to FDCAN bit timings
+        defmt::debug!("CAN prescaler {} bs1 {} bs2 {} sjw {}",
+                     bit_timings.prescaler,
+                     bit_timings.bs1,
+                     bit_timings.bs2,
+                     bit_timings.sjw);
         let btr = NominalBitTiming {
             prescaler: bit_timings.prescaler.try_into().unwrap(),
             seg1: bit_timings.bs1.try_into().unwrap(),
