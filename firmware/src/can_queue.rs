@@ -1,9 +1,10 @@
 use can_bit_timings::CanBitTiming;
-use fdcan::interrupt::{Interrupt, Interrupts};
 use core::cmp::{min, Ordering};
 use fdcan::config::FrameTransmissionConfig::ClassicCanOnly;
+use fdcan::config::InterruptLine;
 use fdcan::id::{Id, StandardId};
-use fdcan::{self, Fifo0, Mailbox, NormalOperationMode, ReceiveOverrun};
+use fdcan::interrupt::{Interrupt, Interrupts};
+use fdcan::{self, Fifo0, Mailbox, Mailboxes, NormalOperationMode, ReceiveOverrun};
 use fdcan::{
     config::NominalBitTiming,
     filter::{StandardFilter, StandardFilterSlot},
@@ -45,11 +46,13 @@ impl<I: fdcan::Instance> Control<I> {
         bit_timings: &CanBitTiming,
     ) -> (Self, Rx, Tx<I>) {
         // Convert the generic bit timings to FDCAN bit timings
-        defmt::debug!("CAN prescaler {} bs1 {} bs2 {} sjw {}",
-                     bit_timings.prescaler,
-                     bit_timings.bs1,
-                     bit_timings.bs2,
-                     bit_timings.sjw);
+        defmt::debug!(
+            "CAN prescaler {} bs1 {} bs2 {} sjw {}",
+            bit_timings.prescaler,
+            bit_timings.bs1,
+            bit_timings.bs2,
+            bit_timings.sjw
+        );
         let btr = NominalBitTiming {
             prescaler: bit_timings.prescaler.try_into().unwrap(),
             seg1: bit_timings.bs1.try_into().unwrap(),
@@ -64,12 +67,15 @@ impl<I: fdcan::Instance> Control<I> {
             StandardFilter::accept_all_into_fifo0(),
         );
         can.set_frame_transmit(ClassicCanOnly); // Currently no FD long frame support
+
+        can.enable_interrupt_line(InterruptLine::_1, true); // Swapped in crate, this is line 0
         can.enable_interrupts(
             Interrupts::RX_FIFO0_NEW_MSG
                 | Interrupts::ERR_PASSIVE
                 | Interrupts::BUS_OFF
                 | Interrupts::TX_COMPLETE,
         );
+        can.enable_transmission_interrupts(Mailboxes::all());
         defmt::info!("Configuring fdcan...");
 
         // Make the RTIC channel for received messages
@@ -102,8 +108,7 @@ impl<I: fdcan::Instance> Control<I> {
         } else if self.hw.has_interrupt(Interrupt::RxFifo0NewMsg) {
             self.on_rx_irq();
         } else if self.hw.has_interrupt(Interrupt::ErrPassive) {
-            defmt::warn!("CAN peripheral in Error Passive");
-            // TODO: Should probably try to recover from this?
+            panic!("CAN peripheral in Error Passive");
         } else if self.hw.has_interrupt(Interrupt::BusOff) {
             panic!("CAN peripheral in Bus Off");
         }
@@ -144,7 +149,7 @@ impl defmt::Format for QueuedFrame {
     fn format(&self, f: defmt::Formatter) {
         // format the bitfields of the register as struct fields
         defmt::write!(
-           f,
+            f,
             "CAN Frame (id={=u32:x}, dlen={}, data={=[u8]:x})",
             match self.header.id {
                 Id::Standard(sid) => sid.as_raw().into(),

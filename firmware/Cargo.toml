@@ -1,5 +1,6 @@
 [package]
 name = "fakon"
+
 authors = [ "Angus Gratton <gus@projectgus.com" ]
 edition = "2021"
 version = "0.1.0"
@@ -9,8 +10,8 @@ cortex-m = { version = "0.7", features = ["critical-section-single-core"] }
 defmt = { version = "0.3", features = ["encoding-rzcobs"] }
 defmt-brtt = { version = "0.1", default-features = false, features = ["rtt"] }
 panic-probe = { version = "0.3", features = ["print-defmt"] }
-rtic = { version = "2.1", features = [ "thumbv7-backend" ] }
-stm32g4xx-hal = { git = "https://github.com/stm32-rs/stm32g4xx-hal.git", rev = "0c2ed52", features = [ "stm32g474" ] }
+rtic = { version = "2.1", features = [ "thumbv7-backend", "rtic-monotonics" ] }
+stm32g4xx-hal = { git = "https://github.com/stm32-rs/stm32g4xx-hal.git", rev = "39eb64a", features = [ "stm32g474" ] }
 rtic-monotonics = { version = "2.0", features = ["cortex-m-systick"] }
 panic-abort = "0.3.2"
 fugit = "0.3.7"
@@ -68,3 +69,8 @@ overflow-checks = false # <-
 # defmt-rtt = { git = "https://github.com/knurling-rs/defmt", rev = "use defmt version supported by probe-rs (see changelog)" }
 # defmt-test = { git = "https://github.com/knurling-rs/defmt", rev = "use defmt version supported by probe-rs (see changelog)" }
 # panic-probe = { git = "https://github.com/knurling-rs/defmt", rev = "use defmt version supported by probe-rs (see changelog)" }
+
+[patch.crates-io]
+fdcan = { path = "../../fdcan" }
+
+

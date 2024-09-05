@@ -93,7 +93,9 @@ mod app {
         fakon::igpm::task_igpm(cx.shared.pcan_tx, cx.shared.car).await;
     }
 
-    #[task(binds = FDCAN1_INTR0_IT, shared = [pcan_tx], local=[pcan_control], priority = 5)]
+    // FDCAN_INTR0_IT and FDCAN_INTR1_IT are swapped, until stm32g4 crate
+    // updates to include https://github.com/stm32-rs/stm32-rs/pull/996
+    #[task(binds = FDCAN1_INTR1_IT, shared = [pcan_tx], local=[pcan_control], priority = 5)]
     fn pcan_irq(cx: pcan_irq::Context) {
         cx.local.pcan_control.on_irq(cx.shared.pcan_tx);
     }
