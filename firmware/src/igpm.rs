@@ -46,7 +46,7 @@ where
 
     let mut group = PeriodicGroup::new(10.Hz());
     let mut period_10hz = group.new_period(10.Hz());
-    let mut period_5hz = group.new_period(10.Hz());
+    let mut period_5hz = group.new_period(5.Hz());
     let mut period_1hz = group.new_period(1.Hz());
 
     loop {
