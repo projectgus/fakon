@@ -150,13 +150,13 @@ impl defmt::Format for QueuedFrame {
         // format the bitfields of the register as struct fields
         defmt::write!(
             f,
-            "CAN Frame (id={=u32:x}, dlen={}, data={=[u8]:x})",
+            "CAN Frame (id={=u32:#x}, dlen={}, data={=[u8]:#04x})",
             match self.header.id {
                 Id::Standard(sid) => sid.as_raw().into(),
                 Id::Extended(eid) => eid.as_raw(),
             },
             self.header.len,
-            self.data,
+            self.data[..self.header.len as usize],
         )
     }
 }
@@ -264,7 +264,7 @@ impl<I: fdcan::Instance> Tx<I> {
     }
 
     pub fn transmit(&mut self, msg: &QueuedFrame) {
-        defmt::debug!("CAN TX {:?}", msg);
+        defmt::trace!("CAN TX {:?}", msg);
         let maybe_queue = match self.can.transmit_preserve(
             msg.header,
             &msg.data,
