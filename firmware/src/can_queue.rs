@@ -108,7 +108,7 @@ impl<I: fdcan::Instance> Control<I> {
         } else if self.hw.has_interrupt(Interrupt::RxFifo0NewMsg) {
             self.on_rx_irq();
         } else if self.hw.has_interrupt(Interrupt::ErrPassive) {
-            panic!("CAN peripheral in Error Passive");
+            defmt::warn!("CAN peripheral in Error Passive"); // TODO: how to recover?
         } else if self.hw.has_interrupt(Interrupt::BusOff) {
             panic!("CAN peripheral in Bus Off");
         }
