@@ -32,6 +32,10 @@ pub type IG1OnInput = gpioc::PC9<Input<Floating>>;
 
 pub type BrakeInput = gpiob::PB8<Input<Floating>>;
 
+pub type RelayIG3Output = gpiob::PB6<Output<PushPull>>;
+
+pub type LEDIgnitionOutput = gpiob::PB10<Output<PushPull>>;
+
 // Struct to encompass all the board resources, as their functions
 pub struct Board {
     pub pcan_config: FdCan<PCAN, ConfigMode>,
@@ -39,6 +43,8 @@ pub struct Board {
     pub can_timing_500kbps: can_bit_timings::CanBitTiming,
     pub brake_input: BrakeInput,
     pub ig1_on_input: IG1OnInput,
+    pub relay_ig3: RelayIG3Output,
+    pub led_ignition: LEDIgnitionOutput,
 }
 
 // Systick Based Timer
@@ -145,12 +151,12 @@ pub fn init(core: cortex_m::Peripherals, dp: stm32::Peripherals) -> Board {
     let _pin_out7 = gpioa.pa1; // 5V, TIM2_CH2 or TIM5_CH2
 
     // Relay coil drivers
-    let _pin_coil_l1 = gpiob.pb6;
+    let pin_coil_l1 = gpiob.pb6;
     let _pin_coil_l2 = gpioc.pc4; // also LED4, oops
     let _pin_coil_h = gpioc.pc5;
 
     // LEDs, all green, all active high
-    let _led1 = gpiob.pb10.into_push_pull_output();
+    let led1 = gpiob.pb10.into_push_pull_output();
     let _led2 = gpiob.pb5.into_push_pull_output();
     let _led3 = gpioa.pa10.into_push_pull_output();
     // led4 accidentally shared with pin_coil_l2
@@ -175,11 +181,19 @@ pub fn init(core: cortex_m::Peripherals, dp: stm32::Peripherals) -> Board {
     // IN2 => Brake pedal input signal
     let brake_input = pin_in2.into_floating_input();
 
+    // RELAY L1 - IG3 relay coil enable
+    let relay_ig3 = pin_coil_l1.into_push_pull_output();
+
+    // LED 1 - Ignition Status
+    let led_ignition = led1.into_push_pull_output();
+
     Board {
         pcan_config: can1_config,
         srs_crash_out,
         can_timing_500kbps,
         ig1_on_input,
+        relay_ig3,
+        led_ignition,
         brake_input,
     }
 }

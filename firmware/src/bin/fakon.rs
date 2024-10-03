@@ -16,6 +16,7 @@ mod app {
     use fakon::hardware::Mono;
     use fugit::ExtU32;
     use rtic_monotonics::Monotonic;
+    use stm32g4xx_hal::hal::digital::v2::OutputPin;
     use stm32g4xx_hal::prelude::InputPin;
 
     #[shared]
@@ -30,6 +31,8 @@ mod app {
         pcan_rx: can_queue::Rx,
         brake_input: hardware::BrakeInput,
         ig1_on_input: hardware::IG1OnInput,
+        relay_ig3: hardware::RelayIG3Output,
+        led_ignition: hardware::LEDIgnitionOutput,
         srs_crash_out: hardware::PwmSrsCrashOutput,
     }
 
@@ -43,6 +46,8 @@ mod app {
             can_timing_500kbps,
             brake_input,
             ig1_on_input,
+            led_ignition,
+            relay_ig3,
         } = hardware::init(cx.core, cx.device);
 
         let (pcan_control, pcan_rx, pcan_tx) =
@@ -64,6 +69,8 @@ mod app {
                 brake_input,
                 srs_crash_out,
                 ig1_on_input,
+                led_ignition,
+                relay_ig3,
             },
         )
     }
@@ -101,15 +108,30 @@ mod app {
     }
 
     // Why debounce interrupts when you can poll GPIOs in a loop?!?
-    #[task(shared = [car], local = [brake_input, ig1_on_input], priority = 6)]
+    #[task(shared = [car], local = [brake_input, ig1_on_input, led_ignition, relay_ig3], priority = 6)]
     async fn poll_inputs(mut cx: poll_inputs::Context) {
         loop {
             Mono::delay(10.millis()).await;
 
+            let ig1_on = cx.local.ig1_on_input.is_high().unwrap();
+
             cx.shared.car.lock(|car| {
-                car.set_ignition_on(cx.local.ig1_on_input.is_high().unwrap());
+                car.set_ignition_on(ig1_on);
                 car.set_is_braking(cx.local.brake_input.is_high().unwrap());
             });
+
+            // FIXME: ignition sequence should be its own task
+            match ig1_on {
+                true => {
+                    cx.local.relay_ig3.set_high().unwrap();
+                    cx.local.led_ignition.set_high().unwrap();
+                },
+                false => {
+                    cx.local.relay_ig3.set_low().unwrap();
+                    cx.local.led_ignition.set_low().unwrap();
+                }
+            }
+
         }
     }
 }

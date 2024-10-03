@@ -1,5 +1,3 @@
-
-
 #[derive(Clone, Debug)]
 pub struct CarState {
     ignition_on: bool,
