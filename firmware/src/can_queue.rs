@@ -4,7 +4,7 @@ use fdcan::config::FrameTransmissionConfig::ClassicCanOnly;
 use fdcan::config::InterruptLine;
 use fdcan::id::{Id, StandardId};
 use fdcan::interrupt::{Interrupt, Interrupts};
-use fdcan::{self, Fifo0, Mailbox, Mailboxes, NormalOperationMode, ReceiveOverrun};
+use fdcan::{self, Fifo0, Mailbox, NormalOperationMode, ReceiveOverrun};
 use fdcan::{
     config::NominalBitTiming,
     filter::{StandardFilter, StandardFilterSlot},
@@ -75,7 +75,7 @@ impl<I: fdcan::Instance> Control<I> {
                 | Interrupts::BUS_OFF
                 | Interrupts::TX_COMPLETE,
         );
-        can.enable_transmission_interrupts(Mailboxes::all());
+        //can.enable_transmission_interrupts(Mailboxes::all());
         defmt::info!("Configuring fdcan...");
 
         // Make the RTIC channel for received messages
