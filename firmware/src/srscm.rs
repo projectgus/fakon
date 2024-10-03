@@ -13,7 +13,7 @@ where
 {
     // SRS/Airbag control system task. Currently very simple:
     // 1Hz CAN message (constant)
-    // 50Hz soft PWM output, 80% high for "not crashed"
+    // 50Hz soft PWM output, 80% high for "not crashed", 20% high for "crashed"
     let can_1hz = can_queue::QueuedFrame::new_std(0x5a0, &hex!("000000C025029101"));
     let duty_pct = 80;
 
@@ -27,9 +27,9 @@ where
         pcan_tx.lock(|tx| tx.transmit(&can_1hz));
 
         for _ in 0..50 {
-            crash_out.set_high().unwrap();
+            crash_out.set_low().unwrap(); // Note: actual output inverted by N-FET
             Mono::delay(time_high).await;
-            crash_out.set_low().unwrap();
+            crash_out.set_high().unwrap();
             next_cycle += cycle_time;
             Mono::delay_until(next_cycle).await;
         }
