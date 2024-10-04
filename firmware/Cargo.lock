@@ -234,6 +234,7 @@ dependencies = [
  "fugit",
  "heapless",
  "hex-literal",
+ "inverted-pin",
  "nb 1.1.0",
  "panic-abort",
  "panic-probe",
@@ -333,6 +334,15 @@ checksum = "de3fc2e30ba82dd1b3911c8de1ffc143c74a914a14e99514d7637e3099df5ea0"
 dependencies = [
  "equivalent",
  "hashbrown",
+]
+
+[[package]]
+name = "inverted-pin"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "696ca6da747130f217d96a91540c258fd77d6b2675cd550dc8fd042ddf864ff6"
+dependencies = [
+ "embedded-hal 0.2.7",
 ]
 
 [[package]]

@@ -27,9 +27,9 @@ where
         pcan_tx.lock(|tx| tx.transmit(&can_1hz));
 
         for _ in 0..50 {
-            crash_out.set_low().unwrap(); // Note: actual output inverted by N-FET
-            Mono::delay(time_high).await;
             crash_out.set_high().unwrap();
+            Mono::delay(time_high).await;
+            crash_out.set_low().unwrap();
             next_cycle += cycle_time;
             Mono::delay_until(next_cycle).await;
         }

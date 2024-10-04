@@ -12,6 +12,7 @@ use hal::gpio::Floating;
 use hal::gpio::Input;
 use hal::gpio::Output;
 use hal::gpio::PushPull;
+use inverted_pin::InvertedPin;
 use stm32g4xx_hal as hal;
 use stm32g4xx_hal::can::CanExt;
 use stm32g4xx_hal::gpio::GpioExt;
@@ -26,7 +27,7 @@ use stm32g4xx_hal::stm32;
 pub type PCAN = hal::can::Can<hal::stm32::FDCAN1>;
 
 // Type aliases for I/O pins
-pub type PwmSrsCrashOutput = gpioa::PA4<Output<PushPull>>;
+pub type PwmSrsCrashOutput = InvertedPin<gpioa::PA4<Output<PushPull>>>;
 
 pub type IG1OnInput = gpioc::PC9<Input<Floating>>;
 
@@ -173,7 +174,8 @@ pub fn init(core: cortex_m::Peripherals, dp: stm32::Peripherals) -> Board {
     let _scu_park_rx = pin_in13;
 
     // OUT1 => SRS Crash signal, 50Hz soft PWM
-    let srs_crash_out = pin_out1.into_push_pull_output();
+    // Inverted as MCU pin drives a FET gate for open drain output
+    let srs_crash_out = InvertedPin::new(pin_out1.into_push_pull_output());
 
     // IN1 => IG1 ignition on input
     let ig1_on_input = pin_in1.into_floating_input();
