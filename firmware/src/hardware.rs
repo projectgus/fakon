@@ -27,7 +27,7 @@ use stm32g4xx_hal::stm32;
 pub type PCAN = hal::can::Can<hal::stm32::FDCAN1>;
 
 // Type aliases for I/O pins
-pub type PwmSrsCrashOutput = InvertedPin<gpioa::PA4<Output<PushPull>>>;
+pub type AcuCrashOutput = InvertedPin<gpioa::PA4<Output<PushPull>>>;
 
 pub type IG1OnInput = gpioc::PC9<Input<Floating>>;
 
@@ -40,7 +40,7 @@ pub type LEDIgnitionOutput = gpiob::PB10<Output<PushPull>>;
 // Struct to encompass all the board resources, as their functions
 pub struct Board {
     pub pcan_config: FdCan<PCAN, ConfigMode>,
-    pub srs_crash_out: PwmSrsCrashOutput,
+    pub srs_crash_out: AcuCrashOutput,
     pub can_timing_500kbps: can_bit_timings::CanBitTiming,
     pub brake_input: BrakeInput,
     pub ig1_on_input: IG1OnInput,

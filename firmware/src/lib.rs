@@ -16,7 +16,7 @@ pub mod periodic;
 pub mod car;
 pub mod ieb;
 pub mod igpm;
-pub mod srscm;
+pub mod airbag_control;
 pub mod dbc;
 
 // same panicking *behavior* as `panic-probe` but doesn't print a panic message

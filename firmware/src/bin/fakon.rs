@@ -33,7 +33,7 @@ mod app {
         ig1_on_input: hardware::IG1OnInput,
         relay_ig3: hardware::RelayIG3Output,
         led_ignition: hardware::LEDIgnitionOutput,
-        srs_crash_out: hardware::PwmSrsCrashOutput,
+        srs_crash_out: hardware::AcuCrashOutput,
     }
 
     #[init]
@@ -57,7 +57,7 @@ mod app {
 
         pcan_rx::spawn().unwrap();
         poll_inputs::spawn().unwrap();
-        srscm::spawn().unwrap();
+        airbag_control::spawn().unwrap();
         ieb::spawn().unwrap();
         igpm::spawn().unwrap();
 
@@ -86,8 +86,8 @@ mod app {
     }
 
     #[task(shared = [pcan_tx], local = [srs_crash_out], priority = 3)]
-    async fn srscm(cx: srscm::Context) {
-        fakon::srscm::task(cx.shared.pcan_tx, cx.local.srs_crash_out).await;
+    async fn airbag_control(cx: airbag_control::Context) {
+        fakon::airbag_control::task(cx.shared.pcan_tx, cx.local.srs_crash_out).await;
     }
 
     #[task(shared = [pcan_tx, car], priority = 3)]
