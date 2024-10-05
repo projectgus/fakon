@@ -12,12 +12,14 @@ mod app {
     use fakon;
     use fakon::can_queue;
     use fakon::car;
+    use fakon::dbc::pcan;
     use fakon::hardware;
     use fakon::hardware::Mono;
     use fugit::ExtU32;
     use rtic_monotonics::Monotonic;
     use stm32g4xx_hal::hal::digital::v2::OutputPin;
     use stm32g4xx_hal::prelude::InputPin;
+    use embedded_can::Frame;
 
     #[shared]
     struct Shared {
@@ -80,8 +82,11 @@ mod app {
         let pcan_rx = cx.local.pcan_rx;
         loop {
             let frame = pcan_rx.recv().await.unwrap();
+            let msg = pcan::Messages::from_can_message(frame.id(), frame.data());
             // TODO: actually handle received CAN messages!
-            defmt::debug!("PCAN RX {:?}", frame);
+
+            defmt::debug!("PCAN RX {:?}", defmt::Debug2Format(&msg)); // +60KB of code(!)
+            defmt::trace!("RAW RX {:?}", frame);
         }
     }
 
