@@ -24,6 +24,8 @@ can-bit-timings-core = "1.1.0"
 byteorder = { version = "1.5.0", default-features = false }
 hex-literal = "0.4.1"
 inverted-pin = "0.2.0"
+embedded-can = "0.4.1"
+bitvec = { version = "1.0.1", features = ["atomic"], default-features = false }
 
 # cargo build/run
 [profile.dev]
@@ -73,5 +75,8 @@ overflow-checks = false # <-
 
 [patch.crates-io]
 fdcan = { path = "../../fdcan" }
+
+[build-dependencies]
+dbc-codegen = { git = "https://github.com/technocreatives/dbc-codegen", branch = "main", version = "0.3.0" }
 
 

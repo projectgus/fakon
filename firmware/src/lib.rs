@@ -17,7 +17,7 @@ pub mod car;
 pub mod ieb;
 pub mod igpm;
 pub mod srscm;
-
+pub mod dbc;
 
 // same panicking *behavior* as `panic-probe` but doesn't print a panic message
 // this prevents the panic message being printed *twice* when `defmt::panic` is invoked

@@ -1,0 +1,3 @@
+[submodule "firmware/dbc"]
+	path = firmware/dbc
+	url = https://github.com/projectgus/kona-ev-dbc
