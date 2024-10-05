@@ -1,8 +1,8 @@
 use can_bit_timings::CanBitTiming;
+use embedded_can::{Frame, Id, StandardId};
 use core::cmp::{min, Ordering};
 use fdcan::config::FrameTransmissionConfig::ClassicCanOnly;
 use fdcan::config::InterruptLine;
-use fdcan::id::{Id, StandardId};
 use fdcan::interrupt::{Interrupt, Interrupts};
 use fdcan::{self, Fifo0, Mailbox, NormalOperationMode, ReceiveOverrun};
 use fdcan::{
@@ -137,10 +137,11 @@ impl<I: fdcan::Instance> Control<I> {
     }
 }
 
-// Public struct for a Queued CAN frame in either direction
+// Public struct for a Queued CAN frame in either direction. Access as an embedded_can::Frame
 // (FDCAN doesn't have a struct for this, it splits headers and their data up.)
 #[derive(Clone, Debug)]
 pub struct QueuedFrame {
+    // TODO: make both these fields private once all access via embedded_can::Frame
     pub header: TxFrameHeader, // Note: TxFrameHeader is used for TX and RX directions
     pub data: [u8; 8],         // Fixed size array, see header.len for 'real' length
 }
@@ -246,6 +247,63 @@ impl QueuedFrame {
     }
 }
 
+impl<F> From<&F> for QueuedFrame
+where
+    F: Frame,
+{
+    fn from(frame: &F) -> Self {
+        QueuedFrame::new(frame.id(), frame.data()).unwrap()
+    }
+}
+
+impl Frame for QueuedFrame
+{
+    fn new(id: impl Into<Id>, data: &[u8]) -> Option<Self> {
+        let len = data.len();
+        if len > 8 {
+            return None
+        };
+        Some(Self::new_tx(
+            TxFrameHeader {
+                id: id.into(),
+                len: len as u8,
+                // No FD-CAN features supported for embedded_can::Frame
+                frame_format: fdcan::frame::FrameFormat::Standard,
+                bit_rate_switching: false,
+                marker: None,
+            },
+            data,
+        ))
+    }
+
+    fn new_remote(_id: impl Into<Id>, _dlc: usize) -> Option<Self> {
+        None // No remote frame support here
+    }
+
+    fn is_extended(&self) -> bool {
+        match self.header.id {
+            Id::Standard(_) => false,
+            Id::Extended(_) => true,
+        }
+    }
+
+    fn is_remote_frame(&self) -> bool {
+        return false;
+    }
+
+    fn id(&self) -> Id {
+        self.header.id
+    }
+
+    fn dlc(&self) -> usize {
+        self.header.len as usize
+    }
+
+    fn data(&self) -> &[u8] {
+        &self.data
+    }
+}
+
 impl Eq for QueuedFrame {}
 
 // Public struct for the Tx side. Unlike Rx this isn't an RTIC queue
@@ -263,18 +321,20 @@ impl<I: fdcan::Instance> Tx<I> {
         }
     }
 
-    pub fn transmit(&mut self, msg: &QueuedFrame) {
-        defmt::trace!("CAN TX {:?}", msg);
-        let maybe_queue = match self.can.transmit_preserve(
-            msg.header,
-            &msg.data,
+    pub fn transmit(&mut self, msg: &impl Frame) {
+        //defmt::trace!("CAN TX {:?}", msg); // TODO: fix log line
+        let maybe_queue = match self.can.transmit_preserve_frame(
+            msg,
             &mut QueuedFrame::from_pending_transmit,
         ) {
+            // Happy path, there was an empty hardware TX buffer
+            Ok(None) => None,
             // Preserve the pending TX message that was replaced in hardware
             Ok(Some(dequeued)) => Some(dequeued),
             // Rather than blocking on fdcan, queue this message for later transmit
-            Err(nb::Error::WouldBlock) => Some(msg.clone()),
-            _ => None,
+            Err(nb::Error::WouldBlock) => Some(msg.into()),
+            // TODO: Figure out what this means given error type is Infallible here...
+            Err(nb::Error::Other(_)) => panic!("Unexpected CAN TX error"),
         };
         if let Some(to_queue) = maybe_queue {
             match self.queue.push(to_queue) {

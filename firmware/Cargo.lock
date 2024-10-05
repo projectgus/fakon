@@ -312,6 +312,7 @@ name = "fdcan"
 version = "0.2.1"
 dependencies = [
  "bitflags",
+ "embedded-can",
  "nb 1.1.0",
  "paste",
  "static_assertions",
