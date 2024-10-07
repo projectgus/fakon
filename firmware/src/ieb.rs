@@ -1,10 +1,9 @@
-use crate::can_utils::{
-    byte_checksum_simple, counter_update, counter_update_skip,
-};
+use crate::can_utils::byte_checksum_simple;
 use crate::hardware;
 use crate::car;
+use crate::dbc::pcan::{Ieb153Tcs, Ieb2a2, Ieb331, Ieb386Wheel, Ieb387Wheel, Ieb507Tcs};
 use crate::periodic::PeriodicGroup;
-use crate::can_queue::{self, QueuedFrame};
+use crate::can_queue;
 use fugit::RateExtU32;
 use hex_literal::hex;
 use rtic::Mutex;
@@ -15,12 +14,12 @@ where
     MPCAN: Mutex<T = can_queue::Tx<hardware::PCAN>>,
     MCAR: Mutex<T = car::CarState>,
 {
-    let mut tcs_153 = QueuedFrame::new_std(0x153, &hex!("208010FF00FF0000"));
-    let mut ieb_2a2 = QueuedFrame::new_std(0x2a2, &hex!("0500001C1000005E"));
-    let mut ieb_331 = QueuedFrame::new_std(0x331, &hex!("F000000000000000"));
-    let mut ieb_386 = QueuedFrame::new_std(0x386, &hex!("0000000000400080"));
-    let mut ieb_387 = QueuedFrame::new_std(0x387, &hex!("0A0D000000210A00"));
-    let ieb_507 = QueuedFrame::new_std(0x507, &hex!("00000001"));
+    let mut tcs_153 = Ieb153Tcs::try_from(hex!("208010FF00FF0000").as_slice()).unwrap();
+    let mut brake_pedal = Ieb2a2::try_from(hex!("0500001C1000005E").as_slice()).unwrap();
+    let mut ieb_331 = Ieb331::try_from(hex!("F000000000000000").as_slice()).unwrap();
+    let mut ieb_386 = Ieb386Wheel::try_from(hex!("0000000000400080").as_slice()).unwrap();
+    let mut ieb_387 = Ieb387Wheel::try_from(hex!("0A0D000000210A00").as_slice()).unwrap();
+    let ieb_507 = Ieb507Tcs::try_from(hex!("00000001").as_slice()).unwrap();
 
     let mut group = PeriodicGroup::new(100.Hz());
     let mut every_100hz = group.new_period(100.Hz());
@@ -36,35 +35,37 @@ where
         if every_100hz.due(&group) {
             // TCS 153
             {
-                counter_update_skip::<0xF0, 0xF0>(&mut tcs_153.data[6]);
-                tcs_153.data[7] = byte_checksum_simple(&tcs_153.data[..6]);
+                tcs_153.set_alive_counter_tcs1(
+                    match tcs_153.alive_counter_tcs1() {
+                        Ieb153Tcs::ALIVE_COUNTER_TCS1_MAX => Ieb153Tcs::ALIVE_COUNTER_TCS1_MIN,
+                        c => c + 1,
+                    }).unwrap();
             }
 
-            // 2A2 Brake pedal data. Includes pedal force field and other brake-proportional field.
+            // Brake pedal data. Includes pedal force field and other brake-proportional field.
             {
-                ieb_2a2.data[0] ^= 0x01; // LSB of byte 0 is a heartbit bit
+                brake_pedal.set_heart_beat(!brake_pedal.heart_beat()).unwrap();
 
                 if braking {
-                    ieb_2a2.data[3] = 0x1C; // 3,4 BrakePedalForce 16-bit
-                    ieb_2a2.data[4] = 0x10;
-                    ieb_2a2.data[7] = 0x5e; // 7 BrakeUnknown, roughly correlates with BrakePedalForce
+                    brake_pedal.set_brake_pedal_force(0x101C).unwrap(); // Arbitrary value
+                    brake_pedal.set_brake_unknown(0x5e).unwrap(); // BrakeUnknown, roughly correlates with BrakePedalForce
                 } else {
-                    ieb_2a2.data[3] = 0x00;
-                    ieb_2a2.data[4] = 0x00;
-                    ieb_2a2.data[7] = 0x00;
+                    brake_pedal.set_brake_pedal_force(0).unwrap();
+                    brake_pedal.set_brake_unknown(0).unwrap();
                 }
             }
 
             // IEB 331, unknown message includes wheel speed data
             {
-                // Seems to be approx 2x "BrakeUnknown" in ieb_2a2
-                ieb_331.data[0] = if braking { 0xEB } else { 0x00 };
+                // Seems to be approx 2x "BrakeUnknown" in brake_pedal
+                ieb_331.set_brake_unknown(if braking { 0xEB } else { 0x00 }).unwrap();
             }
 
             pcan_tx.lock(|tx| {
-                for m in [&tcs_153, &ieb_2a2, &ieb_331] {
-                    tx.transmit(m)
-                }
+                // TODO: can be a loop or a map, maybe?
+                tx.transmit(&tcs_153);
+                tx.transmit(&brake_pedal);
+                tx.transmit(&ieb_331);
             });
         }
 
@@ -72,26 +73,38 @@ where
             // IEB 386, wheel speed data
             {
                 // Live counters in the top 2 bits of each 16-bit wheel speed value
-                counter_update::<0xC0>(&mut ieb_386.data[1]);
-                counter_update::<0xC0>(&mut ieb_386.data[3]);
+                ieb_386.set_whl_spd_alive_counter_lsb(
+                    match ieb_386.whl_spd_alive_counter_lsb() {
+                        Ieb386Wheel::WHL_SPD_ALIVE_COUNTER_LSB_MAX => Ieb386Wheel::WHL_SPD_ALIVE_COUNTER_LSB_MIN,
+                        lsb => lsb + 1
+                    }).unwrap();
+
+                if ieb_386.whl_spd_alive_counter_lsb() == Ieb386Wheel::WHL_SPD_ALIVE_COUNTER_LSB_MIN {
+                    // When LSB wraps, increment the MSB
+                    ieb_386.set_whl_spd_alive_counter_msb(
+                        match ieb_386.whl_spd_alive_counter_msb() {
+                            Ieb386Wheel::WHL_SPD_ALIVE_COUNTER_MSB_MAX => Ieb386Wheel::WHL_SPD_ALIVE_COUNTER_MSB_MIN,
+                            msb => msb + 1,
+                        }).unwrap();
+                }
             }
 
             // IEB 387 Wheel pulse counts
             {
-                counter_update::<0x0F>(&mut ieb_387.data[7]);
-
-                // 4 bit alive counter in the lower nibble of bytes 6
-                counter_update_skip::<0x0F, 0x0E>(&mut ieb_387.data[6]);
+                ieb_387.set_alive_counter_whl_pul(
+                    match ieb_387.alive_counter_whl_pul() {
+                        Ieb387Wheel::ALIVE_COUNTER_WHL_PUL_MAX => Ieb387Wheel::ALIVE_COUNTER_WHL_PUL_MIN,
+                        n => n + 1,
+                    }).unwrap();
 
                 // Byte 5 is a checksum that weirdly includes byte 6 after it, maybe also 7
-                ieb_387.data[5] = 0;
-                ieb_387.data[5] = byte_checksum_simple(&ieb_387.data);
+                ieb_387.set_whl_pul_chksum(0).unwrap();
+                ieb_387.set_whl_pul_chksum(byte_checksum_simple(ieb_387.raw())).unwrap();
             }
 
             pcan_tx.lock(|tx| {
-                for m in [&ieb_386, &ieb_387] {
-                    tx.transmit(m)
-                }
+                tx.transmit(&ieb_386);
+                tx.transmit(&ieb_387);
             });
         }
 
