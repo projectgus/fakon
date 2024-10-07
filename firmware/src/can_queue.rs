@@ -8,7 +8,7 @@ use fdcan::{self, Fifo0, Mailbox, NormalOperationMode, ReceiveOverrun};
 use fdcan::{
     config::NominalBitTiming,
     filter::{StandardFilter, StandardFilterSlot},
-    frame::{RxFrameInfo, TxFrameHeader},
+    frame::{FramePriority, RxFrameInfo, TxFrameHeader},
 };
 use heapless::binary_heap::Max;
 use heapless::BinaryHeap;
@@ -162,32 +162,9 @@ impl defmt::Format for QueuedFrame {
     }
 }
 
-// TODO: Figure out how to use fdcan::frame::FramePriority here, currently
-// the implementation is copied from fdcan id.rs file
 impl Ord for QueuedFrame {
     fn cmp(&self, other: &Self) -> Ordering {
-        let id_a = self.header.id;
-        let id_b = other.header.id;
-        match (id_a, id_b) {
-            (Id::Standard(a), Id::Standard(b)) => {
-                // Lower IDs have priority over higher IDs.
-                a.as_raw().cmp(&b.as_raw()).reverse()
-            }
-            (Id::Extended(a), Id::Extended(b)) => a.as_raw().cmp(&b.as_raw()).reverse(),
-            (Id::Standard(a), Id::Extended(b)) => {
-                // Standard frames have priority over extended frames if their Base IDs match.
-                a.as_raw()
-                    .cmp(&b.standard_id().as_raw())
-                    .reverse()
-                    .then(Ordering::Greater)
-            }
-            (Id::Extended(a), Id::Standard(b)) => a
-                .standard_id()
-                .as_raw()
-                .cmp(&b.as_raw())
-                .reverse()
-                .then(Ordering::Less),
-        }
+        FramePriority::from(self.header.id).cmp(&other.header.id.into())
     }
 }
 
