@@ -85,7 +85,7 @@ mod app {
             let msg = pcan::Messages::from_can_message(frame.id(), frame.data());
             // TODO: actually handle received CAN messages!
 
-            defmt::debug!("PCAN RX {:?}", defmt::Debug2Format(&msg)); // +60KB of code(!)
+            defmt::debug!("PCAN RX {:?}", msg.unwrap()); // +25KB of code(!)
             defmt::trace!("RAW RX {:?}", frame);
         }
     }
