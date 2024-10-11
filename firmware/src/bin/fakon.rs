@@ -90,9 +90,9 @@ mod app {
         }
     }
 
-    #[task(shared = [pcan_tx], local = [srs_crash_out], priority = 3)]
+    #[task(shared = [pcan_tx, car], local = [srs_crash_out], priority = 3)]
     async fn airbag_control(cx: airbag_control::Context) {
-        fakon::airbag_control::task(cx.shared.pcan_tx, cx.local.srs_crash_out).await;
+        fakon::airbag_control::task(cx.shared.pcan_tx, cx.shared.car, cx.local.srs_crash_out).await;
     }
 
     #[task(shared = [pcan_tx, car], priority = 3)]

@@ -1,9 +1,9 @@
+use crate::can_queue;
 use crate::can_utils::byte_checksum_simple;
-use crate::hardware;
 use crate::car;
 use crate::dbc::pcan::{Ieb153Tcs, Ieb2a2, Ieb331, Ieb386Wheel, Ieb387Wheel, Ieb507Tcs};
+use crate::hardware;
 use crate::periodic::PeriodicGroup;
-use crate::can_queue;
 use fugit::RateExtU32;
 use hex_literal::hex;
 use rtic::Mutex;
@@ -29,22 +29,34 @@ where
     loop {
         group.next_poll().await;
 
+        if !car.lock(|car| car.ignition_on()) {
+            // IG1
+            // IEB only starts sending messages when car ignition comes on.
+            //
+            // NOTE: It keeps sending them for a time after ignition goes off, until the
+            // thing goes to sleep. Unsure if need to model that here or not.
+            continue;
+        }
+
         // Read once per loop for consistency
-        let braking = car.lock(|car| car.is_braking() );
+        let braking = car.lock(|car| car.is_braking());
 
         if every_100hz.due(&group) {
             // TCS 153
             {
-                tcs_153.set_alive_counter_tcs1(
-                    match tcs_153.alive_counter_tcs1() {
+                tcs_153
+                    .set_alive_counter_tcs1(match tcs_153.alive_counter_tcs1() {
                         Ieb153Tcs::ALIVE_COUNTER_TCS1_MAX => Ieb153Tcs::ALIVE_COUNTER_TCS1_MIN,
                         c => c + 1,
-                    }).unwrap();
+                    })
+                    .unwrap();
             }
 
             // Brake pedal data. Includes pedal force field and other brake-proportional field.
             {
-                brake_pedal.set_heart_beat(!brake_pedal.heart_beat()).unwrap();
+                brake_pedal
+                    .set_heart_beat(!brake_pedal.heart_beat())
+                    .unwrap();
 
                 if braking {
                     brake_pedal.set_brake_pedal_force(0x101C).unwrap(); // Arbitrary value
@@ -58,7 +70,9 @@ where
             // IEB 331, unknown message includes wheel speed data
             {
                 // Seems to be approx 2x "BrakeUnknown" in brake_pedal
-                ieb_331.set_brake_unknown(if braking { 0xEB } else { 0x00 }).unwrap();
+                ieb_331
+                    .set_brake_unknown(if braking { 0xEB } else { 0x00 })
+                    .unwrap();
             }
 
             pcan_tx.lock(|tx| {
@@ -73,33 +87,45 @@ where
             // IEB 386, wheel speed data
             {
                 // Live counters in the top 2 bits of each 16-bit wheel speed value
-                ieb_386.set_whl_spd_alive_counter_lsb(
-                    match ieb_386.whl_spd_alive_counter_lsb() {
-                        Ieb386Wheel::WHL_SPD_ALIVE_COUNTER_LSB_MAX => Ieb386Wheel::WHL_SPD_ALIVE_COUNTER_LSB_MIN,
-                        lsb => lsb + 1
-                    }).unwrap();
+                ieb_386
+                    .set_whl_spd_alive_counter_lsb(match ieb_386.whl_spd_alive_counter_lsb() {
+                        Ieb386Wheel::WHL_SPD_ALIVE_COUNTER_LSB_MAX => {
+                            Ieb386Wheel::WHL_SPD_ALIVE_COUNTER_LSB_MIN
+                        }
+                        lsb => lsb + 1,
+                    })
+                    .unwrap();
 
-                if ieb_386.whl_spd_alive_counter_lsb() == Ieb386Wheel::WHL_SPD_ALIVE_COUNTER_LSB_MIN {
+                if ieb_386.whl_spd_alive_counter_lsb() == Ieb386Wheel::WHL_SPD_ALIVE_COUNTER_LSB_MIN
+                {
                     // When LSB wraps, increment the MSB
-                    ieb_386.set_whl_spd_alive_counter_msb(
-                        match ieb_386.whl_spd_alive_counter_msb() {
-                            Ieb386Wheel::WHL_SPD_ALIVE_COUNTER_MSB_MAX => Ieb386Wheel::WHL_SPD_ALIVE_COUNTER_MSB_MIN,
+                    ieb_386
+                        .set_whl_spd_alive_counter_msb(match ieb_386.whl_spd_alive_counter_msb() {
+                            Ieb386Wheel::WHL_SPD_ALIVE_COUNTER_MSB_MAX => {
+                                Ieb386Wheel::WHL_SPD_ALIVE_COUNTER_MSB_MIN
+                            }
                             msb => msb + 1,
-                        }).unwrap();
+                        })
+                        .unwrap();
                 }
             }
 
             // IEB 387 Wheel pulse counts
             {
-                ieb_387.set_alive_counter_whl_pul(
-                    match ieb_387.alive_counter_whl_pul() {
-                        Ieb387Wheel::ALIVE_COUNTER_WHL_PUL_MAX => Ieb387Wheel::ALIVE_COUNTER_WHL_PUL_MIN,
+                ieb_387
+                    .set_alive_counter_whl_pul(match ieb_387.alive_counter_whl_pul() {
+                        Ieb387Wheel::ALIVE_COUNTER_WHL_PUL_MAX => {
+                            Ieb387Wheel::ALIVE_COUNTER_WHL_PUL_MIN
+                        }
                         n => n + 1,
-                    }).unwrap();
+                    })
+                    .unwrap();
 
                 // Byte 5 is a checksum that weirdly includes byte 6 after it, maybe also 7
                 ieb_387.set_whl_pul_chksum(0).unwrap();
-                ieb_387.set_whl_pul_chksum(byte_checksum_simple(ieb_387.raw())).unwrap();
+                ieb_387
+                    .set_whl_pul_chksum(byte_checksum_simple(ieb_387.raw()))
+                    .unwrap();
             }
 
             pcan_tx.lock(|tx| {
@@ -113,6 +139,5 @@ where
                 tx.transmit(&ieb_507);
             });
         }
-
     }
 }
