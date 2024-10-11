@@ -9,9 +9,11 @@ use fakon as _;
     dispatchers = [USBWAKEUP, COMP1_2_3, COMP4_5_6, COMP7, SAI, I2C4_EV, I2C4_ER]
 )]
 mod app {
+    use embedded_can::Frame;
     use fakon;
     use fakon::can_queue;
     use fakon::car;
+    use fakon::car::Ignition;
     use fakon::dbc::pcan;
     use fakon::hardware;
     use fakon::hardware::Mono;
@@ -19,7 +21,6 @@ mod app {
     use rtic_monotonics::Monotonic;
     use stm32g4xx_hal::hal::digital::v2::OutputPin;
     use stm32g4xx_hal::prelude::InputPin;
-    use embedded_can::Frame;
 
     #[shared]
     struct Shared {
@@ -77,16 +78,28 @@ mod app {
         )
     }
 
-    #[task(local = [pcan_rx], priority = 2)]
+    #[task(local = [pcan_rx], shared = [car], priority = 2)]
     async fn pcan_rx(cx: pcan_rx::Context) {
         let pcan_rx = cx.local.pcan_rx;
+        let mut car = cx.shared.car;
+
         loop {
             let frame = pcan_rx.recv().await.unwrap();
             let msg = pcan::Messages::from_can_message(frame.id(), frame.data());
-            // TODO: actually handle received CAN messages!
+            match msg {
+                Err(_) => {
+                    defmt::warn!("Failed to parse CAN message ID {:?} data {:?}",
+                        frame.id(),
+                        frame.data(),
+                    );
+                }
+                Ok(msg) => {
+                    defmt::debug!("PCAN RX {:?}", msg); // +25KB of code(!)
+                    defmt::trace!("RAW RX {:?}", frame);
 
-            defmt::debug!("PCAN RX {:?}", msg.unwrap()); // +25KB of code(!)
-            defmt::trace!("RAW RX {:?}", frame);
+                    car.lock(|car| car.update_state(&msg));
+                }
+            }
         }
     }
 
@@ -119,10 +132,12 @@ mod app {
             Mono::delay(10.millis()).await;
 
             let ig1_on = cx.local.ig1_on_input.is_high().unwrap();
+            let brakes_on = cx.local.brake_input.is_high().unwrap();
 
             cx.shared.car.lock(|car| {
-                car.set_ignition_on(ig1_on);
-                car.set_is_braking(cx.local.brake_input.is_high().unwrap());
+                // TODO: also read external IG3 state and update accordingly
+                car.set_ignition(if ig1_on { Ignition::On } else { Ignition::Off });
+                car.set_is_braking(brakes_on);
             });
 
             // FIXME: ignition sequence should be its own task
@@ -130,13 +145,12 @@ mod app {
                 true => {
                     cx.local.relay_ig3.set_high().unwrap();
                     cx.local.led_ignition.set_high().unwrap();
-                },
+                }
                 false => {
                     cx.local.relay_ig3.set_low().unwrap();
                     cx.local.led_ignition.set_low().unwrap();
                 }
             }
-
         }
     }
 }

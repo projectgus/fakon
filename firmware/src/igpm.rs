@@ -1,3 +1,4 @@
+use crate::car::Ignition;
 use crate::dbc::pcan::ChargeSettingsAcChargingCurrent;
 // "CAN Gateway" messages ("Integrated Gateway Power Module").
 // Some of these may originate from modules on other buses and
@@ -21,13 +22,14 @@ where
     MPCAN: Mutex<T = can_queue::Tx<hardware::PCAN>>,
     MCAR: Mutex<T = car::CarState>,
 {
+    // Note this message is only used by 2019 model Kona, not 2021 model which uses a different one
     let charge_settings =
         ChargeSettings::new(ChargeSettingsAcChargingCurrent::Maximum.into()).unwrap();
 
     // BodyState constructor has 43 args, so start from all zeroes and then set some bits!
     let mut body_state = BodyState::try_from(hex!("0000000000000000").as_ref()).unwrap();
 
-    // Driver and passenger door closed, drivers seatbelt on
+    // Driver and passenger door closed, drivers seatbelt on - necessary to allow Drive
     body_state
         .set_drv_door_sw(BodyStateDrvDoorSw::Closed.into())
         .unwrap();
@@ -49,7 +51,7 @@ where
     // Unknown message. The message contents changes sometimes in logs, but very irregularly.
     let igpm_5df = Cgw5df::try_from(hex!("C5FFFF0100000000").as_ref()).unwrap();
 
-    // Another type whose constructor has 41 args
+    // Another type whose constructor has too many args
     let body_warnings = {
         let mut bw = BodyWarnings::try_from(hex!("0000000000000000").as_ref()).unwrap();
         // These two bits seem to be set during "normal" operation
@@ -81,10 +83,12 @@ where
         if period_10hz.due(&group) {
             // Body State
             {
-                if car_state.ignition_on() {
+                if car_state.ignition() == Ignition::On {
                     body_state
                         .set_ignition_sw(BodyStateIgnitionSw::On.into())
                         .unwrap();
+                    // In the logs it actually looks like IGN1 & 2 go high at slightly
+                    // different times. Not sure what these actually signify...
                     body_state.set_ign1(true).unwrap();
                     body_state.set_ign2(true).unwrap();
                 } else {
@@ -98,7 +102,7 @@ where
 
             // Clock
             // Note: technically the clock normally goes "valid" when ignition comes on,
-            // placeholder-looking values are sent until then
+            // placeholder-looking values are sent until then. Hoping can ignore this fact.
             let secs = Mono::now().duration_since_epoch().to_secs();
             clock.set_unknown(0x02).unwrap();
             clock.set_second((secs % 60) as u8).unwrap(); // Seconds
@@ -123,8 +127,8 @@ where
 
         if period_5hz.due(&group) {
             pcan_tx.lock(|tx| {
-                if car_state.ignition_on() {
-                    tx.transmit(&charge_settings); // IG1 or IG3
+                if car_state.ignition().ig3_on() {
+                    tx.transmit(&charge_settings);
                 }
                 tx.transmit(&body_warnings);
                 tx.transmit(&igpm_5df);

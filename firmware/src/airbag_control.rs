@@ -7,6 +7,7 @@
 //! a "crashed" and open contactors in an emergency.
 use crate::can_queue;
 use crate::car;
+use crate::car::Ignition;
 use crate::dbc::pcan;
 use crate::hardware;
 use crate::hardware::Mono;
@@ -38,8 +39,7 @@ where
 
     loop {
         // Every 1Hz
-        if car.lock(|car| car.ignition_on()) {
-            // TODO: Confirm if linked to IG1, IG3
+        if car.lock(|car| car.ignition() == Ignition::On) {
             pcan_tx.lock(|tx| tx.transmit(&can_1hz));
         }
 

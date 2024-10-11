@@ -1,6 +1,6 @@
 use crate::can_queue;
 use crate::can_utils::byte_checksum_simple;
-use crate::car;
+use crate::car::{self, Ignition};
 use crate::dbc::pcan::{Ieb153Tcs, Ieb2a2, Ieb331, Ieb386Wheel, Ieb387Wheel, Ieb507Tcs};
 use crate::hardware;
 use crate::periodic::PeriodicGroup;
@@ -29,8 +29,7 @@ where
     loop {
         group.next_poll().await;
 
-        if !car.lock(|car| car.ignition_on()) {
-            // IG1
+        if !car.lock(|car| car.ignition() == Ignition::On) {
             // IEB only starts sending messages when car ignition comes on.
             //
             // NOTE: It keeps sending them for a time after ignition goes off, until the
