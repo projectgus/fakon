@@ -1,3 +1,4 @@
+use crate::car::Contactor;
 use crate::car::Ignition;
 use crate::dbc::pcan::ChargeSettingsAcChargingCurrent;
 // "CAN Gateway" messages ("Integrated Gateway Power Module").
@@ -46,7 +47,7 @@ where
     // First arg is "unknown" field as seen when vehicle is off, details are unknown...
     let mut clock = Clock::new(0x8D, 0, 0, 0, 0).unwrap();
 
-    let mut charge_port = ChargePort::new(false).unwrap();
+    let mut charge_port = ChargePort::new(false, false, false, false).unwrap();
 
     // Unknown message. The message contents changes sometimes in logs, but very irregularly.
     let igpm_5df = Cgw5df::try_from(hex!("C5FFFF0100000000").as_ref()).unwrap();
@@ -84,9 +85,12 @@ where
             // Body State
             {
                 if car_state.ignition() == Ignition::On {
-                    body_state
-                        .set_ignition_sw(BodyStateIgnitionSw::On.into())
-                        .unwrap();
+                    let ignition_sw = if car_state.contactor() == Contactor::PreCharging {
+                        BodyStateIgnitionSw::PreChargingMaybe
+                    } else {
+                        BodyStateIgnitionSw::On
+                    };
+                    body_state.set_ignition_sw(ignition_sw.into()).unwrap();
                     // In the logs it actually looks like IGN1 & 2 go high at slightly
                     // different times. Not sure what these actually signify...
                     body_state.set_ign1(true).unwrap();

@@ -70,6 +70,11 @@ impl CarState {
         self.ignition
     }
 
+    #[inline]
+    pub fn contactor(&self) -> Contactor {
+        self.contactor
+    }
+
     /// Return true if the vehicle is Ready to drive
     #[inline]
     pub fn ready(&self) -> bool {
