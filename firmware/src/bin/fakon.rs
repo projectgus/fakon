@@ -10,6 +10,7 @@ use fakon as _;
 )]
 mod app {
     use embedded_can::Frame;
+    use embedded_can::Id;
     use fakon;
     use fakon::can_queue;
     use fakon::car;
@@ -78,6 +79,13 @@ mod app {
         )
     }
 
+    fn is_diagnostic(id: Id) -> bool {
+        match id {
+            Id::Standard(std) => std.as_raw() >= 0x700,
+            Id::Extended(_) => false,
+        }
+    }
+
     #[task(local = [pcan_rx], shared = [car], priority = 2)]
     async fn pcan_rx(cx: pcan_rx::Context) {
         let pcan_rx = cx.local.pcan_rx;
@@ -85,6 +93,11 @@ mod app {
 
         loop {
             let frame = pcan_rx.recv().await.unwrap();
+            if is_diagnostic(frame.id()) {
+                // Skip diagnostic IDs for now (can change to be a hw filter, or
+                // possibly will add diagnostic handlers elsewhere
+                continue;
+            }
             let msg = pcan::Messages::from_can_message(frame.id(), frame.data());
             match msg {
                 Err(_) => {
