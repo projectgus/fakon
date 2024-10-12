@@ -9,6 +9,7 @@ use fakon as _;
     dispatchers = [USBWAKEUP, COMP1_2_3, COMP4_5_6, COMP7, SAI, I2C4_EV, I2C4_ER]
 )]
 mod app {
+    use defmt::Debug2Format;
     use embedded_can::Frame;
     use embedded_can::Id;
     use fakon;
@@ -102,7 +103,7 @@ mod app {
             match msg {
                 Err(_) => {
                     defmt::warn!("Failed to parse CAN message ID {:?} data {:?}",
-                        frame.id(),
+                        Debug2Format(&frame.id()),
                         frame.data(),
                     );
                 }

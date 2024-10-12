@@ -108,7 +108,7 @@ impl<I: fdcan::Instance> Control<I> {
         } else if self.hw.has_interrupt(Interrupt::RxFifo0NewMsg) {
             self.on_rx_irq();
         } else if self.hw.has_interrupt(Interrupt::ErrPassive) {
-            defmt::warn!("CAN peripheral in Error Passive"); // TODO: how to recover?
+            defmt::error!("CAN peripheral in Error Passive"); // TODO: how to recover?
         } else if self.hw.has_interrupt(Interrupt::BusOff) {
             panic!("CAN peripheral in Bus Off");
         }
@@ -122,7 +122,7 @@ impl<I: fdcan::Instance> Control<I> {
             Ok(ReceiveOverrun::Overrun(header)) => {
                 // I think this only happens if the buffer is too small, so
                 // in Classic CAN it shouldn't ever.
-                defmt::warn!("CAN RX overrun reported");
+                defmt::error!("CAN RX overrun reported");
                 header
             }
             // Shouldn't happen unless RX IRQ fired without anything received
