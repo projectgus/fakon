@@ -1,5 +1,5 @@
 use crate::hardware::Mono;
-use fugit::{Duration, Instant, Rate};
+use crate::{Duration, Instant, Rate};
 use rtic_monotonics::Monotonic;
 
 // Very simple structure to have a loop which does a bunch of periodic things
@@ -12,17 +12,17 @@ use rtic_monotonics::Monotonic;
 // like this...
 
 pub struct PeriodicGroup {
-    last: Instant<u32, 1, 1000>, // Last time this period group was triggered
-    shortest: Duration<u32, 1, 1000>, // Shortest period for wakeups
+    last: Instant, // Last time this period group was triggered
+    shortest: Duration, // Shortest period for wakeups
 }
 
 pub struct Period {
-    period: Duration<u32, 1, 1000>,
-    next: Instant<u32, 1, 1000>,
+    period: Duration,
+    next: Instant,
 }
 
 impl PeriodicGroup {
-    pub fn new(shortest: Rate<u32, 1, 1000>) -> Self {
+    pub fn new(shortest: Rate) -> Self {
         PeriodicGroup {
             last: Mono::now(),
             shortest: shortest.into_duration(),
@@ -34,7 +34,7 @@ impl PeriodicGroup {
         Mono::delay_until(self.last).await;
     }
 
-    pub fn new_period(&self, period: Rate<u32, 1, 1000>) -> Period {
+    pub fn new_period(&self, period: Rate) -> Period {
         let duration = period.into_duration();
         assert!(duration.ticks() % self.shortest.ticks() == 0); // ?
         Period {

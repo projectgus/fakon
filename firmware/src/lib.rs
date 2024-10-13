@@ -19,6 +19,12 @@ pub mod igpm;
 pub mod airbag_control;
 pub mod dbc;
 
+// Make some common type aliases for fugit Duration, Instance and Rate
+// based on our firmware's 1ms tick period
+type Duration = fugit::Duration<u32, 1, 1000>;
+type Instant = fugit::Instant<u32, 1, 1000>;
+type Rate = fugit::Rate<u32, 1, 1000>;
+
 // same panicking *behavior* as `panic-probe` but doesn't print a panic message
 // this prevents the panic message being printed *twice* when `defmt::panic` is invoked
 #[defmt::panic_handler]
