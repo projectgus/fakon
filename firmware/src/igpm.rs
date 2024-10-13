@@ -85,7 +85,7 @@ where
             // Body State
             {
                 if car_state.ignition() == Ignition::On {
-                    let ignition_sw = if car_state.contactor() == Contactor::PreCharging {
+                    let ignition_sw = if car_state.contactor().get() == Some(Contactor::PreCharging) {
                         BodyStateIgnitionSw::PreChargingMaybe
                     } else {
                         BodyStateIgnitionSw::On

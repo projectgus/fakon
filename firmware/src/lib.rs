@@ -14,6 +14,7 @@ pub mod can_utils;
 pub mod hardware;
 pub mod periodic;
 pub mod car;
+pub mod fresh;
 pub mod ieb;
 pub mod igpm;
 pub mod airbag_control;

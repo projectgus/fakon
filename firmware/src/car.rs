@@ -1,13 +1,14 @@
-use defmt::Format;
-
 use crate::dbc::pcan::Messages;
+use crate::fresh::Fresh;
+use defmt::Format;
+use fugit::ExtU32;
 
-#[derive(Clone, Debug, Format)]
+#[derive(Clone, Format)]
 pub struct CarState {
     /// Main ignition power state
     ignition: Ignition,
     /// Main high voltage contactor state
-    contactor: Contactor,
+    contactor: Fresh<Contactor>,
     charge_port_locked: bool,
     is_braking: bool,
 
@@ -17,12 +18,12 @@ pub struct CarState {
     motor_rpm: f32,
 
     // Internal state tracking
-    last_precharge: bool,
+    last_precharge: Fresh<bool>,
 }
 
 #[derive(Clone, Copy, Debug, Format, PartialEq)]
 pub enum Ignition {
-    /// Car  is off, and will probably transition to sleep soon
+    /// Car is off, and will probably transition to sleep soon
     Off,
     /// Car is partially on for charging (IG3 relay), but not to drive
     IG3,
@@ -50,9 +51,10 @@ pub enum Contactor {
 
 impl CarState {
     pub fn new() -> Self {
+        // Note this is where all of the stale timeouts for the Fresh values are set
         Self {
             ignition: Ignition::Off,
-            contactor: Contactor::Open,
+            contactor: Fresh::new(3.secs()),
             charge_port_locked: false,
             is_braking: false,
 
@@ -61,7 +63,7 @@ impl CarState {
             v_inverter: 0,
             motor_rpm: 0.0,
 
-            last_precharge: false,
+            last_precharge: Fresh::new(3.secs()),
         }
     }
 
@@ -71,15 +73,18 @@ impl CarState {
     }
 
     #[inline]
-    pub fn contactor(&self) -> Contactor {
+    /// Return the contactor state.
+    pub fn contactor(&self) -> Fresh<Contactor> {
         self.contactor
     }
 
     /// Return true if the vehicle is Ready to drive
+    ///
+    /// WARNING: This will return false if CAN comms are lost with the BMS
     #[inline]
     pub fn ready(&self) -> bool {
         // TODO: there probably is a VCU CAN message that gives a clearer indication of this state
-        self.contactor == Contactor::Closed && self.ignition == Ignition::On
+        self.contactor.get() == Some(Contactor::Closed) && self.ignition == Ignition::On
     }
 
     pub fn set_ignition(&mut self, value: Ignition) {
@@ -115,16 +120,18 @@ impl CarState {
         }
     }
 
-    // Contactor state only updates in response to CAN messages
+    // Contactor state only updates in response to BMS CAN messages
     fn set_contactor(&mut self, new_state: Contactor) {
-        if self.contactor != new_state {
+        if self.contactor.get() != Some(new_state) {
             // Log contactor transitions, including warnings for unexpected
             // ones
             if matches!(
-                (self.contactor, new_state),
-                (Contactor::Open, Contactor::Closed) // Skipped precharge
-                    | (Contactor::PreCharging, Contactor::Open) // Precharge failed
-                    | (Contactor::Closed, Contactor::PreCharging) // ???
+                (self.contactor.get_unchecked(), new_state),
+                (None, Contactor::Closed) // Firmware reset w/ contactors closed
+                    | (None, Contactor::PreCharging) // Firmware reset in precharge state
+                    | (Some(Contactor::Open), Contactor::Closed) // Skipped precharge
+                    | (Some(Contactor::PreCharging), Contactor::Open) // Precharge failed
+                    | (Some(Contactor::Closed), Contactor::PreCharging) // ???
             ) {
                 defmt::warn!(
                     "Unexpected main contactors {:?} => {:?} inverter {:?} V",
@@ -140,26 +147,36 @@ impl CarState {
                     self.v_inverter
                 );
             }
-            self.contactor = new_state;
         }
+        // Always call set here to mark freshness of the value
+        self.contactor.set(new_state);
     }
 
     pub fn update_state(&mut self, pcan_msg: &Messages) {
         match pcan_msg {
             Messages::Bms5a3(msg) => {
-                self.set_contactor(match (msg.contactor_closed(), self.last_precharge) {
-                    (true, _) => Contactor::Closed,
-                    (false, true) => Contactor::PreCharging,
-                    (false, false) => Contactor::Open,
-                });
-            }
+                if self.contactor.is_fresh() && self.last_precharge.is_stale() {
+                    // We've received more than one of this message recently, but none of
+                    // the higher priority BmsHvMonitor message with the precharge state
+                    defmt::warn!("BMS is sending contactor state without precharge state");
+                } else {
+                    let contactor_closed = msg.contactor_closed();
+                    let precharging = self.last_precharge.get().unwrap_or(false);
+                    self.set_contactor(
+                        match (contactor_closed, precharging) {
+                            (true, _) => Contactor::Closed,
+                            (false, true) => Contactor::PreCharging,
+                            (false, false) => Contactor::Open,
+                        });
+                }
+            },
             Messages::BmsHvMonitor(msg) => {
                 // Pre-charge relay state
                 {
                     // Don't update the contactor state here, wait for the next Bms5a3 message
                     // and switch it there (this is to avoid races when switching in and out of
                     // pre-charge
-                    self.last_precharge = msg.precharging();
+                    self.last_precharge.set(msg.precharging());
                 }
 
                 // Raw battery stats
