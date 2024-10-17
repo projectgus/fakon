@@ -16,8 +16,8 @@ pub struct CarState {
 
     v_batt: f32,
     i_batt: f32,
-    v_inverter: u16,
-    motor_rpm: f32,
+    v_inverter: Fresh<u16>,
+    motor_rpm: Fresh<u16>,
 
     // Internal state of pre-charge relay. Used to update 'contactor' field. Updated from BMS.
     last_precharge: Fresh<bool>,
@@ -62,8 +62,8 @@ impl CarState {
 
             v_batt: 0.0,
             i_batt: 0.0,
-            v_inverter: 0,
-            motor_rpm: 0.0,
+            v_inverter: Fresh::new(3.secs()),
+            motor_rpm: Fresh::new(1.secs()),
 
             last_precharge: Fresh::new(3.secs()),
         }
@@ -78,6 +78,16 @@ impl CarState {
     /// Return the contactor state.
     pub fn contactor(&self) -> Fresh<Contactor> {
         self.contactor
+    }
+
+    #[inline]
+    pub fn v_inverter(&self) -> Fresh<u16> {
+        self.v_inverter
+    }
+
+    #[inline]
+    pub fn motor_rpm(&self) -> Fresh<u16> {
+        self.motor_rpm
     }
 
     /// Return true if the vehicle is Ready to drive
@@ -188,8 +198,9 @@ impl CarState {
                 }
             }
             Messages::InverterStatus(msg) => {
-                self.v_inverter = msg.v_inverter();
-                self.motor_rpm = msg.speed_abs();
+                // as these two have the same "freshness" they could conceivably be merged somehow
+                self.v_inverter.set(msg.v_inverter());
+                self.motor_rpm.set(msg.speed_abs() as u16);
             }
             _ => (),
         }

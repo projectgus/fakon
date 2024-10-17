@@ -167,4 +167,20 @@ mod app {
             }
         }
     }
+
+    #[task(shared = [car])]
+    async fn log_info(mut cx: log_info::Context) {
+        loop {
+            Mono::delay(2.secs()).await;
+
+            cx.shared.car.lock(|car| {
+                defmt::info!("Ign: {:?} Con: {:?} Inv: {:?}V RPM: {:?}",
+                    car.ignition(),
+                    car.contactor(),
+                    car.v_inverter(),
+                    car.motor_rpm(),
+                );
+            });
+        }
+    }
 }
