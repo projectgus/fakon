@@ -8,7 +8,7 @@ use fdcan::{self, Fifo0, Mailbox, NormalOperationMode, ReceiveOverrun};
 use fdcan::{
     config::NominalBitTiming,
     filter::{StandardFilter, StandardFilterSlot},
-    frame::{FramePriority, RxFrameInfo, TxFrameHeader},
+    frame::{FramePriority, TxFrameHeader},
 };
 use heapless::binary_heap::Max;
 use heapless::BinaryHeap;
@@ -116,19 +116,15 @@ impl<I: fdcan::Instance> Control<I> {
     }
 
     fn on_rx_irq(&mut self) {
-        let mut buffer = [0_u8; 8];
-        let rx_header = match self.hw_rx.receive(buffer.as_mut_slice()) {
-            Ok(ReceiveOverrun::NoOverrun(header)) => header,
-            Ok(ReceiveOverrun::Overrun(header)) => {
-                // I think this only happens if the buffer is too small, so
-                // in Classic CAN it shouldn't ever.
+        let frame = match self.hw_rx.receive_frame() {
+            Ok(ReceiveOverrun::NoOverrun(frame)) => frame,
+            Ok(ReceiveOverrun::Overrun(frame)) => {
                 defmt::error!("CAN RX overrun reported");
-                header
+                frame
             }
             // Shouldn't happen unless RX IRQ fired without anything received
             Err(err) => panic!("CAN internal error {err:?}"),
         };
-        let frame = QueuedFrame::new_rx(&rx_header, &buffer);
         match self.rx_sender.try_send(frame) {
             Ok(_) => (),
             // Can probably leave this as panic for now, as app should be able to handle max incoming CAN rate
@@ -152,7 +148,7 @@ impl defmt::Format for QueuedFrame {
         defmt::write!(
             f,
             "CAN Frame (id={=u32:#x}, dlen={}, data={=[u8]:#04x})",
-            match self.header.id {
+            match self.header.id.into() {
                 Id::Standard(sid) => sid.as_raw().into(),
                 Id::Extended(eid) => eid.as_raw(),
             },
@@ -190,17 +186,12 @@ impl QueuedFrame {
             TxFrameHeader {
                 len: data.len() as u8,
                 frame_format: fdcan::frame::FrameFormat::Standard,
-                id: Id::Standard(id),
+                id: Id::Standard(id).into(),
                 bit_rate_switching: false,
                 marker: None,
             },
             data,
         )
-    }
-
-    // Internal constructor for queue receiver
-    fn new_rx(info: &RxFrameInfo, data: &[u8]) -> Self {
-        Self::new_tx(info.to_tx_header(None), data)
     }
 
     // Internal constructor for re-queue on transmit
@@ -242,7 +233,7 @@ impl Frame for QueuedFrame
         };
         Some(Self::new_tx(
             TxFrameHeader {
-                id: id.into(),
+                id: id.into().into(), // urgh!
                 len: len as u8,
                 // No FD-CAN features supported for embedded_can::Frame
                 frame_format: fdcan::frame::FrameFormat::Standard,
@@ -258,7 +249,7 @@ impl Frame for QueuedFrame
     }
 
     fn is_extended(&self) -> bool {
-        match self.header.id {
+        match self.header.id.into() {
             Id::Standard(_) => false,
             Id::Extended(_) => true,
         }
@@ -269,7 +260,7 @@ impl Frame for QueuedFrame
     }
 
     fn id(&self) -> Id {
-        self.header.id
+        self.header.id.into()
     }
 
     fn dlc(&self) -> usize {
