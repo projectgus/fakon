@@ -23,12 +23,13 @@ use stm32g4xx_hal::rcc;
 use stm32g4xx_hal::rcc::{PllConfig, RccExt};
 use stm32g4xx_hal::stm32;
 
-// Type aliases for hardware peripherals, to move into a hardware module
+// Type aliases for hardware peripherals
 pub type PCAN = hal::can::Can<hal::stm32::FDCAN1>;
 
 // Type aliases for I/O pins
 pub type AcuCrashOutput = InvertedPin<gpioa::PA4<Output<PushPull>>>;
 
+// NOTE: For final hardware this should be a WKUP pin
 pub type IG1OnInput = gpioc::PC9<Input<Floating>>;
 
 pub type BrakeInput = gpiob::PB8<Input<Floating>>;

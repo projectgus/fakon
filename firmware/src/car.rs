@@ -5,10 +5,12 @@ use fugit::ExtU32;
 
 #[derive(Clone, Format)]
 pub struct CarState {
-    /// Main ignition power state
+    /// Main ignition power state. Updated from hard wired inputs.
     ignition: Ignition,
-    /// Main high voltage contactor state
+
+    /// Main high voltage contactor state. Updated from BMS whenever IG1 or IG3 is on.
     contactor: Fresh<Contactor>,
+
     charge_port_locked: bool,
     is_braking: bool,
 
@@ -17,7 +19,7 @@ pub struct CarState {
     v_inverter: u16,
     motor_rpm: f32,
 
-    // Internal state tracking
+    // Internal state of pre-charge relay. Used to update 'contactor' field. Updated from BMS.
     last_precharge: Fresh<bool>,
 }
 
@@ -162,14 +164,13 @@ impl CarState {
                 } else {
                     let contactor_closed = msg.contactor_closed();
                     let precharging = self.last_precharge.get().unwrap_or(false);
-                    self.set_contactor(
-                        match (contactor_closed, precharging) {
-                            (true, _) => Contactor::Closed,
-                            (false, true) => Contactor::PreCharging,
-                            (false, false) => Contactor::Open,
-                        });
+                    self.set_contactor(match (contactor_closed, precharging) {
+                        (true, _) => Contactor::Closed,
+                        (false, true) => Contactor::PreCharging,
+                        (false, false) => Contactor::Open,
+                    });
                 }
-            },
+            }
             Messages::BmsHvMonitor(msg) => {
                 // Pre-charge relay state
                 {
