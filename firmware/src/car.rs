@@ -14,6 +14,7 @@ pub struct CarState {
     charge_port_locked: bool,
     is_braking: bool,
 
+    soc_batt: f32,
     v_batt: f32,
     i_batt: f32,
     v_inverter: Fresh<u16>,
@@ -60,6 +61,7 @@ impl CarState {
             charge_port_locked: false,
             is_braking: false,
 
+            soc_batt: 0.0,
             v_batt: 0.0,
             i_batt: 0.0,
             v_inverter: Fresh::new(3.secs()),
@@ -90,13 +92,18 @@ impl CarState {
         self.motor_rpm
     }
 
+    #[inline]
+    pub fn soc_batt(&self) -> f32 {
+        self.soc_batt
+    }
+
     /// Return true if the vehicle is Ready to drive
     ///
     /// WARNING: This will return false if CAN comms are lost with the BMS
     #[inline]
     pub fn ready(&self) -> bool {
         // TODO: there probably is a VCU CAN message that gives a clearer indication of this state
-        self.contactor.get() == Some(Contactor::Closed) && self.ignition == Ignition::On
+        self.ignition == Ignition::On && self.contactor.get() == Some(Contactor::Closed)
     }
 
     pub fn set_ignition(&mut self, value: Ignition) {
@@ -192,10 +199,13 @@ impl CarState {
 
                 // Raw battery stats
                 {
-                    // TODO: Log these periodically, maybe?
                     self.v_batt = msg.v_batt();
                     self.i_batt = msg.i_batt();
                 }
+            }
+            Messages::Bms542(msg) => {
+                // Recording the "display SoC" not the "real SoC" i.e. as shown on dash
+                self.soc_batt = msg.uwe542_0_soc_disp()
             }
             Messages::InverterStatus(msg) => {
                 // as these two have the same "freshness" they could conceivably be merged somehow
