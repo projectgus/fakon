@@ -256,7 +256,7 @@ impl Frame for QueuedFrame
     }
 
     fn is_remote_frame(&self) -> bool {
-        return false;
+        false
     }
 
     fn id(&self) -> Id {

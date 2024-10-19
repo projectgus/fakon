@@ -188,7 +188,7 @@ impl CarState {
                     });
                 }
             }
-            Messages::BmsHvMonitor(msg) => {
+            Messages::BattHvStatus(msg) => {
                 // Pre-charge relay state
                 {
                     // Don't update the contactor state here, wait for the next Bms5a3 message
@@ -205,7 +205,7 @@ impl CarState {
             }
             Messages::Bms542(msg) => {
                 // Recording the "display SoC" not the "real SoC" i.e. as shown on dash
-                self.soc_batt = msg.uwe542_0_soc_disp()
+                self.soc_batt = msg.soc_disp()
             }
             Messages::InverterStatus(msg) => {
                 // as these two have the same "freshness" they could conceivably be merged somehow

@@ -1,7 +1,7 @@
 use crate::can_queue;
 use crate::can_utils::byte_checksum_simple;
 use crate::car::{self, Ignition};
-use crate::dbc::pcan::{Ieb153Tcs, Ieb2a2, Ieb331, Ieb386Wheel, Ieb387Wheel, Ieb507Tcs};
+use crate::dbc::pcan::{Ieb153Tcs, Ieb2a2, Ieb331, Ieb386Wheel, Ieb387Wheel, Ieb507Tcs, StabilityControl};
 use crate::hardware;
 use crate::periodic::PeriodicGroup;
 use fugit::RateExtU32;
@@ -20,6 +20,33 @@ where
     let mut ieb_386 = Ieb386Wheel::try_from(hex!("0000000000400080").as_slice()).unwrap();
     let mut ieb_387 = Ieb387Wheel::try_from(hex!("0A0D000000210A00").as_slice()).unwrap();
     let ieb_507 = Ieb507Tcs::try_from(hex!("00000001").as_slice()).unwrap();
+    // let mut stability = StabilityControl::new(0.0, false, false, // Lat accel
+    //                                       0.0, false, false, // Long accel
+    //                                       0.0, false, false, // Cyl pressure
+    //                                       0.0, false, false, // Yaw rate
+    //                                       0, 0).unwrap();
+
+    // The stability control message has a non-trivial 4-bit checksum, so for now
+    // replay stationary messages for all 4-bit counter values, on a loop...
+    let stability_values = [
+        hex!("CFA388A003039009"),
+        hex!("D08388A003FC8F10"),
+        hex!("D183889C03FE8F21"),
+        hex!("D0C388A003FF8F35"),
+        hex!("CFC3889C03F98F48"),
+        hex!("CFC3889C03FB8F5A"),
+        hex!("CE03899C03049064"),
+        hex!("CFE388A003049078"),
+        hex!("D1C388A00304908A"),
+        hex!("D1A388A003029098"),
+        hex!("D0A388A0030290A9"),
+        hex!("D0A388A0030190B6"),
+        hex!("D3A388A003FB8FC2"),
+        hex!("D3E388A003FD8FD4"),
+        hex!("D0C388A0030190E6"),
+        hex!("CFA388A0030190F7"),
+    ].map(|h| StabilityControl::try_from(h.as_ref()).unwrap());
+    let mut stability_cycle = stability_values.iter().cycle();
 
     let mut group = PeriodicGroup::new(100.Hz());
     let mut every_100hz = group.new_period(100.Hz());
@@ -49,6 +76,8 @@ where
                         c => c + 1,
                     })
                     .unwrap();
+
+                // TODO: this message has a checksum!
             }
 
             // Brake pedal data. Includes pedal force field and other brake-proportional field.
@@ -74,11 +103,21 @@ where
                     .unwrap();
             }
 
+            // ESP status
+            {
+                //stability.set_counter(match stability.counter() {
+                //    StabilityControl::COUNTER_MAX => StabilityControl::COUNTER_MIN,
+                //    n => n + 1,
+                //}).unwrap();
+            }
+            let stability = stability_cycle.next().unwrap();
+
             pcan_tx.lock(|tx| {
                 // TODO: can be a loop or a map, maybe?
                 tx.transmit(&tcs_153);
                 tx.transmit(&brake_pedal);
                 tx.transmit(&ieb_331);
+                tx.transmit(stability);
             });
         }
 
@@ -107,6 +146,8 @@ where
                         })
                         .unwrap();
                 }
+
+                // TODO: this message has 2-bit checksums
             }
 
             // IEB 387 Wheel pulse counts

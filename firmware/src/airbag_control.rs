@@ -29,7 +29,7 @@ where
     M: Mutex<T = can_queue::Tx<hardware::PCAN>>,
     MCAR: Mutex<T = car::CarState>,
 {
-    let can_1hz = pcan::Acu5a0::try_from(hex!("000000C025029101").as_slice()).unwrap();
+    let can_1hz = pcan::AirbagStatus::try_from(hex!("000000C025029101").as_slice()).unwrap();
     let duty_pct = 80;
 
     let cycle_time = 50.Hz::<1, 1000>().into_duration();
