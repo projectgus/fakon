@@ -1,7 +1,7 @@
 use crate::can_queue;
 use crate::can_utils::byte_checksum_simple;
 use crate::car::{self, Ignition};
-use crate::dbc::pcan::{Ieb153Tcs, Ieb2a2, Ieb331, Ieb386Wheel, Ieb387Wheel, Ieb507Tcs, StabilityControl};
+use crate::dbc::pcan::{Ieb2a2, Ieb331, Ieb386Wheel, Ieb387Wheel, Ieb507Tcs, StabilityControl, TractionControl};
 use crate::hardware;
 use crate::periodic::PeriodicGroup;
 use fugit::RateExtU32;
@@ -14,7 +14,7 @@ where
     MPCAN: Mutex<T = can_queue::Tx<hardware::PCAN>>,
     MCAR: Mutex<T = car::CarState>,
 {
-    let mut tcs_153 = Ieb153Tcs::try_from(hex!("208010FF00FF0000").as_slice()).unwrap();
+    let mut traction = TractionControl::try_from(hex!("208010FF00FF40EE").as_slice()).unwrap();
     let mut brake_pedal = Ieb2a2::try_from(hex!("0500001C1000005E").as_slice()).unwrap();
     let mut ieb_331 = Ieb331::try_from(hex!("F000000000000000").as_slice()).unwrap();
     let mut ieb_386 = Ieb386Wheel::try_from(hex!("0000000000400080").as_slice()).unwrap();
@@ -68,16 +68,20 @@ where
         let braking = car.lock(|car| car.is_braking());
 
         if every_100hz.due(&group) {
-            // TCS 153
+            // Traction Control status
             {
-                tcs_153
-                    .set_alive_counter_tcs1(match tcs_153.alive_counter_tcs1() {
-                        Ieb153Tcs::ALIVE_COUNTER_TCS1_MAX => Ieb153Tcs::ALIVE_COUNTER_TCS1_MIN,
+                traction
+                    .set_counter1(match traction.counter1() {
+                        TractionControl::COUNTER1_MAX.. => TractionControl::COUNTER1_MIN,
                         c => c + 1,
-                    })
-                    .unwrap();
+                    }).unwrap();
 
-                // TODO: this message has a checksum!
+                traction
+                    .set_counter2(match traction.counter2() {
+                        TractionControl::COUNTER2_MAX.. => TractionControl::COUNTER2_MIN,
+                        0x8 => 0xA,  // counter2 skips 0x9 rather than 0xF
+                        c => c + 1,
+                    }).unwrap();
             }
 
             // Brake pedal data. Includes pedal force field and other brake-proportional field.
@@ -114,7 +118,7 @@ where
 
             pcan_tx.lock(|tx| {
                 // TODO: can be a loop or a map, maybe?
-                tx.transmit(&tcs_153);
+                tx.transmit(&traction);
                 tx.transmit(&brake_pedal);
                 tx.transmit(&ieb_331);
                 tx.transmit(stability);
