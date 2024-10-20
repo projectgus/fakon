@@ -106,7 +106,7 @@ where
             // ESP status
             {
                 //stability.set_counter(match stability.counter() {
-                //    StabilityControl::COUNTER_MAX => StabilityControl::COUNTER_MIN,
+                //    StabilityControl::COUNTER_MAX.. => StabilityControl::COUNTER_MIN,
                 //    n => n + 1,
                 //}).unwrap();
             }
@@ -127,7 +127,7 @@ where
                 // Live counters in the top 2 bits of each 16-bit wheel speed value
                 ieb_386
                     .set_whl_spd_alive_counter_lsb(match ieb_386.whl_spd_alive_counter_lsb() {
-                        Ieb386Wheel::WHL_SPD_ALIVE_COUNTER_LSB_MAX => {
+                        Ieb386Wheel::WHL_SPD_ALIVE_COUNTER_LSB_MAX.. => {
                             Ieb386Wheel::WHL_SPD_ALIVE_COUNTER_LSB_MIN
                         }
                         lsb => lsb + 1,
@@ -139,7 +139,7 @@ where
                     // When LSB wraps, increment the MSB
                     ieb_386
                         .set_whl_spd_alive_counter_msb(match ieb_386.whl_spd_alive_counter_msb() {
-                            Ieb386Wheel::WHL_SPD_ALIVE_COUNTER_MSB_MAX => {
+                            Ieb386Wheel::WHL_SPD_ALIVE_COUNTER_MSB_MAX.. => {
                                 Ieb386Wheel::WHL_SPD_ALIVE_COUNTER_MSB_MIN
                             }
                             msb => msb + 1,
@@ -154,7 +154,7 @@ where
             {
                 ieb_387
                     .set_alive_counter_whl_pul(match ieb_387.alive_counter_whl_pul() {
-                        Ieb387Wheel::ALIVE_COUNTER_WHL_PUL_MAX => {
+                        Ieb387Wheel::ALIVE_COUNTER_WHL_PUL_MAX.. => {
                             Ieb387Wheel::ALIVE_COUNTER_WHL_PUL_MIN
                         }
                         n => n + 1,

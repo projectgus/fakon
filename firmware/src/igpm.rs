@@ -90,13 +90,13 @@ where
             // Steering angle            {
             steering
                 .set_counter(match steering.counter() {
-                    Steering::COUNTER_MAX => Steering::COUNTER_MIN,
+                    Steering::COUNTER_MAX.. => Steering::COUNTER_MIN,
                     n => n + 1,
                 })
                 .unwrap();
-            steering.set_checksum(0).unwrap();
 
             // 4-bit checksum is XOR of all other nibbles in the message
+            steering.set_checksum(0).unwrap();
             let mut checksum = steering.raw().iter().fold(0, |n, a| n ^ a);
             checksum = (checksum >> 4) ^ (checksum & 0x0f);
             steering.set_checksum(checksum).unwrap();
