@@ -1,7 +1,7 @@
 use crate::can_queue;
 use crate::can_utils::{byte_checksum_simple, OutgoingMessage};
 use crate::car::{self, Ignition};
-use crate::dbc::pcan::{Ieb2a2, Ieb331, Ieb386Wheel, Ieb387Wheel, Ieb507Tcs, StabilityControl, TractionControlFast, TractionControlMed};
+use crate::dbc::pcan::{Ieb2a2, Ieb331, Ieb386Wheel, Ieb387Wheel, Ieb507Tcs, StabilityControl, TractionControlFast, TractionControlMed, ParkingBrake};
 use crate::hardware;
 use crate::periodic::PeriodicGroup;
 use fugit::RateExtU32;
@@ -21,6 +21,8 @@ where
     let mut ieb_386 = Ieb386Wheel::try_from(hex!("0000000000400080").as_slice()).unwrap();
     let mut ieb_387 = Ieb387Wheel::try_from(hex!("0A0D000000210A00").as_slice()).unwrap();
     let ieb_507 = Ieb507Tcs::try_from(hex!("00000001").as_slice()).unwrap();
+    // Parking brake has a lot of fields but can send a static "parking brake off" message
+    let parking_brake = ParkingBrake::try_from(hex!("0000082100000000").as_slice()).unwrap();
     let mut stability = StabilityControl::new(0.0, false, false, // Lat accel
                                            0.0, false, false, // Long accel
                                            0.0, false, false, // Cyl pressure
@@ -30,6 +32,7 @@ where
     let mut group = PeriodicGroup::new(100.Hz());
     let mut every_100hz = group.new_period(100.Hz());
     let mut every_50hz = group.new_period(50.Hz());
+    let mut every_20hz = group.new_period(20.Hz());
     let mut every_10hz = group.new_period(10.Hz());
 
     loop {
@@ -148,6 +151,12 @@ where
                 tx.transmit(&ieb_386);
                 tx.transmit(&ieb_387);
                 tx.transmit(&traction_med);
+            });
+        }
+
+        if every_20hz.due(&group) {
+            pcan_tx.lock(|tx| {
+                tx.transmit(&parking_brake);
             });
         }
 
