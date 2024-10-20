@@ -49,8 +49,7 @@ where
         if every_100hz.due(&group) {
             // Traction Control status ("fast" 100Hz message)
             {
-                traction_fast.increment_counter();
-                traction_fast.update_checksum();
+                traction_fast.update();
             }
 
             // Brake pedal data. Includes pedal force field and other brake-proportional field.
@@ -78,8 +77,7 @@ where
 
             // ESP status
             {
-                stability.increment_counter();
-                stability.update_checksum();
+                stability.update();
             }
 
             pcan_tx.lock(|tx| {
@@ -143,8 +141,7 @@ where
             // Traction Control Medium Speed Message (0x394)
             {
                 traction_med.set_driver_braking(braking).unwrap();
-                traction_med.increment_counter();
-                traction_med.update_checksum();
+                traction_med.update();
             }
 
             pcan_tx.lock(|tx| {

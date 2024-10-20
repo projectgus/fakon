@@ -31,6 +31,13 @@ pub(crate) trait OutgoingMessage {
 
     /// Update any checksum field(s) according to the contents of the message
     fn update_checksum(&mut self);
+
+    /// Perform all regular "liveness" updates (counters, checksums)
+    #[inline]
+    fn update(&mut self) {
+        self.increment_counter();
+        self.update_checksum();
+    }
 }
 
 // Additional methods for StabilityControl message ID 0x220
