@@ -103,3 +103,16 @@ impl OutgoingMessage for pcan::TractionControlMed {
         self.set_checksum(((new_sum ^ 0x0F) + 1) & 0x0F).unwrap();
     }
 }
+
+impl OutgoingMessage for pcan::Unk471 {
+    fn increment_counter(&mut self) {
+        self.set_counter(match self.counter() {
+            Self::COUNTER_MAX.. => Self::COUNTER_MIN,
+            n => n + 1,
+        }).unwrap();
+    }
+
+    fn update_checksum(&mut self) {
+        // It's possible this message has a 2-bit checksum, but unclear
+    }
+}

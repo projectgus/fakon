@@ -19,6 +19,7 @@ pub mod ieb;
 pub mod igpm;
 pub mod airbag_control;
 pub mod dbc;
+pub mod unknown;
 
 // Make some common type aliases for fugit Duration, Instance and Rate
 // based on our firmware's 1ms tick period
