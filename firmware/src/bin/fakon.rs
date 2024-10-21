@@ -140,13 +140,13 @@ mod app {
 
     // FDCAN_INTR0_IT and FDCAN_INTR1_IT are swapped, until stm32g4 crate
     // updates to include https://github.com/stm32-rs/stm32-rs/pull/996
-    #[task(binds = FDCAN1_INTR1_IT, shared = [pcan_tx], local=[pcan_control], priority = 5)]
+    #[task(binds = FDCAN1_INTR1_IT, shared = [pcan_tx], local=[pcan_control], priority = 6)]
     fn pcan_irq(cx: pcan_irq::Context) {
         cx.local.pcan_control.on_irq(cx.shared.pcan_tx);
     }
 
     // Why debounce interrupts when you can poll GPIOs in a loop?!?
-    #[task(shared = [car], local = [brake_input, ig1_on_input, led_ignition, relay_ig3], priority = 6)]
+    #[task(shared = [car], local = [brake_input, ig1_on_input, led_ignition, relay_ig3], priority = 5)]
     async fn poll_inputs(mut cx: poll_inputs::Context) {
         loop {
             Mono::delay(10.millis()).await;

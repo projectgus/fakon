@@ -99,20 +99,28 @@ impl<I: fdcan::Instance> Control<I> {
     where
         M: Mutex<T = Tx<I>>,
     {
+        // This is kind of annoying that we have to poll the
+        // interrupt register on each check
+        if self.hw.has_interrupt(Interrupt::RxFifo0NewMsg) {
+            self.hw.clear_interrupt(Interrupt::RxFifo0NewMsg);
+            self.on_rx_irq();
+        }
         if self.hw.has_interrupt(Interrupt::TxComplete) {
+            self.hw.clear_interrupt(Interrupt::TxComplete);
             m_tx.lock(|tx| {
                 if let Some(msg) = tx.queue.pop() {
                     tx.transmit(&msg);
                 }
             });
-        } else if self.hw.has_interrupt(Interrupt::RxFifo0NewMsg) {
-            self.on_rx_irq();
-        } else if self.hw.has_interrupt(Interrupt::ErrPassive) {
+        }
+        if self.hw.has_interrupt(Interrupt::ErrPassive) {
+            self.hw.clear_interrupt(Interrupt::ErrPassive);
             defmt::error!("CAN peripheral in Error Passive"); // TODO: how to recover?
-        } else if self.hw.has_interrupt(Interrupt::BusOff) {
+        }
+        if self.hw.has_interrupt(Interrupt::BusOff) {
+            self.hw.clear_interrupt(Interrupt::BusOff);
             panic!("CAN peripheral in Bus Off");
         }
-        self.hw.clear_interrupts(Interrupts::all());
     }
 
     fn on_rx_irq(&mut self) {
