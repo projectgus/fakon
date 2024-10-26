@@ -65,6 +65,7 @@ mod app {
         airbag_control::spawn().unwrap();
         ieb::spawn().unwrap();
         igpm::spawn().unwrap();
+        unknown::spawn().unwrap();
         log_info::spawn().unwrap();
 
         (
