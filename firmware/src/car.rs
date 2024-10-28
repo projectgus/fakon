@@ -1,4 +1,4 @@
-use crate::dbc::pcan::Messages;
+use crate::dbc::pcan::{BattHvStatusPrechargeRelay, Messages};
 use crate::fresh::Fresh;
 use defmt::Format;
 use fugit::ExtU32;
@@ -194,7 +194,7 @@ impl CarState {
                     // Don't update the contactor state here, wait for the next Bms5a3 message
                     // and switch it there (this is to avoid races when switching in and out of
                     // pre-charge
-                    self.last_precharge.set(msg.precharging());
+                    self.last_precharge.set(msg.precharge_relay() == BattHvStatusPrechargeRelay::Closed);
                 }
 
                 // Raw battery stats

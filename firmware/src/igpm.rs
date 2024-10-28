@@ -71,7 +71,7 @@ where
     let hu_datc_pe = CgwHuDatcPe00::new(3, 3, 0).unwrap();
 
     // Steering angle sensor
-    let mut steering = Steering::new(0.0, 0, 0x7, 0, 0).unwrap();
+    let mut steering = Steering::new(9.2, 0, 0x7, 0, 0).unwrap();
 
     let mut group = PeriodicGroup::new(100.Hz());
     let mut period_100hz = group.new_period(100.Hz());
@@ -112,7 +112,11 @@ where
                 if car_state.ignition() == Ignition::On {
                     let ignition_sw = if car_state.contactor().get() == Some(Contactor::PreCharging)
                     {
-                        BodyStateIgnitionSw::PreChargingMaybe
+                        // Note: currently the precharging relay is closed much shorter
+                        // time than the period of "Starting" shown in the logs.
+                        //
+                        // This might be timed by other messages, unsure which.
+                        BodyStateIgnitionSw::Starting
                     } else {
                         BodyStateIgnitionSw::On
                     };
