@@ -22,7 +22,7 @@ use rtic_sync::{channel, make_channel};
 
 // CAN TX and RX software queue sizes
 const RX_CAPACITY: usize = 16;
-const TX_CAPACITY: usize = 16;
+const TX_CAPACITY: usize = 32;
 
 // Types for each end of the Rx rtic channel
 
