@@ -39,6 +39,7 @@ mod app {
         relay_ig3: hardware::RelayIG3Output,
         led_ignition: hardware::LEDIgnitionOutput,
         srs_crash_out: hardware::AcuCrashOutput,
+        ev_ready: hardware::EVReadyInput,
     }
 
     #[init]
@@ -53,6 +54,7 @@ mod app {
             ig1_on_input,
             led_ignition,
             relay_ig3,
+            ev_ready
         } = hardware::init(cx.core, cx.device);
 
         let (pcan_control, pcan_rx, pcan_tx) =
@@ -78,6 +80,7 @@ mod app {
                 ig1_on_input,
                 led_ignition,
                 relay_ig3,
+                ev_ready,
             },
         )
     }
@@ -147,18 +150,20 @@ mod app {
     }
 
     // Why debounce interrupts when you can poll GPIOs in a loop?!?
-    #[task(shared = [car], local = [brake_input, ig1_on_input, led_ignition, relay_ig3], priority = 5)]
+    #[task(shared = [car], local = [brake_input, ig1_on_input, led_ignition, relay_ig3, ev_ready], priority = 5)]
     async fn poll_inputs(mut cx: poll_inputs::Context) {
         loop {
             Mono::delay(10.millis()).await;
 
             let ig1_on = cx.local.ig1_on_input.is_high().unwrap();
             let brakes_on = cx.local.brake_input.is_high().unwrap();
+            let ev_ready = cx.local.ev_ready.is_high().unwrap();
 
             cx.shared.car.lock(|car| {
                 // TODO: also read external IG3 state and update accordingly
                 car.set_ignition(if ig1_on { Ignition::On } else { Ignition::Off });
                 car.set_is_braking(brakes_on);
+                car.set_ev_ready(ev_ready);
             });
 
             // FIXME: ignition sequence should be its own task

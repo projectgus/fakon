@@ -34,6 +34,8 @@ pub type IG1OnInput = gpioc::PC9<Input<Floating>>;
 
 pub type BrakeInput = gpiob::PB8<Input<Floating>>;
 
+pub type EVReadyInput = InvertedPin<gpiob::PB9<Input<Floating>>>;
+
 pub type RelayIG3Output = gpiob::PB6<Output<PushPull>>;
 
 pub type LEDIgnitionOutput = gpiob::PB10<Output<PushPull>>;
@@ -47,6 +49,7 @@ pub struct Board {
     pub ig1_on_input: IG1OnInput,
     pub relay_ig3: RelayIG3Output,
     pub led_ignition: LEDIgnitionOutput,
+    pub ev_ready: EVReadyInput,
 }
 
 // Systick Based Timer
@@ -128,7 +131,7 @@ pub fn init(core: cortex_m::Peripherals, dp: stm32::Peripherals) -> Board {
     // Signal Inputs
     let pin_in1 = gpioc.pc9; // 12V
     let pin_in2 = gpiob.pb8; // 12V
-    let _pin_in3 = gpiob.pb9; // 12V
+    let pin_in3 = gpiob.pb9; // 12V
     let _pin_in4 = gpioa.pa5; // 12V
     let _pin_in5 = gpioa.pa6; // 12V
     let _pin_in6 = gpioa.pa7; // 12V
@@ -184,6 +187,9 @@ pub fn init(core: cortex_m::Peripherals, dp: stm32::Peripherals) -> Board {
     // IN2 => Brake pedal input signal
     let brake_input = pin_in2.into_floating_input();
 
+    // IN3 => EV Ready input (active low)
+    let ev_ready = InvertedPin::new(pin_in3.into_floating_input());
+
     // RELAY L1 - IG3 relay coil enable
     let relay_ig3 = pin_coil_l1.into_push_pull_output();
 
@@ -198,5 +204,6 @@ pub fn init(core: cortex_m::Peripherals, dp: stm32::Peripherals) -> Board {
         relay_ig3,
         led_ignition,
         brake_input,
+        ev_ready,
     }
 }

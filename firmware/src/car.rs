@@ -11,6 +11,8 @@ pub struct CarState {
     /// Main high voltage contactor state. Updated from BMS whenever IG1 or IG3 is on.
     contactor: Fresh<Contactor>,
 
+    ev_ready: bool,
+
     charge_port_locked: bool,
     is_braking: bool,
 
@@ -58,6 +60,7 @@ impl CarState {
         Self {
             ignition: Ignition::Off,
             contactor: Fresh::new(3.secs()),
+            ev_ready: false,
             charge_port_locked: false,
             is_braking: false,
 
@@ -124,6 +127,16 @@ impl CarState {
             defmt::info!("Braking => {}", value);
             self.is_braking = value;
         }
+    }
+
+    #[inline]
+    pub fn set_ev_ready(&mut self, value: bool) {
+        // As this is an active low input, it's also low when VCU is off
+        let value = value && self.v_inverter.is_fresh();
+        if value != self.ev_ready {
+              defmt::info!("EV Ready => {}", value);
+              self.ev_ready = value;
+          }
     }
 
     #[inline]
