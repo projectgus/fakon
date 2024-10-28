@@ -82,7 +82,7 @@ where
     loop {
         group.next_poll().await;
 
-        // Car state is a small struct, cloning it means whole iteration
+        // Car state is a reasonably small struct, cloning it means whole iteration
         // sees consistent state without holding the lock
         let car_state = car.lock(|c| c.clone());
 
@@ -161,9 +161,7 @@ where
 
         if period_5hz.due(&group) {
             pcan_tx.lock(|tx| {
-                if car_state.ignition().ig3_on() {
-                    tx.transmit(&charge_settings);
-                }
+                tx.transmit(&charge_settings); // Note: this message not being sent when it was gated on IG3?
                 tx.transmit(&body_warnings);
                 tx.transmit(&igpm_5df);
             });
