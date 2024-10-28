@@ -107,7 +107,7 @@ mod app {
             let msg = pcan::Messages::from_can_message(frame.id(), frame.data());
             match msg {
                 Err(_) => {
-                    defmt::warn!("Failed to parse CAN message ID {:?} data {:?}",
+                    defmt::error!("Failed to parse CAN message ID {:?} data {:?}",
                         Debug2Format(&frame.id()),
                         frame.data(),
                     );

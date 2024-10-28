@@ -316,7 +316,7 @@ impl<I: fdcan::Instance> Tx<I> {
             match self.queue.push(to_queue) {
                 Ok(_) => (),
                 _ => {
-                    defmt::warn!("TX queue overflow");
+                    defmt::error!("TX queue overflow");
                     // Generally all the data we send is only useful if fresh, so
                     // clear the transmit queue if it seems like the bus is offline
                     self.queue.clear();

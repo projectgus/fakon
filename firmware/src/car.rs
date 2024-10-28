@@ -190,7 +190,7 @@ impl CarState {
                 if self.contactor.is_fresh() && self.last_precharge.is_stale() {
                     // We've received more than one of this message recently, but none of
                     // the higher priority BmsHvMonitor message with the precharge state
-                    defmt::warn!("BMS is sending contactor state without precharge state");
+                    defmt::error!("BMS is sending contactor state without precharge state");
                 } else {
                     let contactor_closed = msg.contactor_closed();
                     let precharging = self.last_precharge.get().unwrap_or(false);
