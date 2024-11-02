@@ -1,3 +1,7 @@
+///! Module to support software TX and RX queued CAN on rtic
+///!
+///! TX side uses a binary heap to send out messages in priority order.
+///! RX side writes messages into an RTIC channel in FIFO order, for processing by the app.
 use can_bit_timings::CanBitTiming;
 use embedded_can::{Frame, Id, StandardId};
 use core::cmp::{min, Ordering};
@@ -15,25 +19,21 @@ use heapless::BinaryHeap;
 use rtic::Mutex;
 use rtic_sync::{channel, make_channel};
 
-// Module to support software TX and RX queued CAN on rtic
-//
-// TX side uses a binary heap to send out messages in priority order.
-// RX side writes messages into an RTIC channel in FIFO order, for processing by the app.
-
-// CAN TX and RX software queue sizes
+/// Software RX queue size
 const RX_CAPACITY: usize = 16;
+/// Software TX queue size
 const TX_CAPACITY: usize = 32;
 
 // Types for each end of the Rx rtic channel
 
-// The receive end is the public interface to receive CAN frames
+/// The receive end is the public interface to receive CAN frames
 pub type Rx = channel::Receiver<'static, QueuedFrame, RX_CAPACITY>;
 
-// The send end is only for internal use
+/// The send end is only for internal use
 type RxSender = channel::Sender<'static, QueuedFrame, RX_CAPACITY>;
 
-// Control struct is used when instantiating the queue, and
-// by the interrupt handler function
+/// Control struct is used when instantiating the queue, and
+/// by the interrupt handler function
 pub struct Control<I: fdcan::Instance> {
     hw: fdcan::FdCanControl<I, fdcan::NormalOperationMode>,
     hw_rx: fdcan::Rx<I, NormalOperationMode, Fifo0>,

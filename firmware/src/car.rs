@@ -1,3 +1,5 @@
+///! Common state of the entire "car" as presented to the Kona
+///! components.
 use crate::dbc::pcan::{BattHvStatusPrechargeRelay, Messages};
 use crate::fresh::Fresh;
 use defmt::Format;

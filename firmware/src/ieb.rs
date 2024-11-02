@@ -1,3 +1,8 @@
+///! IEB - Integrated Electronic Brake module
+///!
+///! Also manages traction control and vehicle stability control messages. Most of this
+///! is spoofed, the VCU's perspective should be that it's forever driving in a straight
+///! line down a road with perfect traction...
 use crate::can_queue;
 use crate::can_utils::{byte_checksum_simple, OutgoingMessage};
 use crate::car::{self, Ignition};
