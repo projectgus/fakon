@@ -163,6 +163,7 @@ where
                 tx.transmit(&unk55f);
                 tx.transmit(&unk561);
                 tx.transmit(&unk578);
+                tx.transmit(&unk588);
                 tx.transmit(&unk593);
             });
         }
