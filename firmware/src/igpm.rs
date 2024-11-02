@@ -9,7 +9,7 @@ use crate::car;
 use crate::dbc::pcan::Steering;
 use crate::dbc::pcan::{
     BodyState, BodyStateDrvDoorSw, BodyStateDrvSeatBeltSw, BodyStateIgnitionSw,
-    BodyStatePassDoorSw, BodyWarnings, Cgw5df, CgwHuDatcPe00, ChargePort, ChargeSettings, Clock,
+    BodyStatePassDoorSw, BodyWarnings, Cgw5df, ChargePort, ChargeSettings, Clock,
     Odometer,
 };
 use crate::hardware::{self, Mono};
@@ -65,10 +65,6 @@ where
     // Odometer reading
     // Currently using the logged reading from the 2022 car. TODO: check if needs to exceed value set in the 2019 VCU?
     let odometer = Odometer::new(14452.5).unwrap();
-
-    // HU_DATC_PE_00 - unclear if these signal names are even accurate, but this message never has different values
-    // in any of our logs...
-    let hu_datc_pe = CgwHuDatcPe00::new(3, 3, 0).unwrap();
 
     // Steering angle sensor
     let mut steering = Steering::new(9.2, 0, 0x7, 0, 0).unwrap();
@@ -170,7 +166,6 @@ where
         if period_1hz.due(&group) {
             pcan_tx.lock(|tx| {
                 tx.transmit(&odometer);
-                tx.transmit(&hu_datc_pe);
             });
         }
     }
