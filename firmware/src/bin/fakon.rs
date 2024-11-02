@@ -71,7 +71,6 @@ mod app {
         airbag_control::spawn().unwrap();
         ieb::spawn().unwrap();
         igpm::spawn().unwrap();
-        unknown::spawn().unwrap();
         log_info::spawn().unwrap();
 
         (
@@ -139,11 +138,6 @@ mod app {
     #[task(shared = [pcan_tx, car], priority = 3)]
     async fn igpm(cx: igpm::Context) {
         fakon::igpm::task_igpm(cx.shared.pcan_tx, cx.shared.car).await;
-    }
-
-    #[task(shared = [pcan_tx, car], priority = 3)]
-    async fn unknown(cx: unknown::Context) {
-        fakon::unknown::task_unknown(cx.shared.pcan_tx, cx.shared.car).await;
     }
 
     // FDCAN_INTR0_IT and FDCAN_INTR1_IT are swapped, until stm32g4 crate
