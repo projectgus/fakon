@@ -26,6 +26,7 @@ hex-literal = "0.4.1"
 inverted-pin = "0.2.0"
 embedded-can = "0.4.1"
 bitvec = { version = "1.0.1", features = ["atomic"], default-features = false }
+debouncr = "0.2.2"
 
 # cargo build/run
 [profile.dev]

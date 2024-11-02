@@ -9,6 +9,10 @@ use fakon as _;
     dispatchers = [USBWAKEUP, COMP1_2_3, COMP4_5_6, COMP7, SAI, I2C4_EV, I2C4_ER]
 )]
 mod app {
+    use debouncr::debounce_stateful_3;
+    use debouncr::debounce_stateful_5;
+    use debouncr::Edge::Falling;
+    use debouncr::Edge::Rising;
     use defmt::Debug2Format;
     use embedded_can::Frame;
     use embedded_can::Id;
@@ -63,7 +67,7 @@ mod app {
         let car = car::CarState::new();
 
         pcan_rx::spawn().unwrap();
-        poll_inputs::spawn().unwrap();
+        poll_slow_inputs::spawn().unwrap();
         airbag_control::spawn().unwrap();
         ieb::spawn().unwrap();
         igpm::spawn().unwrap();
@@ -149,32 +153,55 @@ mod app {
         cx.local.pcan_control.on_irq(cx.shared.pcan_tx);
     }
 
-    // Why debounce interrupts when you can poll GPIOs in a loop?!?
+    // Power state changes are slow, so poll them in a timed loop with some debounce logic
     #[task(shared = [car], local = [brake_input, ig1_on_input, led_ignition, relay_ig3, ev_ready], priority = 5)]
-    async fn poll_inputs(mut cx: poll_inputs::Context) {
+    async fn poll_slow_inputs(mut cx: poll_slow_inputs::Context) {
+        // Time base for the debouncing delays
+        let PERIOD = 10.millis();
+        // Debouncers. Each debounce period is (_N * PERIOD)
+        let mut ig1_on = debounce_stateful_5(false);
+        let mut brakes_on = debounce_stateful_3(false);
+        let mut ev_ready = debounce_stateful_5(false);
+
+        let mut next = Mono::now() + PERIOD;
         loop {
-            Mono::delay(10.millis()).await;
+            Mono::delay_until(next).await;
+            next += PERIOD;
 
-            let ig1_on = cx.local.ig1_on_input.is_high().unwrap();
-            let brakes_on = cx.local.brake_input.is_high().unwrap();
-            let ev_ready = cx.local.ev_ready.is_high().unwrap();
+            let ig1_edge = ig1_on.update(cx.local.ig1_on_input.is_high().unwrap());
+            let brakes_edge = brakes_on.update(cx.local.brake_input.is_high().unwrap());
+            let ready_edge = ev_ready.update(cx.local.ev_ready.is_high().unwrap());
 
-            cx.shared.car.lock(|car| {
-                // TODO: also read external IG3 state and update accordingly
-                car.set_ignition(if ig1_on { Ignition::On } else { Ignition::Off });
-                car.set_is_braking(brakes_on);
-                car.set_ev_ready(ev_ready);
-            });
+            if [ig1_edge, brakes_edge, ready_edge].into_iter().any(|o| o.is_some()) {
+                cx.shared.car.lock(|car| {
+                    // TODO: also read external IG3 state and update accordingly
 
-            // FIXME: ignition sequence should be its own task
-            match ig1_on {
-                true => {
-                    cx.local.relay_ig3.set_high().unwrap();
-                    cx.local.led_ignition.set_high().unwrap();
-                }
-                false => {
-                    cx.local.relay_ig3.set_low().unwrap();
-                    cx.local.led_ignition.set_low().unwrap();
+                    if let Some(edge) = ig1_edge {
+                        car.set_ignition(match edge {
+                            Rising => Ignition::On,
+                            Falling => Ignition::Off,
+                        });
+                    };
+                    if let Some(edge) = brakes_edge {
+                        car.set_is_braking(edge == Rising);
+                    }
+                    if let Some(edge) = ready_edge {
+                        car.set_ev_ready_input(edge == Rising);
+                    }
+                });
+            }
+
+            if let Some(edge) = ig1_edge {
+                // FIXME: ignition sequence should be its own task
+                match edge {
+                    Rising => {
+                        cx.local.relay_ig3.set_high().unwrap();
+                        cx.local.led_ignition.set_high().unwrap();
+                    }
+                    Falling => {
+                        cx.local.relay_ig3.set_low().unwrap();
+                        cx.local.led_ignition.set_low().unwrap();
+                    }
                 }
             }
         }
