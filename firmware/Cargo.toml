@@ -27,6 +27,7 @@ inverted-pin = "0.2.0"
 embedded-can = "0.4.1"
 bitvec = { version = "1.0.1", features = ["atomic"], default-features = false }
 debouncr = "0.2.2"
+num = { version = "0.4.3", default-features = false }
 
 # cargo build/run
 [profile.dev]
@@ -80,4 +81,5 @@ fdcan = { path = "../../fdcan" }
 [build-dependencies]
 dbc-codegen = { git = "https://github.com/technocreatives/dbc-codegen", branch = "main", version = "0.3.0" }
 
-
+[patch."https://github.com/technocreatives/dbc-codegen"]
+dbc-codegen = { path = "../../dbc-codegen" }
