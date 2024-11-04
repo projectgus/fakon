@@ -6,11 +6,16 @@
 //! However having it allows clearing all faults, and allows us to extend later to send
 //! a "crashed" and open contactors in an emergency.
 use crate::can_queue;
+use crate::can_queue::QueuedFrame;
 use crate::car;
 use crate::car::Ignition;
 use crate::dbc::pcan;
+use crate::dbc::pcan::AirbagStatus;
 use crate::hardware;
 use crate::hardware::Mono;
+use crate::periodic::{send_periodic, PeriodicMessage};
+use embedded_can::Frame as _;
+use futures::{FutureExt, select_biased};
 use fugit::RateExtU32;
 use hex_literal::hex;
 use rtic::Mutex;
@@ -29,7 +34,19 @@ where
     M: Mutex<T = can_queue::Tx<hardware::PCAN>>,
     MCAR: Mutex<T = car::CarState>,
 {
-    let can_1hz = pcan::AirbagStatus::try_from(hex!("000000C025029101").as_slice()).unwrap();
+    let mut airbag_status = pcan::AirbagStatus::try_from(hex!("000000C025029101").as_slice()).unwrap();
+
+    let msgs: &mut [&mut dyn PeriodicMessage] = &mut [&mut airbag_status];
+
+    loop {
+        select_biased!(
+            _ = crash_signal_pwm(crash_out).fuse() => (),
+            _ = send_periodic(msgs, &mut pcan_tx, &mut car).fuse() => (),
+        );
+    }
+}
+
+async fn crash_signal_pwm(crash_out: &mut hardware::AcuCrashOutput) -> ! {
     let duty_pct = 80;
 
     let cycle_time = 50.Hz::<1, 1000>().into_duration();
@@ -38,17 +55,26 @@ where
     let mut next_cycle = Mono::now();
 
     loop {
-        // Every 1Hz
-        if car.lock(|car| car.ignition() == Ignition::On) {
-            pcan_tx.lock(|tx| tx.transmit(&can_1hz));
-        }
-
         for _ in 0..50 {
             crash_out.set_high().unwrap();
             Mono::delay(time_high).await;
             crash_out.set_low().unwrap();
             next_cycle += cycle_time;
             Mono::delay_until(next_cycle).await;
+        }
+    }
+}
+
+impl PeriodicMessage for AirbagStatus {
+    fn rate(&self) -> crate::Rate {
+        1.Hz()
+    }
+
+    fn update_for_transmit(&mut self, car: &car::CarState) -> Option<can_queue::QueuedFrame> {
+        // Airbag status message is constant for now, not simulating 'crashed'
+        match car.ignition() {
+            Ignition::On => QueuedFrame::new(self.id(), self.raw()),
+            _ => None,
         }
     }
 }
