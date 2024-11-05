@@ -38,6 +38,8 @@ where
 
     let msgs: &mut [&mut dyn PeriodicMessage] = &mut [&mut airbag_status];
 
+    // Note: the loop here is unnecessary because none of these functions ever
+    // actually return, but select_biased macro doesn't support that
     loop {
         select_biased!(
             _ = crash_signal_pwm(crash_out).fuse() => (),
@@ -47,21 +49,18 @@ where
 }
 
 async fn crash_signal_pwm(crash_out: &mut hardware::AcuCrashOutput) -> ! {
-    let duty_pct = 80;
-
+    let duty_pct = 80; // "not crashed"
     let cycle_time = 50.Hz::<1, 1000>().into_duration();
     let time_high = cycle_time * duty_pct / 100;
 
     let mut next_cycle = Mono::now();
 
     loop {
-        for _ in 0..50 {
-            crash_out.set_high().unwrap();
-            Mono::delay(time_high).await;
-            crash_out.set_low().unwrap();
-            next_cycle += cycle_time;
-            Mono::delay_until(next_cycle).await;
-        }
+        crash_out.set_high().unwrap();
+        Mono::delay(time_high).await;
+        crash_out.set_low().unwrap();
+        next_cycle += cycle_time;
+        Mono::delay_until(next_cycle).await;
     }
 }
 
