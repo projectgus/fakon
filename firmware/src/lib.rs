@@ -13,6 +13,7 @@ pub mod can_queue;
 pub mod can_utils;
 pub mod hardware;
 pub mod periodic;
+pub mod periodic_tick;
 pub mod car;
 pub mod fresh;
 pub mod ieb;

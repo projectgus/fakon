@@ -292,10 +292,18 @@ impl<I: fdcan::Instance> Tx<I> {
         }
     }
 
+    #[inline]
     pub fn transmit(&mut self, msg: &impl Frame) {
+        // Convert to a QueuedFrame here, to minimise monomorphisation
+
+        // Panic: TODO unsure what to do about unwrap here?
+        self.transmit_frame(QueuedFrame::new(msg.id(), msg.data()).unwrap());
+    }
+
+    fn transmit_frame(&mut self, frame: QueuedFrame) {
         //defmt::trace!("CAN TX {:?}", msg); // TODO: fix log line
         let maybe_queue = match self.can.transmit_preserve_frame(
-            msg,
+            &frame,
             &mut QueuedFrame::from_pending_transmit,
         ) {
             // Happy path, there was an empty hardware TX buffer
@@ -303,7 +311,7 @@ impl<I: fdcan::Instance> Tx<I> {
             // Preserve the pending TX message that was replaced in hardware
             Ok(Some(dequeued)) => Some(dequeued),
             // Rather than blocking on fdcan, queue this message for later transmit
-            Err(nb::Error::WouldBlock) => Some(msg.into()),
+            Err(nb::Error::WouldBlock) => Some(frame),
             // TODO: Figure out what this means given error type is Infallible here...
             Err(nb::Error::Other(_)) => panic!("Unexpected CAN TX error"),
         };

@@ -10,6 +10,9 @@ pub struct CarState {
     /// Main ignition power state. Updated from hard wired inputs.
     ignition: Ignition,
 
+    /// The "most on" that the car has been since reset
+    most_on: Ignition,
+
     /// Main high voltage contactor state. Updated from BMS whenever IG1 or IG3 is on.
     contactor: Fresh<Contactor>,
 
@@ -62,6 +65,7 @@ impl CarState {
         // Note this is where all of the stale timeouts for the Fresh values are set
         Self {
             ignition: Ignition::Off,
+            most_on: Ignition::On,
             contactor: Fresh::new(3.secs()),
             ev_ready_input: false,
             charge_port_locked: false,
@@ -117,6 +121,12 @@ impl CarState {
             defmt::info!("Ignition => {}", value);
             self.ignition = value;
         }
+        // Update the lifetime "most on" value
+        self.most_on = match (self.most_on, value) {
+            (Ignition::Off, Ignition::IG3) => Ignition::IG3,
+            (_, Ignition::On) => Ignition::On,
+            (existing, _) => existing,
+        };
     }
 
     #[inline]
@@ -234,6 +244,11 @@ impl CarState {
             }
             _ => (),
         }
+    }
+
+    // Return the "most on" that the ignition has been since reset
+    pub(crate) fn most_on(&self) -> Ignition {
+        self.most_on
     }
 }
 

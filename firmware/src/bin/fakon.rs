@@ -23,10 +23,14 @@ mod app {
     use fakon::dbc::pcan;
     use fakon::hardware;
     use fakon::hardware::Mono;
+    use fakon::periodic_tick::TickListener;
+    use fakon::periodic_tick::Ticker;
     use fugit::ExtU32;
     use rtic_monotonics::Monotonic;
     use stm32g4xx_hal::hal::digital::v2::OutputPin;
     use stm32g4xx_hal::prelude::InputPin;
+
+    static TICKER: Ticker = Ticker::new();
 
     #[shared]
     struct Shared {
@@ -44,6 +48,10 @@ mod app {
         led_ignition: hardware::LEDIgnitionOutput,
         srs_crash_out: hardware::AcuCrashOutput,
         ev_ready: hardware::EVReadyInput,
+
+        // Periodic ticks
+        ticks_airbag: TickListener<'static>,
+        ticks_igpm: TickListener<'static>,
     }
 
     #[init]
@@ -58,8 +66,11 @@ mod app {
             ig1_on_input,
             led_ignition,
             relay_ig3,
-            ev_ready
+            ev_ready,
         } = hardware::init(cx.core, cx.device);
+
+        let ticks_airbag = TICKER.subscribe().unwrap();
+        let ticks_igpm = TICKER.subscribe().unwrap();
 
         let (pcan_control, pcan_rx, pcan_tx) =
             can_queue::Control::init(pcan_config, &can_timing_500kbps);
@@ -84,6 +95,9 @@ mod app {
                 led_ignition,
                 relay_ig3,
                 ev_ready,
+
+                ticks_airbag,
+                ticks_igpm,
             },
         )
     }
@@ -110,7 +124,8 @@ mod app {
             let msg = pcan::Messages::from_can_message(frame.id(), frame.data());
             match msg {
                 Err(_) => {
-                    defmt::error!("Failed to parse CAN message ID {:?} data {:?}",
+                    defmt::error!(
+                        "Failed to parse CAN message ID {:?} data {:?}",
                         Debug2Format(&frame.id()),
                         frame.data(),
                     );
@@ -125,9 +140,15 @@ mod app {
         }
     }
 
-    #[task(shared = [pcan_tx, car], local = [srs_crash_out], priority = 3)]
+    #[task(shared = [pcan_tx, car], local = [srs_crash_out, ticks_airbag], priority = 3)]
     async fn airbag_control(cx: airbag_control::Context) {
-        fakon::airbag_control::task(cx.shared.pcan_tx, cx.shared.car, cx.local.srs_crash_out).await;
+        fakon::airbag_control::task(
+            cx.local.ticks_airbag,
+            cx.shared.pcan_tx,
+            cx.shared.car,
+            cx.local.srs_crash_out,
+        )
+        .await;
     }
 
     #[task(shared = [pcan_tx, car], priority = 3)]
@@ -135,9 +156,9 @@ mod app {
         fakon::ieb::task_ieb(cx.shared.pcan_tx, cx.shared.car).await;
     }
 
-    #[task(shared = [pcan_tx, car], priority = 3)]
+    #[task(shared = [pcan_tx, car], local = [ticks_igpm], priority = 3)]
     async fn igpm(cx: igpm::Context) {
-        fakon::igpm::task_igpm(cx.shared.pcan_tx, cx.shared.car).await;
+        fakon::igpm::task_igpm(cx.local.ticks_igpm, cx.shared.pcan_tx, cx.shared.car).await;
     }
 
     // FDCAN_INTR0_IT and FDCAN_INTR1_IT are swapped, until stm32g4 crate
@@ -166,7 +187,10 @@ mod app {
             let brakes_edge = brakes_on.update(cx.local.brake_input.is_high().unwrap());
             let ready_edge = ev_ready.update(cx.local.ev_ready.is_high().unwrap());
 
-            if [ig1_edge, brakes_edge, ready_edge].into_iter().any(|o| o.is_some()) {
+            if [ig1_edge, brakes_edge, ready_edge]
+                .into_iter()
+                .any(|o| o.is_some())
+            {
                 cx.shared.car.lock(|car| {
                     // TODO: also read external IG3 state and update accordingly
 
@@ -207,12 +231,13 @@ mod app {
             Mono::delay(2.secs()).await;
 
             cx.shared.car.lock(|car| {
-                defmt::info!("Ign: {:?} Con: {:?} Batt: {:05}% Inv: {:?}V RPM: {:?}",
-                             car.ignition(),
-                             car.contactor(),
-                             car.soc_batt(),
-                             car.v_inverter(),
-                             car.motor_rpm(),
+                defmt::info!(
+                    "Ign: {:?} Con: {:?} Batt: {:05}% Inv: {:?}V RPM: {:?}",
+                    car.ignition(),
+                    car.contactor(),
+                    car.soc_batt(),
+                    car.v_inverter(),
+                    car.motor_rpm(),
                 );
             });
         }
