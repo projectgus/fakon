@@ -202,6 +202,10 @@ impl QueuedFrame {
         )
     }
 
+    pub fn from_frame<F>(frame: F) -> Self where F: Frame {
+        QueuedFrame::new(frame.id(), frame.data()).unwrap()
+    }
+
     // Internal constructor for re-queue on transmit
     fn new_tx(header: TxFrameHeader, tx_data: &[u8]) -> Self {
         let mut data = [0_u8; 8];
@@ -220,15 +224,6 @@ impl QueuedFrame {
             data[..dlen].copy_from_slice(&data32.align_to::<u8>().1[..dlen]);
         }
         QueuedFrame { header, data }
-    }
-}
-
-impl<F> From<&F> for QueuedFrame
-where
-    F: Frame,
-{
-    fn from(frame: &F) -> Self {
-        QueuedFrame::new(frame.id(), frame.data()).unwrap()
     }
 }
 
