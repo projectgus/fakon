@@ -29,8 +29,6 @@ bitvec = { version = "1.0.1", features = ["atomic"], default-features = false }
 debouncr = "0.2.2"
 num = { version = "0.4.3", default-features = false }
 futures = { version = "0.3.31", default-features = false, features = ["async-await", "cfg-target-has-atomic"] }
-embassy-sync = { version = "0.6.0", features = ["defmt"] }
-enum-iterator = "2.1.0"
 
 # cargo build/run
 [profile.dev]

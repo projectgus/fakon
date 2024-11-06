@@ -9,17 +9,16 @@ use panic_probe as _;
 
 use stm32g4xx_hal as _; // memory layout
 
+pub mod airbag_control;
 pub mod can_queue;
 pub mod can_utils;
-pub mod hardware;
-pub mod periodic;
-pub mod periodic_tick;
 pub mod car;
+pub mod dbc;
+pub mod every;
 pub mod fresh;
+pub mod hardware;
 pub mod ieb;
 pub mod igpm;
-pub mod airbag_control;
-pub mod dbc;
 
 // Make some common type aliases for fugit Duration, Instance and Rate
 // based on our firmware's 1ms tick period

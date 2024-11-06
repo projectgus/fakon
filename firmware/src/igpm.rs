@@ -12,13 +12,14 @@ use crate::dbc::pcan::{
     ChargeSettings, ChargeSettingsAcChargingCurrent, Clock, Odometer, Steering,
 };
 use crate::hardware::{self, Mono};
-use crate::periodic_tick::{Period, TickListener};
+use crate::every::Every;
+use fugit::RateExtU32;
+use futures::{select_biased, FutureExt};
 use hex_literal::hex;
 use rtic::Mutex;
 use rtic_monotonics::Monotonic;
 
 pub async fn task_igpm<MPCAN, MCAR>(
-    ticker: &mut TickListener<'_>,
     mut pcan_tx: MPCAN,
     mut car: MCAR,
 ) -> !
@@ -73,44 +74,63 @@ where
 
     let mut steering_counter = 0u8;
 
-    loop {
-        let period = ticker.next_period().await;
-        let car = car.lock(|car| car.clone());
+    let mut every_1hz = Every::new(1.Hz());
+    let mut every_5hz = Every::new(5.Hz());
+    let mut every_10hz = Every::new(10.Hz());
+    let mut every_50hz = Every::new(50.Hz());
+    let mut every_100hz = Every::new(100.Hz());
 
-        pcan_tx.lock(|tx| match period {
-            Period::Hz1 => {
-                tx.transmit(&odometer);
-            }
-            Period::Hz5 => {
-                tx.transmit(&charge_settings);
-                tx.transmit(&igpm_5df);
-                tx.transmit(&body_warnings);
-                tx.transmit(&zeroes45d);
-                tx.transmit(&zeroes45e);
-                tx.transmit(&unk4fe);
-                tx.transmit(&Cgw5b3::latest(&car));
-            }
-            Period::Hz10 => {
-                tx.transmit(&BodyState::latest(&car));
-                tx.transmit(&Clock::latest(&car));
-                tx.transmit(&ChargePort::latest(&car));
-                tx.transmit(&unk55f);
-                tx.transmit(&unk55c);
-                tx.transmit(&unk561);
-                tx.transmit(&unk578);
-                tx.transmit(&Cgw588::latest(&car));
-            }
-            Period::Hz20 => {}
-            Period::Hz50 => {
-                tx.transmit(&unk450);
-                tx.transmit(&unk462);
-            }
-            Period::Hz100 => {
-                if car.ignition().ig3_on() {
-                    tx.transmit(&Steering::latest(&car, &mut steering_counter));
+    loop {
+        select_biased!(
+            _ = every_100hz.next().fuse() => {
+                if car.lock(|car| car.ignition().ig3_on()) {
+                    pcan_tx.lock(|tx|
+                        tx.transmit(&Steering::latest(&mut steering_counter)))
                 }
             }
-        });
+            _ = every_50hz.next().fuse() => {
+                pcan_tx.lock(|tx| {
+                    tx.transmit(&unk450);
+                    tx.transmit(&unk462);
+                });
+            }
+            _ = every_10hz.next().fuse() => {
+                let (body_state, clock, charge_port, cgw588) = car.lock(|car| {
+                    (BodyState::latest(car),
+                        Clock::latest(car),
+                        ChargePort::latest(car),
+                        Cgw588::latest(car),
+                    )
+                });
+                pcan_tx.lock(|tx| {
+                    tx.transmit(&body_state);
+                    tx.transmit(&charge_port);
+                    tx.transmit(&clock);
+                    tx.transmit(&cgw588);
+                    tx.transmit(&unk55f);
+                    tx.transmit(&unk55c);
+                    tx.transmit(&unk561);
+                    tx.transmit(&unk578);
+                });
+            }
+            _ = every_5hz.next().fuse() => {
+                let cgw5b3 = car.lock(|car| {
+                    Cgw5b3::latest(car)
+                });
+                pcan_tx.lock(|tx| {
+                    tx.transmit(&charge_settings);
+                    tx.transmit(&igpm_5df);
+                    tx.transmit(&body_warnings);
+                    tx.transmit(&zeroes45d);
+                    tx.transmit(&zeroes45e);
+                    tx.transmit(&unk4fe);
+                    tx.transmit(&cgw5b3);
+                });
+            }
+            _ = every_1hz.next().fuse() => {
+                pcan_tx.lock(|tx| tx.transmit(&odometer));
+            }
+        );
     }
 }
 
@@ -185,7 +205,7 @@ impl ChargePort {
 }
 
 impl Steering {
-    fn latest(_car: &CarState, counter: &mut u8) -> Self {
+    fn latest(counter: &mut u8) -> Self {
         *counter = match *counter {
             Self::COUNTER_MAX.. => Self::COUNTER_MIN,
             n => n + 1,

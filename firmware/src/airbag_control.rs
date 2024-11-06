@@ -11,7 +11,7 @@ use crate::car::Ignition;
 use crate::dbc::pcan;
 use crate::hardware;
 use crate::hardware::Mono;
-use crate::periodic_tick::{Period, TickListener};
+use crate::every::Every;
 use futures::{FutureExt, select_biased};
 use fugit::RateExtU32;
 use hex_literal::hex;
@@ -23,7 +23,6 @@ use stm32g4xx_hal::prelude::OutputPin;
 // - 1Hz Send CAN message (constant contents)
 // - 50Hz soft PWM output, 80% high duty for "not crashed", 20% for "crashed"
 pub async fn task<M, MCAR>(
-    ticker: &mut TickListener<'_>,
     mut pcan_tx: M,
     mut car: MCAR,
     crash_out: &mut hardware::AcuCrashOutput,
@@ -34,19 +33,19 @@ where
 {
     let airbag_status = pcan::AirbagStatus::try_from(hex!("000000C025029101").as_slice()).unwrap();
 
+    let mut every_1hz = Every::new(1.Hz());
+
     // Note: the loop here is unnecessary because none of these functions ever
     // actually return, but select_biased macro doesn't support that
     loop {
         select_biased!(
             _ = crash_signal_pwm(crash_out).fuse() => (),
-            period = ticker.next_period().fuse() => {
-                if period == Period::Hz1 {
+            _ = every_1hz.next().fuse() => {
                     let ignition = car.lock(|car| car.ignition());
                     if ignition == Ignition::On {
                         // TODO: monomorphisation here may be too big
                         pcan_tx.lock(|can| can.transmit(&airbag_status));
                     }
-                }
             }
         );
     }

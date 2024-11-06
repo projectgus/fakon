@@ -23,14 +23,10 @@ mod app {
     use fakon::dbc::pcan;
     use fakon::hardware;
     use fakon::hardware::Mono;
-    use fakon::periodic_tick::TickListener;
-    use fakon::periodic_tick::Ticker;
     use fugit::ExtU32;
     use rtic_monotonics::Monotonic;
     use stm32g4xx_hal::hal::digital::v2::OutputPin;
     use stm32g4xx_hal::prelude::InputPin;
-
-    static TICKER: Ticker = Ticker::new();
 
     #[shared]
     struct Shared {
@@ -48,10 +44,6 @@ mod app {
         led_ignition: hardware::LEDIgnitionOutput,
         srs_crash_out: hardware::AcuCrashOutput,
         ev_ready: hardware::EVReadyInput,
-
-        // Periodic ticks
-        ticks_airbag: TickListener<'static>,
-        ticks_igpm: TickListener<'static>,
     }
 
     #[init]
@@ -68,9 +60,6 @@ mod app {
             relay_ig3,
             ev_ready,
         } = hardware::init(cx.core, cx.device);
-
-        let ticks_airbag = TICKER.subscribe().unwrap();
-        let ticks_igpm = TICKER.subscribe().unwrap();
 
         let (pcan_control, pcan_rx, pcan_tx) =
             can_queue::Control::init(pcan_config, &can_timing_500kbps);
@@ -95,9 +84,6 @@ mod app {
                 led_ignition,
                 relay_ig3,
                 ev_ready,
-
-                ticks_airbag,
-                ticks_igpm,
             },
         )
     }
@@ -140,10 +126,9 @@ mod app {
         }
     }
 
-    #[task(shared = [pcan_tx, car], local = [srs_crash_out, ticks_airbag], priority = 3)]
+    #[task(shared = [pcan_tx, car], local = [srs_crash_out], priority = 3)]
     async fn airbag_control(cx: airbag_control::Context) {
         fakon::airbag_control::task(
-            cx.local.ticks_airbag,
             cx.shared.pcan_tx,
             cx.shared.car,
             cx.local.srs_crash_out,
@@ -156,9 +141,9 @@ mod app {
         fakon::ieb::task_ieb(cx.shared.pcan_tx, cx.shared.car).await;
     }
 
-    #[task(shared = [pcan_tx, car], local = [ticks_igpm], priority = 3)]
+    #[task(shared = [pcan_tx, car], priority = 3)]
     async fn igpm(cx: igpm::Context) {
-        fakon::igpm::task_igpm(cx.local.ticks_igpm, cx.shared.pcan_tx, cx.shared.car).await;
+        fakon::igpm::task_igpm(cx.shared.pcan_tx, cx.shared.car).await;
     }
 
     // FDCAN_INTR0_IT and FDCAN_INTR1_IT are swapped, until stm32g4 crate
