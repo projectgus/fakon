@@ -14,7 +14,7 @@ pub mod can_queue;
 pub mod can_utils;
 pub mod car;
 pub mod dbc;
-pub mod every;
+pub mod repeater;
 pub mod fresh;
 pub mod hardware;
 pub mod ieb;

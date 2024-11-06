@@ -10,11 +10,11 @@ use crate::dbc::pcan::{
     Ieb2a2, Ieb331, Ieb386Wheel, Ieb387Wheel, Ieb507Tcs, ParkingBrake, StabilityControl,
     TractionControlFast, TractionControlMed,
 };
-use crate::every::Every;
+use crate::repeater::Repeater;
 use crate::hardware::Mono;
 use crate::hardware;
 use fugit::{ExtU32, RateExtU32};
-use futures::{select_biased, FutureExt};
+use futures::select_biased;
 use hex_literal::hex;
 use rtic::Mutex;
 use rtic_monotonics::Monotonic;
@@ -39,10 +39,10 @@ where
         }
 
         // Restart all the periodic counters each time ignition comes on
-        let mut every_10hz = Every::new(10.Hz());
-        let mut every_20hz = Every::new(20.Hz());
-        let mut every_50hz = Every::new(50.Hz());
-        let mut every_100hz = Every::new(100.Hz());
+        let mut every_10hz = Repeater::new(10.Hz());
+        let mut every_20hz = Repeater::new(20.Hz());
+        let mut every_50hz = Repeater::new(50.Hz());
+        let mut every_100hz = Repeater::new(100.Hz());
 
         // Counters
         let mut tf_counter1 = 0u8;
@@ -60,7 +60,7 @@ where
             }
 
             select_biased!(
-                _ = every_100hz.next().fuse() => {
+                _ = every_100hz.on_next() => {
                     let (ieb2a2, ieb331, stability) = car.lock(|car| (
                         Ieb2a2::latest(car, &mut ieb_counter),
                         Ieb331::latest(car),
@@ -73,7 +73,7 @@ where
                         tx.transmit(&stability);
                     });
                 },
-                _ = every_50hz.next().fuse() => {
+                _ = every_50hz.on_next() => {
                     let (tcs_med, ieb386, ieb387) = car.lock(|car| (
                         TractionControlMed::latest(car, &mut tm_counter),
                         Ieb386Wheel::latest(car, &mut wheel_counter1, &mut wheel_counter2),
@@ -85,12 +85,12 @@ where
                         tx.transmit(&ieb387);
                     });
                 },
-                _ = every_20hz.next().fuse() => {
+                _ = every_20hz.on_next() => {
                     pcan_tx.lock(|tx| {
                         tx.transmit(&parking_brake);
                     });
                 },
-                _ = every_10hz.next().fuse() => {
+                _ = every_10hz.on_next() => {
                     pcan_tx.lock(|tx| {
                         tx.transmit(&ieb507);
                     });

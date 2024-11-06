@@ -11,9 +11,10 @@ use crate::car::Ignition;
 use crate::dbc::pcan;
 use crate::hardware;
 use crate::hardware::Mono;
-use crate::every::Every;
-use futures::{FutureExt, select_biased};
+use crate::repeater::Repeater;
+use futures::select_biased;
 use fugit::RateExtU32;
+use futures::FutureExt;
 use hex_literal::hex;
 use rtic::Mutex;
 use rtic_monotonics::Monotonic;
@@ -33,14 +34,14 @@ where
 {
     let airbag_status = pcan::AirbagStatus::try_from(hex!("000000C025029101").as_slice()).unwrap();
 
-    let mut every_1hz = Every::new(1.Hz());
+    let mut repeat_1hz = Repeater::new(1.Hz());
 
     // Note: the loop here is unnecessary because none of these functions ever
     // actually return, but select_biased macro doesn't support that
     loop {
         select_biased!(
             _ = crash_signal_pwm(crash_out).fuse() => (),
-            _ = every_1hz.next().fuse() => {
+            _ = repeat_1hz.on_next() => {
                     let ignition = car.lock(|car| car.ignition());
                     if ignition == Ignition::On {
                         // TODO: monomorphisation here may be too big
