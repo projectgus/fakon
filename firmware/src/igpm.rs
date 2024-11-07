@@ -12,17 +12,12 @@ use crate::dbc::pcan::{
     ChargeSettings, ChargeSettingsAcChargingCurrent, Clock, Odometer, Steering,
 };
 use crate::hardware::{self, Mono};
-use crate::repeater::Repeater;
-use fugit::RateExtU32;
-use futures::select_biased;
+use crate::repeater::{Period, Repeater};
 use hex_literal::hex;
 use rtic::Mutex;
 use rtic_monotonics::Monotonic;
 
-pub async fn task_igpm<MPCAN, MCAR>(
-    mut pcan_tx: MPCAN,
-    mut car: MCAR,
-) -> !
+pub async fn task_igpm<MPCAN, MCAR>(mut pcan_tx: MPCAN, mut car: MCAR) -> !
 where
     MPCAN: Mutex<T = Tx<hardware::PCAN>>,
     MCAR: Mutex<T = car::CarState>,
@@ -74,63 +69,60 @@ where
 
     let mut steering_counter = 0u8;
 
-    let mut repeat_1hz = Repeater::new(1.Hz());
-    let mut repeat_5hz = Repeater::new(5.Hz());
-    let mut repeat_10hz = Repeater::new(10.Hz());
-    let mut repeat_50hz = Repeater::new(50.Hz());
-    let mut repeat_100hz = Repeater::new(100.Hz());
+    let mut repeater = Repeater::new();
 
     loop {
-        select_biased!(
-            _ = repeat_100hz.on_next() => {
-                if car.lock(|car| car.ignition().ig3_on()) {
-                    pcan_tx.lock(|tx|
-                        tx.transmit(&Steering::latest(&mut steering_counter)))
+        for next in repeater.tick().await {
+            match next {
+                Period::Hz1 => {
+                    pcan_tx.lock(|tx| tx.transmit(&odometer));
+                }
+                Period::Hz5 => {
+                    let cgw5b3 = car.lock(|car| Cgw5b3::latest(car));
+                    pcan_tx.lock(|tx| {
+                        tx.transmit(&charge_settings);
+                        tx.transmit(&igpm_5df);
+                        tx.transmit(&body_warnings);
+                        tx.transmit(&zeroes45d);
+                        tx.transmit(&zeroes45e);
+                        tx.transmit(&unk4fe);
+                        tx.transmit(&cgw5b3);
+                    });
+                }
+                Period::Hz10 => {
+                    let (body_state, clock, charge_port, cgw588) = car.lock(|car| {
+                        (
+                            BodyState::latest(car),
+                            Clock::latest(car),
+                            ChargePort::latest(car),
+                            Cgw588::latest(car),
+                        )
+                    });
+                    pcan_tx.lock(|tx| {
+                        tx.transmit(&body_state);
+                        tx.transmit(&charge_port);
+                        tx.transmit(&clock);
+                        tx.transmit(&cgw588);
+                        tx.transmit(&unk55f);
+                        tx.transmit(&unk55c);
+                        tx.transmit(&unk561);
+                        tx.transmit(&unk578);
+                    });
+                }
+                Period::Hz20 => todo!(),
+                Period::Hz50 => {
+                    pcan_tx.lock(|tx| {
+                        tx.transmit(&unk450);
+                        tx.transmit(&unk462);
+                    });
+                }
+                Period::Hz100 => {
+                    if car.lock(|car| car.ignition().ig3_on()) {
+                        pcan_tx.lock(|tx| tx.transmit(&Steering::latest(&mut steering_counter)))
+                    }
                 }
             }
-            _ = repeat_50hz.on_next() => {
-                pcan_tx.lock(|tx| {
-                    tx.transmit(&unk450);
-                    tx.transmit(&unk462);
-                });
-            }
-            _ = repeat_10hz.on_next() => {
-                let (body_state, clock, charge_port, cgw588) = car.lock(|car| {
-                    (BodyState::latest(car),
-                        Clock::latest(car),
-                        ChargePort::latest(car),
-                        Cgw588::latest(car),
-                    )
-                });
-                pcan_tx.lock(|tx| {
-                    tx.transmit(&body_state);
-                    tx.transmit(&charge_port);
-                    tx.transmit(&clock);
-                    tx.transmit(&cgw588);
-                    tx.transmit(&unk55f);
-                    tx.transmit(&unk55c);
-                    tx.transmit(&unk561);
-                    tx.transmit(&unk578);
-                });
-            }
-            _ = repeat_5hz.on_next() => {
-                let cgw5b3 = car.lock(|car| {
-                    Cgw5b3::latest(car)
-                });
-                pcan_tx.lock(|tx| {
-                    tx.transmit(&charge_settings);
-                    tx.transmit(&igpm_5df);
-                    tx.transmit(&body_warnings);
-                    tx.transmit(&zeroes45d);
-                    tx.transmit(&zeroes45e);
-                    tx.transmit(&unk4fe);
-                    tx.transmit(&cgw5b3);
-                });
-            }
-            _ = repeat_1hz.on_next() => {
-                pcan_tx.lock(|tx| tx.transmit(&odometer));
-            }
-        );
+        }
     }
 }
 

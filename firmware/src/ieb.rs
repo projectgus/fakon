@@ -10,11 +10,10 @@ use crate::dbc::pcan::{
     Ieb2a2, Ieb331, Ieb386Wheel, Ieb387Wheel, Ieb507Tcs, ParkingBrake, StabilityControl,
     TractionControlFast, TractionControlMed,
 };
-use crate::repeater::Repeater;
-use crate::hardware::Mono;
 use crate::hardware;
-use fugit::{ExtU32, RateExtU32};
-use futures::select_biased;
+use crate::hardware::Mono;
+use crate::repeater::{Period, Repeater};
+use fugit::ExtU32;
 use hex_literal::hex;
 use rtic::Mutex;
 use rtic_monotonics::Monotonic;
@@ -39,10 +38,7 @@ where
         }
 
         // Restart all the periodic counters each time ignition comes on
-        let mut every_10hz = Repeater::new(10.Hz());
-        let mut every_20hz = Repeater::new(20.Hz());
-        let mut every_50hz = Repeater::new(50.Hz());
-        let mut every_100hz = Repeater::new(100.Hz());
+        let mut repeater = Repeater::new();
 
         // Counters
         let mut tf_counter1 = 0u8;
@@ -59,43 +55,53 @@ where
                 break; // Go back around to the outer loop
             }
 
-            select_biased!(
-                _ = every_100hz.on_next() => {
-                    let (ieb2a2, ieb331, stability) = car.lock(|car| (
-                        Ieb2a2::latest(car, &mut ieb_counter),
-                        Ieb331::latest(car),
-                        StabilityControl::latest(&mut stability_counter),
-                    ));
-                    pcan_tx.lock(|tx| {
-                        tx.transmit(&TractionControlFast::latest(&mut tf_counter1, &mut tf_counter2));
-                        tx.transmit(&ieb2a2);
-                        tx.transmit(&ieb331);
-                        tx.transmit(&stability);
-                    });
-                },
-                _ = every_50hz.on_next() => {
-                    let (tcs_med, ieb386, ieb387) = car.lock(|car| (
-                        TractionControlMed::latest(car, &mut tm_counter),
-                        Ieb386Wheel::latest(car, &mut wheel_counter1, &mut wheel_counter2),
-                        Ieb387Wheel::latest(car, &mut wheel_counter3),
-                    ));
-                    pcan_tx.lock(|tx| {
-                        tx.transmit(&tcs_med);
-                        tx.transmit(&ieb386);
-                        tx.transmit(&ieb387);
-                    });
-                },
-                _ = every_20hz.on_next() => {
-                    pcan_tx.lock(|tx| {
-                        tx.transmit(&parking_brake);
-                    });
-                },
-                _ = every_10hz.on_next() => {
-                    pcan_tx.lock(|tx| {
-                        tx.transmit(&ieb507);
-                    });
-                },
-            )
+            for next in repeater.tick().await {
+                match next {
+                    Period::Hz10 => {
+                        pcan_tx.lock(|tx| {
+                            tx.transmit(&ieb507);
+                        });
+                    }
+                    Period::Hz20 => {
+                        pcan_tx.lock(|tx| {
+                            tx.transmit(&parking_brake);
+                        });
+                    }
+                    Period::Hz50 => {
+                        let (tcs_med, ieb386, ieb387) = car.lock(|car| {
+                            (
+                                TractionControlMed::latest(car, &mut tm_counter),
+                                Ieb386Wheel::latest(car, &mut wheel_counter1, &mut wheel_counter2),
+                                Ieb387Wheel::latest(car, &mut wheel_counter3),
+                            )
+                        });
+                        pcan_tx.lock(|tx| {
+                            tx.transmit(&tcs_med);
+                            tx.transmit(&ieb386);
+                            tx.transmit(&ieb387);
+                        });
+                    }
+                    Period::Hz100 => {
+                        let (ieb2a2, ieb331, stability) = car.lock(|car| {
+                            (
+                                Ieb2a2::latest(car, &mut ieb_counter),
+                                Ieb331::latest(car),
+                                StabilityControl::latest(&mut stability_counter),
+                            )
+                        });
+                        pcan_tx.lock(|tx| {
+                            tx.transmit(&TractionControlFast::latest(
+                                &mut tf_counter1,
+                                &mut tf_counter2,
+                            ));
+                            tx.transmit(&ieb2a2);
+                            tx.transmit(&ieb331);
+                            tx.transmit(&stability);
+                        });
+                    }
+                    _ => (),
+                }
+            }
         }
     }
 }
@@ -197,18 +203,14 @@ impl Ieb386Wheel {
 
         // Live counters in the top 2 bits of each 16-bit wheel speed value
         *counter1 = match *counter1 {
-            Self::WHL_SPD_ALIVE_COUNTER_LSB_MAX.. => {
-                Self::WHL_SPD_ALIVE_COUNTER_LSB_MIN
-            }
+            Self::WHL_SPD_ALIVE_COUNTER_LSB_MAX.. => Self::WHL_SPD_ALIVE_COUNTER_LSB_MIN,
             lsb => lsb + 1,
         };
 
         if *counter1 == Self::WHL_SPD_ALIVE_COUNTER_LSB_MIN {
             // When LSB wraps, increment the MSB
             *counter2 = match *counter2 {
-                Self::WHL_SPD_ALIVE_COUNTER_MSB_MAX.. => {
-                    Self::WHL_SPD_ALIVE_COUNTER_MSB_MIN
-                }
+                Self::WHL_SPD_ALIVE_COUNTER_MSB_MAX.. => Self::WHL_SPD_ALIVE_COUNTER_MSB_MIN,
                 msb => msb + 1,
             };
         }
@@ -257,7 +259,7 @@ impl StabilityControl {
             0.0, false, false, // Yaw rate
             0, 0,
         )
-            .unwrap();
+        .unwrap();
 
         // Increment counter
         {
