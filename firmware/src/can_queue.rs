@@ -1,7 +1,7 @@
-///! Module to support software TX and RX queued CAN on rtic
-///!
-///! TX side uses a binary heap to send out messages in priority order.
-///! RX side writes messages into an RTIC channel in FIFO order, for processing by the app.
+//! Module to support software TX and RX queued CAN on rtic
+//!
+//! TX side uses a binary heap to send out messages in priority order.
+//! RX side writes messages into an RTIC channel in FIFO order, for processing by the app.
 use can_bit_timings::CanBitTiming;
 use embedded_can::{Frame, Id, StandardId};
 use core::cmp::{min, Ordering};
