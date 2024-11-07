@@ -1,7 +1,5 @@
 #![no_main]
 #![no_std]
-#![feature(type_alias_impl_trait)]
-#![feature(never_type)]
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 use defmt_brtt as _; // global logger
@@ -49,6 +47,11 @@ mod app {
     use rtic_monotonics::Monotonic;
     use stm32g4xx_hal::hal::digital::v2::OutputPin;
     use stm32g4xx_hal::prelude::InputPin;
+
+    // Task functions
+    use crate::airbag_control::task_airbag_control;
+    use crate::ieb::task_ieb;
+    use crate::igpm::task_igpm;
 
     #[shared]
     struct Shared {
@@ -150,10 +153,6 @@ mod app {
         }
     }
 
-    use crate::airbag_control::task_airbag_control;
-    use crate::ieb::task_ieb;
-    use crate::igpm::task_igpm;
-
     // Task declarations all extern-ed to split the firmware up into modules
     extern "Rust" {
         #[task(shared = [pcan_tx, car], local = [srs_crash_out], priority = 3)]
@@ -230,7 +229,7 @@ mod app {
         }
     }
 
-    #[task(shared = [car], priority = 2)]
+    #[task(shared = [car], priority = 0)]
     async fn log_info(mut cx: log_info::Context) {
         loop {
             Mono::delay(2.secs()).await;
