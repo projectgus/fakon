@@ -11,11 +11,7 @@ use crate::car::Ignition;
 use crate::dbc::pcan;
 use crate::hardware;
 use crate::hardware::Mono;
-use crate::repeater::Period;
-use crate::repeater::Repeater;
-use futures::select_biased;
 use fugit::RateExtU32;
-use futures::FutureExt;
 use hex_literal::hex;
 use rtic::Mutex;
 use rtic_monotonics::Monotonic;
@@ -34,37 +30,25 @@ where
     MCAR: Mutex<T = car::CarState>,
 {
     let airbag_status = pcan::AirbagStatus::try_from(hex!("000000C025029101").as_slice()).unwrap();
+    let duty_pct = 80;
 
-    let mut repeater = Repeater::new();
-
-    // Note: the loop here is unnecessary because none of these functions ever
-    // actually return, but select_biased macro doesn't support that
-    loop {
-        select_biased!(
-            _ = crash_signal_pwm(crash_out).fuse() => (),
-            _ = repeater.on_tick_filtered(Period::Hz1.into()) => {
-                    let ignition = car.lock(|car| car.ignition());
-                    if ignition == Ignition::On {
-                        // TODO: monomorphisation here may be too big
-                        pcan_tx.lock(|can| can.transmit(&airbag_status));
-                    }
-            }
-        );
-    }
-}
-
-async fn crash_signal_pwm(crash_out: &mut hardware::AcuCrashOutput) -> ! {
-    let duty_pct = 80; // "not crashed"
     let cycle_time = 50.Hz::<1, 1000>().into_duration();
     let time_high = cycle_time * duty_pct / 100;
 
     let mut next_cycle = Mono::now();
 
     loop {
-        crash_out.set_high().unwrap();
-        Mono::delay(time_high).await;
-        crash_out.set_low().unwrap();
-        next_cycle += cycle_time;
-        Mono::delay_until(next_cycle).await;
+        // Every 1Hz
+        if car.lock(|car| car.ignition() == Ignition::On) {
+            pcan_tx.lock(|tx| tx.transmit(&airbag_status));
+        }
+
+        for _ in 0..50 {
+            crash_out.set_high().unwrap();
+            Mono::delay(time_high).await;
+            crash_out.set_low().unwrap();
+            next_cycle += cycle_time;
+            Mono::delay_until(next_cycle).await;
+        }
     }
 }
