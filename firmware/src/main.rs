@@ -1,14 +1,43 @@
 #![no_main]
 #![no_std]
 #![feature(type_alias_impl_trait)]
+#![feature(never_type)]
 
-use fakon as _;
+use core::sync::atomic::{AtomicUsize, Ordering};
+use defmt_brtt as _; // global logger
+
+use panic_probe as _;
+
+use stm32g4xx_hal as _; // memory layout
+
+pub mod airbag_control;
+pub mod can_queue;
+pub mod can_utils;
+pub mod car;
+pub mod dbc;
+pub mod fresh;
+pub mod hardware;
+pub mod ieb;
+pub mod igpm;
+pub mod repeater;
+
+// Make some common type aliases for fugit Duration, Instance and Rate
+// based on our firmware's 1ms tick period
+type Duration = fugit::Duration<u32, 1, 1000>;
+type Instant = fugit::Instant<u32, 1, 1000>;
+type Rate = fugit::Rate<u32, 1, 1000>;
 
 #[rtic::app(
     device = stm32g4xx_hal::stm32,
     dispatchers = [USBWAKEUP, COMP1_2_3, COMP4_5_6, COMP7, SAI, I2C4_EV, I2C4_ER]
 )]
 mod app {
+    use crate::can_queue;
+    use crate::car;
+    use crate::car::Ignition;
+    use crate::dbc::pcan;
+    use crate::hardware;
+    use crate::hardware::Mono;
     use debouncr::debounce_stateful_3;
     use debouncr::debounce_stateful_5;
     use debouncr::Edge::Falling;
@@ -16,13 +45,6 @@ mod app {
     use defmt::Debug2Format;
     use embedded_can::Frame;
     use embedded_can::Id;
-    use fakon;
-    use fakon::can_queue;
-    use fakon::car;
-    use fakon::car::Ignition;
-    use fakon::dbc::pcan;
-    use fakon::hardware;
-    use fakon::hardware::Mono;
     use fugit::ExtU32;
     use rtic_monotonics::Monotonic;
     use stm32g4xx_hal::hal::digital::v2::OutputPin;
@@ -68,9 +90,9 @@ mod app {
 
         pcan_rx::spawn().unwrap();
         poll_slow_inputs::spawn().unwrap();
-        airbag_control::spawn().unwrap();
-        ieb::spawn().unwrap();
-        igpm::spawn().unwrap();
+        task_airbag_control::spawn().unwrap();
+        task_ieb::spawn().unwrap();
+        task_igpm::spawn().unwrap();
         log_info::spawn().unwrap();
 
         (
@@ -128,24 +150,20 @@ mod app {
         }
     }
 
-    #[task(shared = [pcan_tx, car], local = [srs_crash_out], priority = 3)]
-    async fn airbag_control(cx: airbag_control::Context) {
-        fakon::airbag_control::task(
-            cx.shared.pcan_tx,
-            cx.shared.car,
-            cx.local.srs_crash_out,
-        )
-        .await;
-    }
+    use crate::airbag_control::task_airbag_control;
+    use crate::ieb::task_ieb;
+    use crate::igpm::task_igpm;
 
-    #[task(shared = [pcan_tx, car], priority = 3)]
-    async fn ieb(cx: ieb::Context) {
-        fakon::ieb::task_ieb(cx.shared.pcan_tx, cx.shared.car).await;
-    }
+    // Task declarations all extern-ed to split the firmware up into modules
+    extern "Rust" {
+        #[task(shared = [pcan_tx, car], local = [srs_crash_out], priority = 3)]
+        async fn task_airbag_control(cx: task_airbag_control::Context);
 
-    #[task(shared = [pcan_tx, car], priority = 3)]
-    async fn igpm(cx: igpm::Context) {
-        fakon::igpm::task_igpm(cx.shared.pcan_tx, cx.shared.car).await;
+        #[task(shared = [pcan_tx, car], priority = 3)]
+        async fn task_ieb(cx: task_ieb::Context);
+
+        #[task(shared = [pcan_tx, car], priority = 3)]
+        async fn task_igpm(cx: task_igpm::Context);
     }
 
     // FDCAN_INTR0_IT and FDCAN_INTR1_IT are swapped, until stm32g4 crate
@@ -228,5 +246,27 @@ mod app {
                 );
             });
         }
+    }
+}
+
+// same panicking *behavior* as `panic-probe` but doesn't print a panic message
+// this prevents the panic message being printed *twice* when `defmt::panic` is invoked
+#[defmt::panic_handler]
+fn panic() -> ! {
+    cortex_m::asm::udf()
+}
+
+static COUNT: AtomicUsize = AtomicUsize::new(0);
+defmt::timestamp!("{=usize}", {
+    // NOTE(no-CAS) `timestamps` runs with interrupts disabled
+    let n = COUNT.load(Ordering::Relaxed);
+    COUNT.store(n + 1, Ordering::Relaxed);
+    n
+});
+
+/// Terminates the application and makes `probe-rs` exit with exit-code = 0
+pub fn exit() -> ! {
+    loop {
+        cortex_m::asm::bkpt();
     }
 }

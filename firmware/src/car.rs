@@ -1,6 +1,6 @@
 //! Common state of the entire "car" as presented to the Kona
 //! components.
-use crate::dbc::pcan::{BattHvStatusPrechargeRelay, Messages};
+use crate::dbc::pcan::{BattHvStatusPrechargeRelay, Messages, Vcu200CurrentGear};
 use crate::fresh::Fresh;
 use defmt::Format;
 use fugit::ExtU32;
@@ -21,6 +21,8 @@ pub struct CarState {
 
     charge_port_locked: bool,
     is_braking: bool,
+
+    gear: Fresh<Gear>,
 
     soc_batt: f32,
     v_batt: f32,
@@ -60,6 +62,28 @@ pub enum Contactor {
     Closed,
 }
 
+#[derive(Clone, Copy, Format, PartialEq)]
+pub enum Gear {
+    Park,
+    Neutral,
+    Drive,
+    Reverse,
+}
+
+impl TryFrom<Vcu200CurrentGear> for Gear {
+    type Error = ();
+
+    fn try_from(value: Vcu200CurrentGear) -> Result<Self, Self::Error> {
+        match value {
+            Vcu200CurrentGear::P => Ok(Self::Park),
+            Vcu200CurrentGear::D => Ok(Self::Drive),
+            Vcu200CurrentGear::N => Ok(Self::Neutral),
+            Vcu200CurrentGear::R => Ok(Self::Reverse),
+            Vcu200CurrentGear::_Other(_) => Err(()),
+        }
+    }
+}
+
 impl CarState {
     pub fn new() -> Self {
         // Note this is where all of the stale timeouts for the Fresh values are set
@@ -70,6 +94,8 @@ impl CarState {
             ev_ready_input: false,
             charge_port_locked: false,
             is_braking: false,
+
+            gear: Fresh::new(3.secs()),
 
             soc_batt: 0.0,
             v_batt: 0.0,
@@ -247,7 +273,15 @@ impl CarState {
                 // as these two have the same "freshness" they could conceivably be merged somehow
                 self.v_inverter.set(msg.v_inverter());
                 self.motor_rpm.set(msg.speed_abs() as u16);
-            }
+            },
+            Messages::Vcu200(msg) => {
+                if let Ok(gear) = msg.current_gear().try_into() {
+                    self.gear.set(gear);
+                } else if self.ignition().ig3_on() {
+                    defmt::warn!("VCU200 message sent invalid gear value {}",
+                                 msg.current_gear_raw());
+                }
+            },
             _ => (),
         }
     }

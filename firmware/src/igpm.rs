@@ -3,7 +3,7 @@
 //!
 //! Some of these messages may originate from other modules in the car, and be
 //! forwarded onto the PCAN bus by the IGPM. Others originate from the IGPM.
-use crate::can_queue::Tx;
+use crate::app;
 use crate::car::{self, CarState, Contactor, Ignition};
 use crate::dbc::pcan::{
     BodyState, BodyStateDrvDoorSw, BodyStateDrvSeatBeltSw, BodyStateIgnitionSw,
@@ -11,17 +11,16 @@ use crate::dbc::pcan::{
     Cgw561, Cgw578, Cgw588, Cgw5b3, Cgw5b3PowerState, Cgw5b3UnkPowerRelated, Cgw5df, ChargePort,
     ChargeSettings, ChargeSettingsAcChargingCurrent, Clock, Odometer, Steering,
 };
-use crate::hardware::{self, Mono};
+use crate::hardware::Mono;
 use crate::repeater::{Period, Repeater};
 use hex_literal::hex;
 use rtic::Mutex;
 use rtic_monotonics::Monotonic;
 
-pub async fn task_igpm<MPCAN, MCAR>(mut pcan_tx: MPCAN, mut car: MCAR) -> !
-where
-    MPCAN: Mutex<T = Tx<hardware::PCAN>>,
-    MCAR: Mutex<T = car::CarState>,
-{
+pub async fn task_igpm(cx: app::task_igpm::Context<'_>) {
+    let mut pcan_tx = cx.shared.pcan_tx;
+    let mut car = cx.shared.car;
+
     let charge_settings =
         ChargeSettings::new(ChargeSettingsAcChargingCurrent::Maximum.into()).unwrap();
 

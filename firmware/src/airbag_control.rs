@@ -5,11 +5,9 @@
 //!
 //! However having it allows clearing all faults, and allows us to extend later to send
 //! a "crashed" and open contactors in an emergency.
-use crate::can_queue;
-use crate::car;
+use crate::app;
 use crate::car::Ignition;
 use crate::dbc::pcan;
-use crate::hardware;
 use crate::hardware::Mono;
 use fugit::RateExtU32;
 use hex_literal::hex;
@@ -20,15 +18,11 @@ use stm32g4xx_hal::prelude::OutputPin;
 // Task does two things:
 // - 1Hz Send CAN message (constant contents)
 // - 50Hz soft PWM output, 80% high duty for "not crashed", 20% for "crashed"
-pub async fn task<M, MCAR>(
-    mut pcan_tx: M,
-    mut car: MCAR,
-    crash_out: &mut hardware::AcuCrashOutput,
-) -> !
-where
-    M: Mutex<T = can_queue::Tx<hardware::PCAN>>,
-    MCAR: Mutex<T = car::CarState>,
-{
+pub async fn task_airbag_control(cx: app::task_airbag_control::Context<'_>) {
+    let mut car = cx.shared.car;
+    let mut pcan_tx = cx.shared.pcan_tx;
+    let crash_out = cx.local.srs_crash_out;
+
     let airbag_status = pcan::AirbagStatus::try_from(hex!("000000C025029101").as_slice()).unwrap();
     let duty_pct = 80;
 

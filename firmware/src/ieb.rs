@@ -3,14 +3,13 @@
 //! Also manages traction control and vehicle stability control messages. Most of this
 //! is spoofed, the VCU's perspective should be that it's forever driving in a straight
 //! line down a road with perfect traction...
-use crate::can_queue;
+use crate::app;
 use crate::can_utils::byte_checksum_simple;
 use crate::car::{CarState, Ignition};
 use crate::dbc::pcan::{
     Ieb2a2, Ieb331, Ieb386Wheel, Ieb387Wheel, Ieb507Tcs, ParkingBrake, StabilityControl,
     TractionControlFast, TractionControlMed,
 };
-use crate::hardware;
 use crate::hardware::Mono;
 use crate::repeater::{Period, Repeater};
 use fugit::ExtU32;
@@ -18,11 +17,10 @@ use hex_literal::hex;
 use rtic::Mutex;
 use rtic_monotonics::Monotonic;
 
-pub async fn task_ieb<MPCAN, MCAR>(mut pcan_tx: MPCAN, mut car: MCAR) -> !
-where
-    MPCAN: Mutex<T = can_queue::Tx<hardware::PCAN>>,
-    MCAR: Mutex<T = CarState>,
-{
+pub async fn task_ieb(cx: app::task_ieb::Context<'_>) {
+    let mut car = cx.shared.car;
+    let mut pcan_tx = cx.shared.pcan_tx;
+
     // Initialise all the raw CAN messages
 
     let ieb507 = Ieb507Tcs::try_from(hex!("00000001").as_slice()).unwrap();
