@@ -14,7 +14,7 @@ rtic = { version = "2.1", features = [ "thumbv7-backend", "rtic-monotonics" ] }
 stm32g4xx-hal = { git = "https://github.com/stm32-rs/stm32g4xx-hal.git", rev = "39eb64a", features = [ "stm32g474" ] }
 rtic-monotonics = { version = "2.0", features = ["cortex-m-systick"] }
 panic-abort = "0.3.2"
-fugit = "0.3.7"
+fugit = { version = "0.3.7", features = ["defmt"] }
 can-bit-timings = "1.1.0"
 nb = "1.1.0"
 heapless = "0.8.0"

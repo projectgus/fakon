@@ -17,13 +17,25 @@ pub(crate) struct Repeater {
 
 impl Repeater {
     pub fn new(rate: Rate) -> Self {
+        let period = rate.into_duration();
         Repeater {
-            deadline: Mono::now(),
-            period: rate.into_duration(),
+            deadline: Mono::now() + period,
+            period,
         }
     }
 
     pub async fn next(&mut self) {
+        let now = Mono::now();
+        if now > self.deadline {
+            // Should never enter here after the deadline, it means processing
+            // has taken longer than the repeating period. Report that we've
+            // skipped a cycle and push the deadline to the future rather than
+            // returning immediately and risking a cascade failure.
+            defmt::error!("{} Repeater behind by {}, cycle(s) skipped", self.period, now - self.deadline);
+            while now > self.deadline {
+                self.deadline += self.period;
+            }
+        }
         Mono::delay_until(self.deadline).await;
         self.deadline += self.period;
     }
