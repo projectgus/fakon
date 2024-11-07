@@ -4,7 +4,6 @@
 //! is spoofed, the VCU's perspective should be that it's forever driving in a straight
 //! line down a road with perfect traction...
 use crate::app;
-use crate::can_utils::byte_checksum_simple;
 use crate::car::{CarState, Ignition};
 use crate::dbc::pcan::{
     Ieb2a2, Ieb331, Ieb386Wheel, Ieb387Wheel, Ieb507Tcs, ParkingBrake, StabilityControl,
@@ -239,9 +238,9 @@ impl Ieb387Wheel {
 
         // Update checksum
         {
-            // Byte 5 is a checksum that weirdly includes byte 6 after it, maybe also 7
-            res.set_whl_pul_chksum(byte_checksum_simple(res.raw()))
-                .unwrap();
+            // Byte 5 is a simple checksum that weirdly includes byte 6 after it, maybe also 7
+            let csum = res.raw().iter().fold(0, |s, n| n.wrapping_add(s));
+            res.set_whl_pul_chksum(csum).unwrap();
         }
 
         res

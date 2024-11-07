@@ -10,16 +10,15 @@ use stm32g4xx_hal as _; // memory layout
 
 use rtic_monotonics::Monotonic;
 
-pub mod airbag_control;
-pub mod can_queue;
-pub mod can_utils;
-pub mod car;
-pub mod dbc;
-pub mod fresh;
-pub mod hardware;
-pub mod ieb;
-pub mod igpm;
-pub mod repeater;
+mod airbag_control;
+mod can_queue;
+mod car;
+mod dbc;
+mod fresh;
+mod hardware;
+mod ieb;
+mod igpm;
+mod repeater;
 
 // Make some common type aliases for fugit Duration, Instance and Rate
 // based on our firmware's 1ms tick period
