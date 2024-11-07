@@ -1,12 +1,14 @@
 #![no_main]
 #![no_std]
 
-use core::sync::atomic::{AtomicUsize, Ordering};
 use defmt_brtt as _; // global logger
 
+use hardware::Mono;
 use panic_probe as _;
 
 use stm32g4xx_hal as _; // memory layout
+
+use rtic_monotonics::Monotonic;
 
 pub mod airbag_control;
 pub mod can_queue;
@@ -255,12 +257,8 @@ fn panic() -> ! {
     cortex_m::asm::udf()
 }
 
-static COUNT: AtomicUsize = AtomicUsize::new(0);
-defmt::timestamp!("{=usize}", {
-    // NOTE(no-CAS) `timestamps` runs with interrupts disabled
-    let n = COUNT.load(Ordering::Relaxed);
-    COUNT.store(n + 1, Ordering::Relaxed);
-    n
+defmt::timestamp!("{=u32}", {
+    Mono::now().ticks()
 });
 
 /// Terminates the application and makes `probe-rs` exit with exit-code = 0
