@@ -133,6 +133,11 @@ impl CarState {
         self.soc_batt
     }
 
+    #[inline]
+    pub fn gear(&self) -> Fresh<Gear> {
+        self.gear
+    }
+
     /// Return true if the vehicle is Ready to drive
     ///
     /// WARNING: This will return false if CAN comms are lost with the BMS

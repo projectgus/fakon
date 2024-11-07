@@ -13,11 +13,11 @@ use hal::gpio::Input;
 use hal::gpio::Output;
 use hal::gpio::PushPull;
 use inverted_pin::InvertedPin;
+use stm32g4xx_hal::gpio::gpiod;
 use stm32g4xx_hal as hal;
 use stm32g4xx_hal::can::CanExt;
 use stm32g4xx_hal::gpio::GpioExt;
 use stm32g4xx_hal::gpio::Speed;
-use stm32g4xx_hal::pwm::PwmExt;
 use stm32g4xx_hal::pwr::PwrExt;
 use stm32g4xx_hal::rcc;
 use stm32g4xx_hal::rcc::{PllConfig, RccExt};
@@ -40,6 +40,10 @@ pub type RelayIG3Output = gpiob::PB6<Output<PushPull>>;
 
 pub type LEDIgnitionOutput = gpiob::PB10<Output<PushPull>>;
 
+pub type ScuParkTx = InvertedPin<gpioc::PC3<Output<PushPull>>>;
+
+pub type ScuParkRx = InvertedPin<gpiod::PD2<Input<Floating>>>;
+
 // Struct to encompass all the board resources, as their functions
 pub struct Board {
     pub pcan_config: FdCan<PCAN, ConfigMode>,
@@ -50,6 +54,8 @@ pub struct Board {
     pub relay_ig3: RelayIG3Output,
     pub led_ignition: LEDIgnitionOutput,
     pub ev_ready: EVReadyInput,
+    pub scu_park_tx: ScuParkTx,
+    pub scu_park_rx: ScuParkRx,
 }
 
 // Systick Based Timer
@@ -168,14 +174,11 @@ pub fn init(core: cortex_m::Peripherals, dp: stm32::Peripherals) -> Board {
 
     // Functions assigned to pins
 
-    // OUT5 => SCU Park TX PWM
-    let _pwm_scu_park_tx = {
-        let pin = pin_out5.into_alternate();
-        dp.TIM1.pwm(pin, 1000.Hz(), &mut rcc)
-    };
+    // OUT5 => SCU Park TX (5V 10Hz soft PWM)
+    let scu_park_tx = InvertedPin::new(pin_out5.into_push_pull_output());
 
-    // IN13 => SCU Park RX (soft PWM)
-    let _scu_park_rx = pin_in13;
+    // IN13 => SCU Park RX (5V 10Hz soft PWM)
+    let scu_park_rx = InvertedPin::new(pin_in13.into_floating_input()) ;
 
     // OUT1 => SRS Crash signal, 50Hz soft PWM
     // Inverted as MCU pin drives a FET gate for open drain output
@@ -205,5 +208,7 @@ pub fn init(core: cortex_m::Peripherals, dp: stm32::Peripherals) -> Board {
         led_ignition,
         brake_input,
         ev_ready,
+        scu_park_tx,
+        scu_park_rx,
     }
 }

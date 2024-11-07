@@ -19,6 +19,7 @@ mod hardware;
 mod ieb;
 mod igpm;
 mod repeater;
+mod shift_control;
 
 // Make some common type aliases for fugit Duration, Instance and Rate
 // based on our firmware's 1ms tick period
@@ -53,6 +54,9 @@ mod app {
     use crate::airbag_control::task_airbag_control;
     use crate::ieb::task_ieb;
     use crate::igpm::task_igpm;
+    use crate::shift_control::task_scu_main;
+    use crate::shift_control::task_scu_can;
+    use crate::shift_control::task_scu_pwm;
 
     #[shared]
     struct Shared {
@@ -70,6 +74,8 @@ mod app {
         led_ignition: hardware::LEDIgnitionOutput,
         srs_crash_out: hardware::AcuCrashOutput,
         ev_ready: hardware::EVReadyInput,
+        scu_park_tx: hardware::ScuParkTx,
+        scu_park_rx: hardware::ScuParkRx,
     }
 
     #[init]
@@ -85,7 +91,8 @@ mod app {
             led_ignition,
             relay_ig3,
             ev_ready,
-        } = hardware::init(cx.core, cx.device);
+            scu_park_tx,
+            scu_park_rx } = hardware::init(cx.core, cx.device);
 
         let (pcan_control, pcan_rx, pcan_tx) =
             can_queue::Control::init(pcan_config, &can_timing_500kbps);
@@ -100,7 +107,9 @@ mod app {
         log_info::spawn().unwrap();
 
         (
-            Shared { pcan_tx, car },
+            Shared { pcan_tx,
+                     car,
+            },
             Local {
                 pcan_control,
                 pcan_rx,
@@ -110,6 +119,8 @@ mod app {
                 led_ignition,
                 relay_ig3,
                 ev_ready,
+                scu_park_tx,
+                scu_park_rx,
             },
         )
     }
@@ -164,6 +175,15 @@ mod app {
 
         #[task(shared = [pcan_tx, car], priority = 3)]
         async fn task_igpm(cx: task_igpm::Context);
+
+        #[task(shared = [car], priority = 3)]
+        async fn task_scu_main(cx: task_scu_main::Context);
+
+        #[task(shared = [pcan_tx, car], priority = 3)]
+        async fn task_scu_can(cx: task_scu_can::Context);
+
+        #[task(shared = [car], local = [scu_park_tx, scu_park_rx], priority = 6)]
+        async fn task_scu_pwm(cx: task_scu_pwm::Context);
     }
 
     // FDCAN_INTR0_IT and FDCAN_INTR1_IT are swapped, until stm32g4 crate
