@@ -79,6 +79,9 @@ impl<I: fdcan::Instance> Control<I> {
         defmt::info!("Configuring fdcan...");
 
         // Make the RTIC channel for received messages
+        //
+        // (Hoping using static here will allow at most one channel
+        // per CAN bus type as this function is generic over the fdcan Instance...)
         let (rx_sender, rx_receiver) = make_channel!(QueuedFrame, RX_CAPACITY);
 
         // Start the CAN peripheral and split it
