@@ -117,7 +117,8 @@ where
                     });
                 }
                 Period::Hz100 => {
-                    if car.lock(|car| car.ignition().ig3_on()) {
+                    let ignition = car.lock(|car| car.ignition());
+                    if ignition.ig3_on() {
                         pcan_tx.lock(|tx| tx.transmit(&Steering::latest(&mut steering_counter)))
                     }
                 }
