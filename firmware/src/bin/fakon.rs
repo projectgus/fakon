@@ -95,6 +95,8 @@ mod app {
         }
     }
 
+    // TODO: consider bumping this to priority 4, above the sending of messages,
+    // so that the vehicle state is always up to date
     #[task(local = [pcan_rx], shared = [car], priority = 2)]
     async fn pcan_rx(cx: pcan_rx::Context) {
         let pcan_rx = cx.local.pcan_rx;

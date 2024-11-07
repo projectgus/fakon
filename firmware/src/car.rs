@@ -169,6 +169,12 @@ impl CarState {
         }
     }
 
+    // Return the "most on" that the ignition has been since reset
+    #[inline]
+    pub(crate) fn most_on(&self) -> Ignition {
+        self.most_on
+    }
+
     // Contactor state only updates in response to BMS CAN messages
     fn set_contactor(&mut self, new_state: Contactor) {
         if self.contactor.get() != Some(new_state) {
@@ -244,11 +250,6 @@ impl CarState {
             }
             _ => (),
         }
-    }
-
-    // Return the "most on" that the ignition has been since reset
-    pub(crate) fn most_on(&self) -> Ignition {
-        self.most_on
     }
 }
 
