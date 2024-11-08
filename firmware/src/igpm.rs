@@ -108,7 +108,6 @@ pub async fn task_igpm(cx: app::task_igpm::Context<'_>) {
                         tx.transmit(&unk578);
                     });
                 }
-                Period::Hz20 => todo!(),
                 Period::Hz50 => {
                     pcan_tx.lock(|tx| {
                         tx.transmit(&unk450);
@@ -121,6 +120,7 @@ pub async fn task_igpm(cx: app::task_igpm::Context<'_>) {
                         pcan_tx.lock(|tx| tx.transmit(&Steering::latest(&mut steering_counter)))
                     }
                 }
+                _ => (),
             }
         }
     }

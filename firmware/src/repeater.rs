@@ -39,16 +39,15 @@ impl Period {
 
     /// This period expires every N passes of the TICK_BASE
     const fn multiplier(&self) -> u32 {
-        let res = self.rate().to_Hz() / TICK_BASE.rate().to_Hz();
+        let res = TICK_BASE.rate().to_Hz() / self.rate().to_Hz();
         // All ticks should be a multiple of the TICK_BASE period
-        // (implemented awkwardly as Rate doesn't implement Rem)
-        assert!(self.rate().to_Hz() % TICK_BASE.rate().to_Hz() == 0);
+        assert!(TICK_BASE.rate().to_Hz() % self.rate().to_Hz() == 0);
         res
     }
 
     /// Should this period trigger on this tick?
     const fn due_on(&self, ticks: u32) -> bool {
-        self.multiplier() % ticks == 0
+        ticks % self.multiplier() == 0
     }
 }
 
