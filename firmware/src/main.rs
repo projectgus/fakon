@@ -38,6 +38,7 @@ mod app {
     use crate::dbc::pcan;
     use crate::hardware;
     use crate::hardware::Mono;
+    use crate::shift_control;
     use debouncr::debounce_stateful_3;
     use debouncr::debounce_stateful_5;
     use debouncr::Edge::Falling;
@@ -54,14 +55,15 @@ mod app {
     use crate::airbag_control::task_airbag_control;
     use crate::ieb::task_ieb;
     use crate::igpm::task_igpm;
-    use crate::shift_control::task_scu_main;
-    use crate::shift_control::task_scu_can;
-    use crate::shift_control::task_scu_pwm;
+    use crate::shift_control::task_scu_can_tx;
+    use crate::shift_control::task_scu_pwm_rx;
+    use crate::shift_control::task_scu_pwm_tx;
 
     #[shared]
     struct Shared {
         pcan_tx: can_queue::Tx<hardware::PCAN>,
         car: car::CarState,
+        park_actuator: shift_control::ActuatorState,
     }
 
     #[local]
@@ -92,23 +94,30 @@ mod app {
             relay_ig3,
             ev_ready,
             scu_park_tx,
-            scu_park_rx } = hardware::init(cx.core, cx.device);
+            scu_park_rx,
+        } = hardware::init(cx.core, cx.device);
 
         let (pcan_control, pcan_rx, pcan_tx) =
             can_queue::Control::init(pcan_config, &can_timing_500kbps);
 
         let car = car::CarState::new();
 
+        let park_actuator = shift_control::ActuatorState::default();
+
         pcan_rx::spawn().unwrap();
         poll_slow_inputs::spawn().unwrap();
         task_airbag_control::spawn().unwrap();
         task_ieb::spawn().unwrap();
         task_igpm::spawn().unwrap();
+        task_scu_can_tx::spawn().unwrap();
+        task_scu_pwm_tx::spawn().unwrap();
         log_info::spawn().unwrap();
 
         (
-            Shared { pcan_tx,
-                     car,
+            Shared {
+                pcan_tx,
+                car,
+                park_actuator,
             },
             Local {
                 pcan_control,
@@ -134,10 +143,11 @@ mod app {
 
     // TODO: consider bumping this to priority 4, above the sending of messages,
     // so that the vehicle state is always up to date
-    #[task(local = [pcan_rx], shared = [car], priority = 2)]
+    #[task(local = [pcan_rx], shared = [car, park_actuator], priority = 2)]
     async fn pcan_rx(cx: pcan_rx::Context) {
         let pcan_rx = cx.local.pcan_rx;
         let mut car = cx.shared.car;
+        let mut park_actuator = cx.shared.park_actuator;
 
         loop {
             let frame = pcan_rx.recv().await.unwrap();
@@ -160,6 +170,8 @@ mod app {
                     defmt::trace!("PCAN RX {:?}", frame);
 
                     car.lock(|car| car.update_state(&msg));
+
+                    shift_control::on_can_rx(&msg, &mut park_actuator);
                 }
             }
         }
@@ -176,14 +188,14 @@ mod app {
         #[task(shared = [pcan_tx, car], priority = 3)]
         async fn task_igpm(cx: task_igpm::Context);
 
-        #[task(shared = [car], priority = 3)]
-        async fn task_scu_main(cx: task_scu_main::Context);
+        #[task(shared = [pcan_tx, car, park_actuator], priority = 3)]
+        async fn task_scu_can_tx(cx: task_scu_can_tx::Context);
 
-        #[task(shared = [pcan_tx, car], priority = 3)]
-        async fn task_scu_can(cx: task_scu_can::Context);
+        #[task(shared = [car, park_actuator], local = [scu_park_tx], priority = 6)]
+        async fn task_scu_pwm_tx(cx: task_scu_pwm_tx::Context);
 
-        #[task(shared = [car], local = [scu_park_tx, scu_park_rx], priority = 6)]
-        async fn task_scu_pwm(cx: task_scu_pwm::Context);
+        #[task(binds = EXTI2, shared = [park_actuator], local = [scu_park_rx], priority = 6)]
+        fn task_scu_pwm_rx(cx: task_scu_pwm_rx::Context);
     }
 
     // FDCAN_INTR0_IT and FDCAN_INTR1_IT are swapped, until stm32g4 crate
@@ -276,9 +288,7 @@ fn panic() -> ! {
     cortex_m::asm::udf()
 }
 
-defmt::timestamp!("{=u32}", {
-    Mono::now().ticks()
-});
+defmt::timestamp!("{=u32}", { Mono::now().ticks() });
 
 /// Terminates the application and makes `probe-rs` exit with exit-code = 0
 pub fn exit() -> ! {

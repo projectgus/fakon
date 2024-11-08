@@ -2,121 +2,103 @@
 //!
 //! In the Kona this is responsible for driving the parking actuator.
 //!
-//! Sends one CAN message, and has bidirectional PWM link to the EPCU
-use crate::car::Gear;
-use crate::{app, Rate};
-use atomic_enum::atomic_enum;
+//! VCU sends requests for Lock/Unlock to the SCU, which then moves the actuator.
+//! SCU sends the current position of the actuator to the VCU.
+//!
+//! Two redundant communication links for this:
+//! - CAN messages (SCU sends Scu10c message and listens for Vcu109 message, both at 100Hz).
+//! - 10Hz PWM RX/TX connection with different duty cycles corresponding to the same data.
+//!
+//! We emulate both links, but don't emulate a real actuator: the emulated SCU
+//! immediately updates the parking actuator state to whatever the VCU most
+//! recently asked for.
+use crate::dbc::pcan::{Messages, Scu10c, Scu10cParkingActuator, Vcu109ParkActuatorRequest};
+use crate::hardware::Mono;
+use crate::Duration;
+use crate::{app, Instant, Rate};
 use defmt::Format;
+use fugit::ExtU32;
 use hex_literal::hex;
 use rtic::Mutex;
 use rtic_monotonics::Monotonic;
-use rtic_sync::portable_atomic::Ordering::Relaxed;
-use stm32g4xx_hal::prelude::OutputPin;
-use crate::Duration;
-use crate::hardware::Mono;
-use crate::dbc::pcan::{Scu10c, Scu10cParkingActuator};
-use fugit::ExtU32;
+use stm32g4xx_hal::prelude::{InputPin, OutputPin};
 
 const PWM_PERIOD: Duration = Duration::millis(100);
 
-/// Tracking the internal state of the park actuator
-#[derive(Format, PartialEq)]
-#[atomic_enum]
-pub enum ParkActuator {
-    ModuleOff,
+/// Struct to track the overall park actuator state
+///
+/// (This struct bundles two pieces of mostly unrelated state together: the current
+/// position and the PWM RX timestamps, in order to only keep the top-level Shared structure
+/// simple.)
+#[derive(Copy, Clone)]
+pub struct ActuatorState {
+    /// Current position of the emulated park actuator
+    position: ActuatorPosition,
+
+    /// Last PWM RX rising edge
+    rising: Option<Instant>,
+
+    /// Last PWM RX falling edge
+    falling: Option<Instant>,
+}
+
+/// Tracking the emulated position of the park actuator
+#[derive(Clone, Copy, Format, PartialEq)]
+enum ActuatorPosition {
+    Unknown,
     Unlocked,
-    Moving,
+    //Moving, // Not emulated
     Locked,
-    Fault,
 }
 
-static ACTUATOR: AtomicParkActuator = AtomicParkActuator::new(ParkActuator::ModuleOff);
-
-impl From<ParkActuator> for Scu10cParkingActuator {
-    fn from(value: ParkActuator) -> Self {
+impl From<ActuatorPosition> for Scu10cParkingActuator {
+    fn from(value: ActuatorPosition) -> Self {
         match value {
-            ParkActuator::ModuleOff => Self::Initialising,
-            ParkActuator::Unlocked => Self::Unlocked,
-            ParkActuator::Moving => Self::Moving,
-            ParkActuator::Locked => Self::Locked,
-            ParkActuator::Fault => Self::Initialising, // ?
+            ActuatorPosition::Unknown => Self::Unknown,
+            ActuatorPosition::Unlocked => Self::Unlocked,
+            //ActuatorPosition::Moving => Self::Moving,
+            ActuatorPosition::Locked => Self::Locked,
         }
     }
 }
 
-impl ParkActuator {
-    /// SCU PWM transmit low period for parking state
-    fn tx_low_period(&self) -> Duration {
-        Duration::millis(match self {
-            ParkActuator::ModuleOff => 100, // FIXME: Not sure if should be 100% or or high?
-            ParkActuator::Unlocked => 36,
-            ParkActuator::Moving => 50, // FIXME: Need to figure this value out
-            ParkActuator::Locked => 76, // Maybe 80ms?
-            ParkActuator::Fault => 100, // Maybe 40ms?
-        })
-    }
-
-    /// SCU PWM transmit high period for parking state
-    fn tx_high_period(&self) -> Duration {
-        PWM_PERIOD - self.tx_low_period()
-    }
-}
-
-pub async fn task_scu_main(cx: app::task_scu_main::Context<'_>)
-{
-    let mut car = cx.shared.car;
-
-    loop {
-        ACTUATOR.store(ParkActuator::ModuleOff, Relaxed);
-
-        while !car.lock(|car| car.ignition().ig3_on()) {
-            // SCU only runs while IG3 is on. Until we have some
-            // event trigger for this, poll for it in a loop...
-            Mono::delay(20.millis()).await;
-        }
-
-        let cur_gear = car.lock(|car| car.gear());
-
-        while car.lock(|car| car.ignition().ig3_on()) {
-
-            let actuator = match cur_gear.get() {
-                None => ParkActuator::Locked,
-                Some(Gear::Park) => ParkActuator::Locked,
-                _ => {
-                    defmt::warn!("Started with unlocked park actuator...");
-                    ParkActuator::Unlocked
-                },
-            };
-
-            ACTUATOR.store(actuator, Relaxed);
-
+impl ActuatorPosition {
+    /// SCU PWM TX duty cycle (high period) for actuator position
+    fn pwm_tx_duty_percent(&self) -> u32 {
+        match self {
+            ActuatorPosition::Unknown => 84,
+            ActuatorPosition::Unlocked => 64,
+            //ActuatorPosition::Moving => 44,
+            ActuatorPosition::Locked => 24,
         }
     }
-}
 
-pub async fn task_scu_can(cx: app::task_scu_can::Context<'_>)
-{
-    let mut car = cx.shared.car;
-    let mut pcan_tx = cx.shared.pcan_tx;
-    let mut counter = 0u8;
+    /// Decode SCU PWM RX duty cycle (high period) for a possible
+    /// actuator position request.
+    fn from_pwm_rx_duty_percent(pct: u32) -> Option<Self> {
+        const IDLE_PCT: i32 = 55;
+        const REQ_UNLOCK_PCT: i32 = 25;
+        const REQ_LOCK_PCT: i32 = 85;
+        const TOLERANCE_PCT: i32 = 5; // +/- tolerance
+        let pct = pct as i32;
 
-    loop {
-        while !car.lock(|car| car.ignition().ig3_on()) {
-            // SCU only runs while IG3 is on. Until we have some
-            // event trigger for this, poll for it in a loop...
-            Mono::delay(20.millis()).await;
+        if (pct - REQ_UNLOCK_PCT).abs() < TOLERANCE_PCT {
+            return Some(Self::Unlocked);
         }
-
-        Mono::delay(Rate::Hz(100).into_duration()).await;
-        let scu10c = Scu10c::latest(ACTUATOR.load(Relaxed), &mut counter);
-        pcan_tx.lock(|tx| tx.transmit(&scu10c));
+        if (pct - REQ_LOCK_PCT).abs() < TOLERANCE_PCT {
+            return Some(Self::Locked);
+        }
+        if (pct - IDLE_PCT).abs() > TOLERANCE_PCT {
+            defmt::warn!("SCU PWM RX unexpected duty {}%", pct);
+        }
+        None
     }
 }
 
 /// Soft PWM task for SCU backup TX pin
-pub async fn task_scu_pwm(mut cx: app::task_scu_pwm::Context<'_>)
-{
+pub async fn task_scu_pwm_tx(mut cx: app::task_scu_pwm_tx::Context<'_>) {
     let mut car = cx.shared.car;
+    let mut actuator = cx.shared.park_actuator;
     let scu_park_tx = &mut cx.local.scu_park_tx;
 
     // TODO: check the level of this signal when vehicle is off
@@ -129,20 +111,134 @@ pub async fn task_scu_pwm(mut cx: app::task_scu_pwm::Context<'_>)
             Mono::delay(Rate::Hz(10).into_duration()).await;
         }
 
-        let state = ACTUATOR.load(Relaxed);
+        let position = actuator.lock(|actuator| actuator.position);
+        let pwm_duty_pct = position.pwm_tx_duty_percent();
+        let on_time = PWM_PERIOD * pwm_duty_pct / 100;
+        let off_time = PWM_PERIOD - on_time;
 
         scu_park_tx.set_high().unwrap();
 
-        Mono::delay(state.tx_high_period()).await;
+        Mono::delay(on_time).await;
 
         scu_park_tx.set_low().unwrap();
 
-        Mono::delay(state.tx_low_period()).await;
+        Mono::delay(off_time).await;
+    }
+}
+
+impl Default for ActuatorState {
+    fn default() -> Self {
+        Self {
+            position: ActuatorPosition::Unknown,
+            rising: None,
+            falling: None,
+        }
+    }
+}
+
+impl ActuatorState {
+    /// If this new edge timestamp indicates a PWM actuator request
+    /// then return the new position that's being requested.
+    fn is_pwm_request(&self, rising: bool, ts: Instant) -> Option<ActuatorPosition> {
+        // TODO: not sure if should mark the end of a cycle on the rising or falling edge
+        if rising {
+            return None;
+        }
+
+        if let (Some(falling), Some(rising)) = (self.falling, self.rising) {
+            let cycle_time = ts - falling;
+            let tolerance = PWM_PERIOD / 10;
+
+            if PWM_PERIOD - tolerance < cycle_time && cycle_time < PWM_PERIOD + tolerance {
+                let high_time = ts - rising;
+                let duty_pct = (100 * high_time) / PWM_PERIOD;
+                defmt::trace!("SCU PWM RX duty {}%", duty_pct);
+                return ActuatorPosition::from_pwm_rx_duty_percent(duty_pct);
+            } else {
+                defmt::warn!("SCU PWM RX unexpected cycle time {}", ts - falling);
+            }
+        }
+        None
+    }
+
+    /// Update the PWM state with this latest edge
+    fn update_pwm_edge(&mut self, rising: bool, now: Instant) {
+        if rising {
+            self.rising = Some(now);
+        } else {
+            self.falling = Some(now);
+        }
+    }
+}
+
+// Pin interrupt for edge transitions of SCU RX PWM signal
+pub fn task_scu_pwm_rx(mut cx: app::task_scu_pwm_rx::Context) {
+    let now = Mono::now();
+    let rising = cx.local.scu_park_rx.is_high().unwrap();
+    let park_actuator = &mut cx.shared.park_actuator;
+
+    park_actuator.lock(|state| {
+        // Update the position if it changed
+        if let Some(new_pos) = state.is_pwm_request(rising, now) {
+            if new_pos != state.position {
+                defmt::info!("Emulating Parking Actuator => {} (PWM)", new_pos);
+                state.position = new_pos;
+            }
+        }
+
+        // Update latest rising or falling edge
+        state.update_pwm_edge(rising, now);
+    });
+}
+
+/// Sender task for SCU message
+pub async fn task_scu_can_tx(cx: app::task_scu_can_tx::Context<'_>) {
+    let mut car = cx.shared.car;
+    let mut actuator = cx.shared.park_actuator;
+    let mut pcan_tx = cx.shared.pcan_tx;
+    let mut counter = 0u8;
+
+    loop {
+        while !car.lock(|car| car.ignition().ig3_on()) {
+            // SCU only runs while IG3 is on. Until we have some
+            // event trigger for this, poll for it in a loop...
+            Mono::delay(20.millis()).await;
+        }
+
+        let scu10c = actuator.lock(|actuator| Scu10c::latest(actuator.position, &mut counter));
+        pcan_tx.lock(|tx| tx.transmit(&scu10c));
+
+        Mono::delay(Rate::Hz(100).into_duration()).await;
+    }
+}
+
+/// Handler function for received CAN messages.
+///
+/// Extracts any park actuator request and updates the emulated position.
+pub fn on_can_rx<MPARK>(msg: &Messages, state: &mut MPARK)
+where
+    MPARK: Mutex<T = ActuatorState>,
+{
+    if let Messages::Vcu109(msg) = msg {
+        let maybe_new_pos = match msg.park_actuator_request() {
+            Vcu109ParkActuatorRequest::RequestLock => Some(ActuatorPosition::Locked),
+            Vcu109ParkActuatorRequest::RequestUnlock => Some(ActuatorPosition::Unlocked),
+            _ => None,
+        };
+
+        if let Some(new_pos) = maybe_new_pos {
+            state.lock(|state| {
+                if state.position != new_pos {
+                    defmt::info!("Emulating Parking Actuator => {} (CAN)", new_pos);
+                    state.position = new_pos;
+                }
+            });
+        }
     }
 }
 
 impl Scu10c {
-    fn latest(state: ParkActuator, counter: &mut u8) -> Self {
+    fn latest(state: ActuatorPosition, counter: &mut u8) -> Self {
         // Another struct with two many args for constructor
         let mut scu = Scu10c::try_from(hex!("0100555415400100").as_slice()).unwrap();
 
@@ -160,7 +256,9 @@ impl Scu10c {
 
         // Calculate checksum
         {
-            let csum = scu.raw().iter()
+            let csum = scu
+                .raw()
+                .iter()
                 .fold(0u8, |n, e| (n + (e >> 4) + (e & 0xF)) & 0xF);
             scu.set_checksum(csum).unwrap();
         }

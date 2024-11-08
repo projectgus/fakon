@@ -14,6 +14,8 @@ use hal::gpio::Output;
 use hal::gpio::PushPull;
 use inverted_pin::InvertedPin;
 use stm32g4xx_hal::gpio::gpiod;
+use stm32g4xx_hal::gpio::ExtiPin;
+use stm32g4xx_hal::gpio::SignalEdge;
 use stm32g4xx_hal as hal;
 use stm32g4xx_hal::can::CanExt;
 use stm32g4xx_hal::gpio::GpioExt;
@@ -63,7 +65,7 @@ pub const MONOTONIC_FREQUENCY: u32 = 1_000;
 rtic_monotonics::systick_monotonic!(Mono, MONOTONIC_FREQUENCY);
 
 // Hardware init function
-pub fn init(core: cortex_m::Peripherals, dp: stm32::Peripherals) -> Board {
+pub fn init(core: cortex_m::Peripherals, mut dp: stm32::Peripherals) -> Board {
     info!("hardware init");
 
     let rcc = dp.RCC.constrain();
@@ -178,7 +180,9 @@ pub fn init(core: cortex_m::Peripherals, dp: stm32::Peripherals) -> Board {
     let scu_park_tx = InvertedPin::new(pin_out5.into_push_pull_output());
 
     // IN13 => SCU Park RX (5V 10Hz soft PWM)
-    let scu_park_rx = InvertedPin::new(pin_in13.into_floating_input()) ;
+    let mut scu_park_rx = pin_in13.into_floating_input();
+    scu_park_rx.trigger_on_edge(&mut dp.EXTI, SignalEdge::RisingFalling);
+    let scu_park_rx = InvertedPin::new(scu_park_rx);
 
     // OUT1 => SRS Crash signal, 50Hz soft PWM
     // Inverted as MCU pin drives a FET gate for open drain output

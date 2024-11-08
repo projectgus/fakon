@@ -6,7 +6,6 @@ edition = "2021"
 version = "0.1.0"
 
 [dependencies]
-atomic_enum = "0.3.0"
 bitvec = { version = "1.0.1", features = ["atomic"], default-features = false }
 can-bit-timings = "1.1.0"
 can-bit-timings-core = "1.1.0"
