@@ -194,7 +194,7 @@ mod app {
         #[task(shared = [car, park_actuator], local = [scu_park_tx], priority = 6)]
         async fn task_scu_pwm_tx(cx: task_scu_pwm_tx::Context);
 
-        #[task(binds = EXTI2, shared = [park_actuator], local = [scu_park_rx], priority = 6)]
+        #[task(binds = EXTI2, shared = [car, park_actuator], local = [scu_park_rx], priority = 6)]
         fn task_scu_pwm_rx(cx: task_scu_pwm_rx::Context);
     }
 

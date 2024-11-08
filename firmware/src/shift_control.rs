@@ -158,7 +158,7 @@ impl ActuatorState {
                 defmt::warn!("SCU PWM RX unexpected cycle time {}", ts - falling);
             }
         }
-        None
+        Some(ActuatorPosition::Unknown)
     }
 
     /// Update the PWM state with this latest edge
@@ -175,7 +175,15 @@ impl ActuatorState {
 pub fn task_scu_pwm_rx(mut cx: app::task_scu_pwm_rx::Context) {
     let now = Mono::now();
     let rising = cx.local.scu_park_rx.is_high().unwrap();
+    let car = &mut cx.shared.car;
     let park_actuator = &mut cx.shared.park_actuator;
+
+    if !car.lock(|car| car.ignition().ig3_on()) {
+        // Vehicle is off, so reset the emulated actuator state and ignore VCU PWM edge
+        // transitions until it comes back on
+        park_actuator.lock(|state| *state = ActuatorState::default());
+        return;
+    }
 
     park_actuator.lock(|state| {
         // Update the position if it changed
@@ -202,6 +210,9 @@ pub async fn task_scu_can_tx(cx: app::task_scu_can_tx::Context<'_>) {
         while !car.lock(|car| car.ignition().ig3_on()) {
             // SCU only runs while IG3 is on. Until we have some
             // event trigger for this, poll for it in a loop...
+            //
+            // TODO: this is a little different to the real SCU which stays
+            // powered for a minute or two after shutdown
             Mono::delay(20.millis()).await;
         }
 
