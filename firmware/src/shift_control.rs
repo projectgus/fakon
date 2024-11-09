@@ -113,16 +113,16 @@ pub async fn task_scu_pwm_tx(mut cx: app::task_scu_pwm_tx::Context<'_>) {
 
         let position = actuator.lock(|actuator| actuator.position);
         let pwm_duty_pct = position.pwm_tx_duty_percent();
-        let on_time = PWM_PERIOD * pwm_duty_pct / 100;
-        let off_time = PWM_PERIOD - on_time;
-
-        scu_park_tx.set_high().unwrap();
-
-        Mono::delay(on_time).await;
+        let high_time = PWM_PERIOD * pwm_duty_pct / 100;
+        let low_time = PWM_PERIOD - high_time;
 
         scu_park_tx.set_low().unwrap();
 
-        Mono::delay(off_time).await;
+        Mono::delay(low_time).await;
+
+        scu_park_tx.set_high().unwrap();
+
+        Mono::delay(high_time).await;
     }
 }
 
@@ -140,7 +140,8 @@ impl ActuatorState {
     /// If this new edge timestamp indicates a PWM actuator request
     /// then return the new position that's being requested.
     fn is_pwm_request(&self, rising: bool, ts: Instant) -> Option<ActuatorPosition> {
-        // TODO: not sure if should mark the end of a cycle on the rising or falling edge
+        // When the duty changes it seems to change starting from a falling edge,
+        // so measure each cycle falling edge to falling edge.
         if rising {
             return None;
         }
