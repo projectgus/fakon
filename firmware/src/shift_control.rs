@@ -22,6 +22,7 @@ use hex_literal::hex;
 use rtic::Mutex;
 use rtic_monotonics::Monotonic;
 use stm32g4xx_hal::prelude::{InputPin, OutputPin};
+use stm32g4xx_hal::gpio::ExtiPin;
 
 const PWM_PERIOD: Duration = Duration::millis(100);
 
@@ -30,7 +31,7 @@ const PWM_PERIOD: Duration = Duration::millis(100);
 /// (This struct bundles two pieces of mostly unrelated state together: the current
 /// position and the PWM RX timestamps, in order to only keep the top-level Shared structure
 /// simple.)
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Format)]
 pub struct ActuatorState {
     /// Current position of the emulated park actuator
     position: ActuatorPosition,
@@ -104,13 +105,13 @@ pub async fn task_scu_pwm_tx(mut cx: app::task_scu_pwm_tx::Context<'_>) {
     // TODO: check the level of this signal when vehicle is off
     scu_park_tx.set_low().unwrap();
 
-    loop {
-        while !car.lock(|car| car.ignition().ig3_on()) {
-            // SCU only runs while IG3 is on. Until we have some
-            // event trigger for this, poll for it in a loop...
-            Mono::delay(Rate::Hz(10).into_duration()).await;
-        }
+    while !car.lock(|car| car.ignition().ig3_on()) {
+        // SCU only runs after IG3 is on. Until we have some
+        // event trigger for this, poll for it in a loop...
+        Mono::delay(Rate::Hz(10).into_duration()).await;
+    }
 
+    loop {
         let position = actuator.lock(|actuator| actuator.position);
         let pwm_duty_pct = position.pwm_tx_duty_percent();
         let high_time = PWM_PERIOD * pwm_duty_pct / 100;
@@ -147,16 +148,18 @@ impl ActuatorState {
         }
 
         if let (Some(falling), Some(rising)) = (self.falling, self.rising) {
-            let cycle_time = ts - falling;
+            let cycle_time = ts - falling; // Time since first falling edge
             let tolerance = PWM_PERIOD / 10;
 
             if PWM_PERIOD - tolerance < cycle_time && cycle_time < PWM_PERIOD + tolerance {
                 let high_time = ts - rising;
-                let duty_pct = (100 * high_time) / PWM_PERIOD;
-                defmt::trace!("SCU PWM RX duty {}%", duty_pct);
+                let duty_pct = (100 * high_time) / cycle_time;
+                defmt::trace!("SCU PWM RX duty {}% (high time {} cycle time {}", duty_pct, high_time, cycle_time);
                 return ActuatorPosition::from_pwm_rx_duty_percent(duty_pct);
             } else {
-                defmt::warn!("SCU PWM RX unexpected cycle time {}", ts - falling);
+                // This happens as a one-off in normal operation when VCU powers
+                // on, and sometimes shortly after that
+                defmt::debug!("SCU PWM RX unexpected cycle time {}", ts - falling);
             }
         }
         Some(ActuatorPosition::Unknown)
@@ -183,21 +186,22 @@ pub fn task_scu_pwm_rx(mut cx: app::task_scu_pwm_rx::Context) {
         // Vehicle is off, so reset the emulated actuator state and ignore VCU PWM edge
         // transitions until it comes back on
         park_actuator.lock(|state| *state = ActuatorState::default());
-        return;
+    } else {
+        park_actuator.lock(|state| {
+            // Update the position if it changed
+            if let Some(new_pos) = state.is_pwm_request(rising, now) {
+                if new_pos != state.position {
+                    defmt::info!("Emulating Parking Actuator => {} (PWM)", new_pos);
+                    state.position = new_pos;
+                }
+            }
+
+            // Update latest rising or falling edge
+            state.update_pwm_edge(rising, now);
+        });
     }
 
-    park_actuator.lock(|state| {
-        // Update the position if it changed
-        if let Some(new_pos) = state.is_pwm_request(rising, now) {
-            if new_pos != state.position {
-                defmt::info!("Emulating Parking Actuator => {} (PWM)", new_pos);
-                state.position = new_pos;
-            }
-        }
-
-        // Update latest rising or falling edge
-        state.update_pwm_edge(rising, now);
-    });
+    cx.local.scu_park_rx.clear_interrupt_pending_bit();
 }
 
 /// Sender task for SCU message
@@ -207,16 +211,13 @@ pub async fn task_scu_can_tx(cx: app::task_scu_can_tx::Context<'_>) {
     let mut pcan_tx = cx.shared.pcan_tx;
     let mut counter = 0u8;
 
-    loop {
-        while !car.lock(|car| car.ignition().ig3_on()) {
-            // SCU only runs while IG3 is on. Until we have some
-            // event trigger for this, poll for it in a loop...
-            //
-            // TODO: this is a little different to the real SCU which stays
-            // powered for a minute or two after shutdown
-            Mono::delay(20.millis()).await;
-        }
+    while !car.lock(|car| car.ignition().ig3_on()) {
+        // SCU doesn't start until IG3 is on. Until we have some
+        // event trigger for this, poll for it in a loop...
+        Mono::delay(20.millis()).await;
+    }
 
+    loop {
         let scu10c = actuator.lock(|actuator| Scu10c::latest(actuator.position, &mut counter));
         pcan_tx.lock(|tx| tx.transmit(&scu10c));
 

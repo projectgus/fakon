@@ -21,6 +21,7 @@ use stm32g4xx_hal::can::CanExt;
 use stm32g4xx_hal::gpio::GpioExt;
 use stm32g4xx_hal::gpio::Speed;
 use stm32g4xx_hal::pwr::PwrExt;
+use stm32g4xx_hal::syscfg::SysCfgExt;
 use stm32g4xx_hal::rcc;
 use stm32g4xx_hal::rcc::{PllConfig, RccExt};
 use stm32g4xx_hal::stm32;
@@ -44,7 +45,7 @@ pub type LEDIgnitionOutput = gpiob::PB10<Output<PushPull>>;
 
 pub type ScuParkTx = InvertedPin<gpioc::PC3<Output<PushPull>>>;
 
-pub type ScuParkRx = InvertedPin<gpiod::PD2<Input<Floating>>>;
+pub type ScuParkRx = gpiod::PD2<Input<Floating>>;
 
 // Struct to encompass all the board resources, as their functions
 pub struct Board {
@@ -68,6 +69,7 @@ rtic_monotonics::systick_monotonic!(Mono, MONOTONIC_FREQUENCY);
 pub fn init(core: cortex_m::Peripherals, mut dp: stm32::Peripherals) -> Board {
     info!("hardware init");
 
+    let mut syscfg = dp.SYSCFG.constrain();
     let rcc = dp.RCC.constrain();
 
     // Sysclock is based on PLL_R
@@ -177,12 +179,14 @@ pub fn init(core: cortex_m::Peripherals, mut dp: stm32::Peripherals) -> Board {
     // Functions assigned to pins
 
     // OUT5 => SCU Park TX (5V 10Hz soft PWM)
+    // (inverted due to drive FET)
     let scu_park_tx = InvertedPin::new(pin_out5.into_push_pull_output());
 
-    // IN13 => SCU Park RX (5V 10Hz soft PWM)
+    // IN13 => SCU Park RX (5V 10Hz PWM via interrupt)
     let mut scu_park_rx = pin_in13.into_floating_input();
+    scu_park_rx.make_interrupt_source(&mut syscfg);
     scu_park_rx.trigger_on_edge(&mut dp.EXTI, SignalEdge::RisingFalling);
-    let scu_park_rx = InvertedPin::new(scu_park_rx);
+    scu_park_rx.enable_interrupt(&mut dp.EXTI);
 
     // OUT1 => SRS Crash signal, 50Hz soft PWM
     // Inverted as MCU pin drives a FET gate for open drain output
