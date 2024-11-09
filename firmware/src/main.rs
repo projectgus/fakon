@@ -156,8 +156,8 @@ mod app {
                     );
                 }
                 Ok(msg) => {
-                    defmt::debug!("PCAN RX {:?}", msg); // +25KB of code(!)
-                    defmt::trace!("RAW RX {:?}", frame);
+                    // msg implements Format but reporting it here results in RX overruns
+                    defmt::trace!("PCAN RX {:?}", frame);
 
                     car.lock(|car| car.update_state(&msg));
                 }
