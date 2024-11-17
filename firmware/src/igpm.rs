@@ -192,7 +192,8 @@ impl Clock {
 
 impl ChargePort {
     fn latest(car: &CarState) -> Self {
-        Self::new(car.charge_port_locked(), false, false, false).unwrap()
+        let is_locked = car.charge_port_locked();
+        Self::new(is_locked, false, false, false).unwrap()
     }
 }
 
