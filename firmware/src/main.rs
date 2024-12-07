@@ -40,6 +40,7 @@ mod app {
     use crate::hardware::Mono;
     use crate::shift_control;
     use car::ChargeLock;
+    use debouncr::debounce_stateful_10;
     use debouncr::debounce_stateful_3;
     use debouncr::debounce_stateful_5;
     use debouncr::Edge::Falling;
@@ -233,7 +234,7 @@ mod app {
         let mut ev_ready = debounce_stateful_5(false);
         // Note: we track the charge port lock state here not from task_lock_charge_port as it
         // can also be manually unlocked at any time
-        let mut charge_lock = debounce_stateful_5(false);
+        let mut charge_lock = debounce_stateful_10(false);
 
         let mut next = Mono::now() + PERIOD;
         loop {
@@ -265,7 +266,7 @@ mod app {
                         car.set_ev_ready_input(edge == Rising);
                     }
                     if let Some(edge) = charge_lock_edge {
-                        car.set_charge_port(match edge { // TODO: check direction
+                        car.set_charge_port(match edge {
                             Rising => ChargeLock::Unlocked,
                             Falling => ChargeLock::Locked,
                         });

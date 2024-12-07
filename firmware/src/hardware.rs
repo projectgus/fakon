@@ -53,7 +53,7 @@ pub type ChargeLockDriveOutput = gpioc::PC5<Output<PushPull>>;
 // Currently modelled as an H-Bridge "direction" pin
 pub type ChargeLockDirOutput = InvertedPin<gpiob::PB0<Output<PushPull>>>;
 
-pub type ChargeLockSensorInput = gpioc::PC12<Input<Floating>>;
+pub type ChargeLockSensorInput = gpioc::PC11<Input<Floating>>;
 
 // Struct to encompass all the board resources, as their functions
 pub struct Board {
@@ -163,8 +163,8 @@ pub fn init(core: cortex_m::Peripherals, mut dp: stm32::Peripherals) -> Board {
     let _pin_in11 = gpiob.pb7; // 12V
     let _pin_in12 = gpioa.pa15; // 12V
     let pin_in13 = gpiod.pd2; // 5V
-    let pin_in14 = gpioc.pc12; // 5V
-    let _pin_in15 = gpioc.pc11; // 5V
+    let _pin_in14 = gpioc.pc12; // 5V
+    let pin_in15 = gpioc.pc11; // 5V
     let _pin_in16 = gpioc.pc10; // 5V
 
     // Signal outputs
@@ -227,7 +227,8 @@ pub fn init(core: cortex_m::Peripherals, mut dp: stm32::Peripherals) -> Board {
     // here, it's overkill but has the property of being low on reset!
     let charge_lock_drive = pin_coil_h.into_push_pull_output();
 
-    let charge_lock_sensor = pin_in14.into_floating_input();
+    // IN15 => Charge Port Lock input, no pullup, 5K Pulldown.
+    let charge_lock_sensor = pin_in15.into_floating_input();
 
     Board {
         pcan_config: can1_config,

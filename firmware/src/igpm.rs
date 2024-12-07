@@ -165,48 +165,41 @@ pub async fn task_lock_charge_port(
     // Charge port actuator is "Kusler 04S" also sold as EV-T2M3S-E-LOCK12V (datasheet online)
     // Datasheet says:
     let drive_time: Duration = 600.millis(); // "Recommended adaptation time 600 ms"
-    let mut pause_time: Duration = 3.secs(); // "Pause time after entry or exit path 3 s"
+    let pause_time: Duration = 3.secs(); // "Pause time after entry or exit path 3 s"
 
     let drive = cx.local.charge_lock_drive;
     let dir = cx.local.charge_lock_dir;
 
     dir.set_state(match direction {
-        // TODO: confirm which is which
-        ChargeLock::Unlocked => PinState::High,
-        ChargeLock::Locked => PinState::Low,
+        ChargeLock::Unlocked => PinState::Low,
+        ChargeLock::Locked => PinState::High,
     })
     .unwrap();
 
-    let deadline = Mono::now() + drive_time;
-
     drive.set_high().unwrap(); // Start actuator
 
-    loop {
-        Mono::delay(50.millis()).await;
-
-        if car.lock(|car| car.charge_port() == direction) {
-            // Success!
-
-            // Note: This state is updated from poll_slow_inputs
-            // (Don't need to log here as will have logged when car state changed.)
-            *cx.local.charge_lock_fails = 0;
-            break;
-        }
-        if Mono::now() > deadline {
-            defmt::error!("Charge port timeout");
-            *cx.local.charge_lock_fails += 1;
-
-            // Implement rudimentary backoff here by scaling up the time between
-            // failed attempts by multiples of the pause time
-            pause_time *= *cx.local.charge_lock_fails;
-            break;
-        }
-    }
+    Mono::delay(drive_time).await;
 
     drive.set_low().unwrap(); // Stop actuator
 
+    if car.lock(|car| car.charge_port() == direction) {
+        // Success!
+
+        // Note: This state is updated from poll_slow_inputs
+        // (Don't need to log here as will have logged when car state changed.)
+        *cx.local.charge_lock_fails = 0;
+    } else {
+        defmt::error!("Charge port lock actuator failed");
+        *cx.local.charge_lock_fails += 1;
+    }
+
     // Pausing here prevents another lock/unlock request
     // starting early
+    //
+    // 600ms/3s off in a loop will still hammer the actuator a bit, but the OBC
+    // appears to give up and go into a fault state after about ~30s if it
+    // doesn't see the expected result - so relying on this to avoid wearing the
+    // motor out.
     Mono::delay(pause_time).await;
 }
 
