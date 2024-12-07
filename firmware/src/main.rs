@@ -39,6 +39,7 @@ mod app {
     use crate::hardware;
     use crate::hardware::Mono;
     use crate::shift_control;
+    use car::ChargeLock;
     use debouncr::debounce_stateful_3;
     use debouncr::debounce_stateful_5;
     use debouncr::Edge::Falling;
@@ -54,7 +55,7 @@ mod app {
     // Task functions
     use crate::airbag_control::task_airbag_control;
     use crate::ieb::task_ieb;
-    use crate::igpm::task_igpm;
+    use crate::igpm::{self, task_igpm, task_lock_charge_port};
     use crate::shift_control::task_scu_can_tx;
     use crate::shift_control::task_scu_pwm_rx;
     use crate::shift_control::task_scu_pwm_tx;
@@ -78,6 +79,12 @@ mod app {
         ev_ready: hardware::EVReadyInput,
         scu_park_tx: hardware::ScuParkTx,
         scu_park_rx: hardware::ScuParkRx,
+        charge_lock_drive: hardware::ChargeLockDriveOutput,
+        charge_lock_dir: hardware::ChargeLockDirOutput,
+        charge_lock_sensor: hardware::ChargeLockSensorInput,
+
+        /// How many times in a row has the charge actuator failed to move?
+        charge_lock_fails: u32,
     }
 
     #[init]
@@ -95,6 +102,9 @@ mod app {
             ev_ready,
             scu_park_tx,
             scu_park_rx,
+            charge_lock_drive,
+            charge_lock_dir,
+            charge_lock_sensor,
         } = hardware::init(cx.core, cx.device);
 
         let (pcan_control, pcan_rx, pcan_tx) =
@@ -130,6 +140,10 @@ mod app {
                 ev_ready,
                 scu_park_tx,
                 scu_park_rx,
+                charge_lock_drive,
+                charge_lock_dir,
+                charge_lock_sensor,
+                charge_lock_fails: 0,
             },
         )
     }
@@ -141,9 +155,7 @@ mod app {
         }
     }
 
-    // TODO: consider bumping this to priority 4, above the sending of messages,
-    // so that the vehicle state is always up to date
-    #[task(local = [pcan_rx], shared = [car, park_actuator], priority = 2)]
+    #[task(local = [pcan_rx], shared = [car, park_actuator], priority = 4)]
     async fn pcan_rx(cx: pcan_rx::Context) {
         let pcan_rx = cx.local.pcan_rx;
         let mut car = cx.shared.car;
@@ -172,6 +184,8 @@ mod app {
                     car.lock(|car| car.update_state(&msg));
 
                     shift_control::on_can_rx(&msg, &mut park_actuator);
+
+                    igpm::on_can_rx(&msg);
                 }
             }
         }
@@ -187,6 +201,9 @@ mod app {
 
         #[task(shared = [pcan_tx, car], priority = 3)]
         async fn task_igpm(cx: task_igpm::Context);
+
+        #[task(shared = [car], local=[charge_lock_drive, charge_lock_dir, charge_lock_fails], priority = 2)]
+        async fn task_lock_charge_port(cx: task_lock_charge_port::Context, direction: ChargeLock);
 
         #[task(shared = [pcan_tx, car, park_actuator], priority = 3)]
         async fn task_scu_can_tx(cx: task_scu_can_tx::Context);
@@ -206,7 +223,7 @@ mod app {
     }
 
     // Power state changes are slow, so poll them in a timed loop with some debounce logic
-    #[task(shared = [car], local = [brake_input, ig1_on_input, led_ignition, relay_ig3, ev_ready], priority = 5)]
+    #[task(shared = [car], local = [brake_input, ig1_on_input, led_ignition, relay_ig3, ev_ready, charge_lock_sensor], priority = 5)]
     async fn poll_slow_inputs(mut cx: poll_slow_inputs::Context) {
         // Time base for the debouncing delays
         let PERIOD = 10.millis();
@@ -214,6 +231,9 @@ mod app {
         let mut ig1_on = debounce_stateful_5(false);
         let mut brakes_on = debounce_stateful_3(false);
         let mut ev_ready = debounce_stateful_5(false);
+        // Note: we track the charge port lock state here not from task_lock_charge_port as it
+        // can also be manually unlocked at any time
+        let mut charge_lock = debounce_stateful_5(false);
 
         let mut next = Mono::now() + PERIOD;
         loop {
@@ -223,8 +243,9 @@ mod app {
             let ig1_edge = ig1_on.update(cx.local.ig1_on_input.is_high().unwrap());
             let brakes_edge = brakes_on.update(cx.local.brake_input.is_high().unwrap());
             let ready_edge = ev_ready.update(cx.local.ev_ready.is_high().unwrap());
+            let charge_lock_edge = charge_lock.update(cx.local.charge_lock_sensor.is_high().unwrap());
 
-            if [ig1_edge, brakes_edge, ready_edge]
+            if [ig1_edge, brakes_edge, ready_edge, charge_lock_edge]
                 .into_iter()
                 .any(|o| o.is_some())
             {
@@ -242,6 +263,12 @@ mod app {
                     }
                     if let Some(edge) = ready_edge {
                         car.set_ev_ready_input(edge == Rising);
+                    }
+                    if let Some(edge) = charge_lock_edge {
+                        car.set_charge_port(match edge { // TODO: check direction
+                            Rising => ChargeLock::Unlocked,
+                            Falling => ChargeLock::Locked,
+                        });
                     }
                 });
             }

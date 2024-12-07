@@ -47,6 +47,14 @@ pub type ScuParkTx = InvertedPin<gpioc::PC3<Output<PushPull>>>;
 
 pub type ScuParkRx = gpiod::PD2<Input<Floating>>;
 
+// Currently modelled as an H-Bridge "on" pin
+pub type ChargeLockDriveOutput = gpioc::PC5<Output<PushPull>>;
+
+// Currently modelled as an H-Bridge "direction" pin
+pub type ChargeLockDirOutput = InvertedPin<gpiob::PB0<Output<PushPull>>>;
+
+pub type ChargeLockSensorInput = gpioc::PC12<Input<Floating>>;
+
 // Struct to encompass all the board resources, as their functions
 pub struct Board {
     pub pcan_config: FdCan<PCAN, ConfigMode>,
@@ -59,6 +67,9 @@ pub struct Board {
     pub ev_ready: EVReadyInput,
     pub scu_park_tx: ScuParkTx,
     pub scu_park_rx: ScuParkRx,
+    pub charge_lock_drive: ChargeLockDriveOutput,
+    pub charge_lock_dir: ChargeLockDirOutput,
+    pub charge_lock_sensor: ChargeLockSensorInput,
 }
 
 // Systick Based Timer
@@ -152,13 +163,13 @@ pub fn init(core: cortex_m::Peripherals, mut dp: stm32::Peripherals) -> Board {
     let _pin_in11 = gpiob.pb7; // 12V
     let _pin_in12 = gpioa.pa15; // 12V
     let pin_in13 = gpiod.pd2; // 5V
-    let _pin_in14 = gpioc.pc12; // 5V
+    let pin_in14 = gpioc.pc12; // 5V
     let _pin_in15 = gpioc.pc11; // 5V
     let _pin_in16 = gpioc.pc10; // 5V
 
     // Signal outputs
     let pin_out1 = gpioa.pa4; // 12V, TIM3_CH2
-    let _pin_out2 = gpiob.pb0; // 12V, TIM3_CH3
+    let pin_out2 = gpiob.pb0; // 12V, TIM3_CH3
     let _pin_out3 = gpioc.pc1; // 12V, TIM1_CH2
     let _pin_out4 = gpioc.pc0; // 12V, TIM1_CH1
     let pin_out5 = gpioc.pc3; // 5V, TIM1_CH4
@@ -168,7 +179,7 @@ pub fn init(core: cortex_m::Peripherals, mut dp: stm32::Peripherals) -> Board {
     // Relay coil drivers
     let pin_coil_l1 = gpiob.pb6;
     let _pin_coil_l2 = gpioc.pc4; // also LED4, oops
-    let _pin_coil_h = gpioc.pc5;
+    let pin_coil_h = gpioc.pc5;
 
     // LEDs, all green, all active high
     let led1 = gpiob.pb10.into_push_pull_output();
@@ -207,6 +218,17 @@ pub fn init(core: cortex_m::Peripherals, mut dp: stm32::Peripherals) -> Board {
     // LED 1 - Ignition Status
     let led_ignition = led1.into_push_pull_output();
 
+    // OUT2 => Charge Lock Direction output
+    // Inverted as MCU drives FET gate
+    let charge_lock_dir = InvertedPin::new(pin_out2.into_push_pull_output());
+
+    // Hardware design flaw: I planned to use high and low relay coil drivers for
+    // the charge port but misunderstood the drive design. Still using high side driver
+    // here, it's overkill but has the property of being low on reset!
+    let charge_lock_drive = pin_coil_h.into_push_pull_output();
+
+    let charge_lock_sensor = pin_in14.into_floating_input();
+
     Board {
         pcan_config: can1_config,
         srs_crash_out,
@@ -218,5 +240,8 @@ pub fn init(core: cortex_m::Peripherals, mut dp: stm32::Peripherals) -> Board {
         ev_ready,
         scu_park_tx,
         scu_park_rx,
+        charge_lock_drive,
+        charge_lock_dir,
+        charge_lock_sensor,
     }
 }

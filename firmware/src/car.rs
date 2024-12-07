@@ -19,7 +19,7 @@ pub struct CarState {
     /// Debounced and de-inverted level of EV Ready input
     ev_ready_input: bool,
 
-    charge_port_locked: bool,
+    charge_port: ChargeLock,
     is_braking: bool,
 
     gear: Fresh<Gear>,
@@ -42,6 +42,13 @@ pub enum Ignition {
     IG3,
     /// Car is fully on with key in ignition (both IG1 and IG3 relays)
     On,
+}
+
+/// Map the state of the charge port lock actuator
+#[derive(Clone, Copy, Debug, Format, PartialEq)]
+pub enum ChargeLock {
+    Unlocked,
+    Locked,
 }
 
 impl Ignition {
@@ -92,7 +99,7 @@ impl CarState {
             most_on: Ignition::On,
             contactor: Fresh::new(3.secs()),
             ev_ready_input: false,
-            charge_port_locked: false,
+            charge_port: ChargeLock::Unlocked,
             is_braking: false,
 
             gear: Fresh::new(3.secs()),
@@ -114,17 +121,17 @@ impl CarState {
 
     #[inline]
     /// Return the contactor state.
-    pub fn contactor(&self) -> Fresh<Contactor> {
+    pub fn contactor(&self) -> impl IsFresh<Contactor> {
         self.contactor
     }
 
     #[inline]
-    pub fn v_inverter(&self) -> Fresh<u16> {
+    pub fn v_inverter(&self) -> impl IsFresh<u16> {
         self.v_inverter
     }
 
     #[inline]
-    pub fn motor_rpm(&self) -> Fresh<u16> {
+    pub fn motor_rpm(&self) -> impl IsFresh<u16> {
         self.motor_rpm
     }
 
@@ -188,15 +195,15 @@ impl CarState {
     }
 
     #[inline]
-    pub fn charge_port_locked(&self) -> bool {
-        self.charge_port_locked
+    pub fn charge_port(&self) -> ChargeLock {
+        self.charge_port
     }
 
     #[inline]
-    pub fn set_charge_port_locked(&mut self, value: bool) {
-        if value != self.charge_port_locked {
+    pub fn set_charge_port(&mut self, value: ChargeLock) {
+        if value != self.charge_port {
             defmt::info!("Charge Port Locked => {}", value);
-            self.charge_port_locked = value;
+            self.charge_port = value;
         }
     }
 
@@ -295,5 +302,11 @@ impl CarState {
 impl Default for CarState {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+impl ChargeLock {
+    pub fn is_locked(&self) -> bool {
+        return *self == Self::Locked;
     }
 }

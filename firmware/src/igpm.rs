@@ -3,19 +3,22 @@
 //!
 //! Some of these messages may originate from other modules in the car, and be
 //! forwarded onto the PCAN bus by the IGPM. Others originate from the IGPM.
-use crate::app;
-use crate::car::{self, CarState, Contactor, Ignition};
+use crate::car::{self, CarState, ChargeLock, Contactor, Ignition};
 use crate::dbc::pcan::{
     BodyState, BodyStateDrvDoorSw, BodyStateDrvSeatBeltSw, BodyStateIgnitionSw,
     BodyStatePassDoorSw, BodyWarnings, Cgw450, Cgw45d, Cgw45e, Cgw462, Cgw4fe, Cgw55c, Cgw55f,
     Cgw561, Cgw578, Cgw588, Cgw5b3, Cgw5b3PowerState, Cgw5b3UnkPowerRelated, Cgw5df, ChargePort,
-    ChargeSettings, ChargeSettingsAcChargingCurrent, Clock, Odometer, Steering,
+    ChargeSettings, ChargeSettingsAcChargingCurrent, Clock, Messages, Odometer, Steering,
 };
+use crate::fresh::IsFresh;
 use crate::hardware::Mono;
 use crate::repeater::{Period, Repeater};
+use crate::{app, Duration};
+use fugit::ExtU32;
 use hex_literal::hex;
 use rtic::Mutex;
 use rtic_monotonics::Monotonic;
+use stm32g4xx_hal::prelude::{OutputPin, PinState};
 
 pub async fn task_igpm(cx: app::task_igpm::Context<'_>) {
     let mut pcan_tx = cx.shared.pcan_tx;
@@ -126,6 +129,87 @@ pub async fn task_igpm(cx: app::task_igpm::Context<'_>) {
     }
 }
 
+pub fn on_can_rx(outer_msg: &Messages) {
+    if let Messages::Obc58e(msg) = outer_msg {
+        let unlock = msg.port_unlock_req();
+        let lock = msg.port_lock_req();
+        if lock && unlock {
+            defmt::error!("Invalid OBC lock and unlock requested simultaneously");
+        } else if lock || unlock {
+            let direction = if lock {
+                ChargeLock::Locked
+            } else {
+                ChargeLock::Unlocked
+            };
+            // Result: Ignoring result because an existing lock/unlock may be in progress
+            let _ = app::task_lock_charge_port::spawn(direction);
+        }
+    }
+}
+
+/// Task which is spawned to lock or unlock the charge port.
+///
+/// Is one-shot, so it runs to completion and prevents another lock or unlock
+/// from starting while it is executing.
+///
+/// This is in the IGPM module as in the original Kona this function is
+/// managed by the IGPM, although it makes a bit less sense here in Fakon.
+pub async fn task_lock_charge_port(
+    cx: app::task_lock_charge_port::Context<'_>,
+    direction: ChargeLock,
+) {
+    let mut car = cx.shared.car;
+
+    defmt::info!("Moving charge port to {}", direction);
+
+    // Charge port actuator is "Kusler 04S" also sold as EV-T2M3S-E-LOCK12V (datasheet online)
+    // Datasheet says:
+    let drive_time: Duration = 600.millis(); // "Recommended adaptation time 600 ms"
+    let mut pause_time: Duration = 3.secs(); // "Pause time after entry or exit path 3 s"
+
+    let drive = cx.local.charge_lock_drive;
+    let dir = cx.local.charge_lock_dir;
+
+    dir.set_state(match direction {
+        // TODO: confirm which is which
+        ChargeLock::Unlocked => PinState::High,
+        ChargeLock::Locked => PinState::Low,
+    })
+    .unwrap();
+
+    let deadline = Mono::now() + drive_time;
+
+    drive.set_high().unwrap(); // Start actuator
+
+    loop {
+        Mono::delay(50.millis()).await;
+
+        if car.lock(|car| car.charge_port() == direction) {
+            // Success!
+
+            // Note: This state is updated from poll_slow_inputs
+            // (Don't need to log here as will have logged when car state changed.)
+            *cx.local.charge_lock_fails = 0;
+            break;
+        }
+        if Mono::now() > deadline {
+            defmt::error!("Charge port timeout");
+            *cx.local.charge_lock_fails += 1;
+
+            // Implement rudimentary backoff here by scaling up the time between
+            // failed attempts by multiples of the pause time
+            pause_time *= *cx.local.charge_lock_fails;
+            break;
+        }
+    }
+
+    drive.set_low().unwrap(); // Stop actuator
+
+    // Pausing here prevents another lock/unlock request
+    // starting early
+    Mono::delay(pause_time).await;
+}
+
 impl BodyState {
     fn latest(car: &CarState) -> Self {
         // BodyState constructor has 43 args, so start from all zeroes and then set some bits!
@@ -192,8 +276,7 @@ impl Clock {
 
 impl ChargePort {
     fn latest(car: &CarState) -> Self {
-        let is_locked = car.charge_port_locked();
-        Self::new(is_locked, false, false, false).unwrap()
+        Self::new(car.charge_port().is_locked(), false, false, false).unwrap()
     }
 }
 
