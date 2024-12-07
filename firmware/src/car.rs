@@ -1,9 +1,11 @@
 //! Common state of the entire "car" as presented to the Kona
 //! components.
 use crate::dbc::pcan::{BattHvStatusPrechargeRelay, Messages, Vcu200CurrentGear};
-use crate::fresh::Fresh;
+use crate::fresh::{Fresh, IsFresh};
+use crate::hardware::Mono;
+use crate::Instant;
 use defmt::Format;
-use fugit::ExtU32;
+use rtic_monotonics::Monotonic;
 
 #[derive(Clone, Format)]
 pub struct CarState {
@@ -14,7 +16,7 @@ pub struct CarState {
     most_on: Ignition,
 
     /// Main high voltage contactor state. Updated from BMS whenever IG1 or IG3 is on.
-    contactor: Fresh<Contactor>,
+    contactor: Fresh<Contactor, 3>,
 
     /// Debounced and de-inverted level of EV Ready input
     ev_ready_input: bool,
@@ -22,16 +24,25 @@ pub struct CarState {
     charge_port: ChargeLock,
     is_braking: bool,
 
-    gear: Fresh<Gear>,
+    gear: Fresh<Gear, 3>,
 
     soc_batt: f32,
     v_batt: f32,
     i_batt: f32,
-    v_inverter: Fresh<u16>,
-    motor_rpm: Fresh<u16>,
+    v_inverter: Fresh<u16, 3>,
+    motor_rpm: Fresh<u16, 1>,
 
     // Internal state of pre-charge relay. Used to update 'contactor' field. Updated from BMS.
-    last_precharge: Fresh<bool>,
+    last_precharge: Fresh<bool, 3>,
+
+    /// EVSE connected input from OBC. Doubles as tracker for OBC powered on
+    evse_connected: Fresh<bool, 3>,
+
+    /// Timestamp of last "IG3 only" message received from VCU
+    last_vcu_ig3_on: Option<Instant>,
+
+    /// Timestamp of last time a valid CAN message was received via PCAN
+    last_pcan_rx: Option<Instant>,
 }
 
 #[derive(Clone, Copy, Debug, Format, PartialEq)]
@@ -97,20 +108,20 @@ impl CarState {
         Self {
             ignition: Ignition::Off,
             most_on: Ignition::On,
-            contactor: Fresh::new(3.secs()),
+            contactor: Fresh::new(),
             ev_ready_input: false,
             charge_port: ChargeLock::Unlocked,
             is_braking: false,
 
-            gear: Fresh::new(3.secs()),
+            gear: Fresh::new(),
 
             soc_batt: 0.0,
             v_batt: 0.0,
             i_batt: 0.0,
-            v_inverter: Fresh::new(3.secs()),
-            motor_rpm: Fresh::new(1.secs()),
+            v_inverter: Fresh::new(),
+            motor_rpm: Fresh::new(),
 
-            last_precharge: Fresh::new(3.secs()),
+            last_precharge: Fresh::new(),
         }
     }
 
@@ -141,7 +152,7 @@ impl CarState {
     }
 
     #[inline]
-    pub fn gear(&self) -> Fresh<Gear> {
+    pub fn gear(&self) -> impl IsFresh<Gear> {
         self.gear
     }
 

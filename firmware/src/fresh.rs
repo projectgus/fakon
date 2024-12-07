@@ -1,36 +1,58 @@
 use defmt::Format;
 use rtic_monotonics::Monotonic;
 
-use crate::{hardware::Mono, Duration, Instant};
+use crate::{hardware::Mono, Instant};
 
 /// Struct to wrap a periodic signal value that can be "fresh" or "stale"
 #[derive(Clone, Copy)]
-pub struct Fresh<VALUE>
+pub struct Fresh<VALUE, const STALE_SECS: u32>
 where
     VALUE: Copy,
 {
     value: Option<(Instant, VALUE)>, // (Last Set, Value)
-    stale_after: Duration, // This could be a const generic param, but Duration not currently eligible
 }
 
-impl<VALUE> Fresh<VALUE>
+pub trait IsFresh<VALUE> {
+    /// Set the value and update its last set timestamp
+    fn set(&mut self, value: VALUE);
+
+    /// Get a reference to the value, or None if it's stale or was never set.
+    fn get(&self) -> Option<VALUE>;
+
+    /// Get the last set value, even if it is stale
+    fn get_unchecked(&self) -> Option<VALUE>;
+
+    /// Return true if the value is fresh (i.e. was last set within the stale_after period)
+    fn is_fresh(&self) -> bool;
+
+    /// Return true if the value is stale (i.e. not fresh)
+    #[inline]
+    fn is_stale(&self) -> bool {
+        !self.is_fresh()
+    }
+}
+
+impl<VALUE, const STALE_SECS: u32> Fresh<VALUE, STALE_SECS>
 where
     VALUE: Copy,
 {
-    pub fn new(stale_after: Duration) -> Self {
+    #[inline]
+    pub fn new() -> Self {
         Self {
             value: None,
-            stale_after,
         }
     }
+}
 
-    /// Set the value and update its last set timestamp
-    pub fn set(&mut self, value: VALUE) {
+impl<VALUE, const STALE_SECS: u32> IsFresh<VALUE> for Fresh<VALUE, STALE_SECS>
+where
+    VALUE: Copy,
+{
+    fn set(&mut self, value: VALUE) {
         self.value = Some((Mono::now(), value));
     }
 
-    /// Get a reference to the value, or None if it's stale or was never set.
-    pub fn get(&self) -> Option<VALUE> {
+    fn get(&self) -> Option<VALUE> {
         if self.is_fresh() {
             self.get_unchecked()
         } else {
@@ -38,31 +60,19 @@ where
         }
     }
 
-    /// Get the last set value, even if it is stale
-    pub fn get_unchecked(&self) -> Option<VALUE> {
+    fn get_unchecked(&self) -> Option<VALUE> {
         self.value.map(|(_, value)| value)
     }
 
-    /// Return true if the value is fresh (i.e. was last set within the stale_after period)
-    pub fn is_fresh(&self) -> bool {
-        self.value
-            .map(|(last_set, _)| {
-                let age = Mono::now()
-                    .checked_duration_since(last_set)
-                    .expect("now() not allowed to wrap");
-                age < self.stale_after
-            })
-            .unwrap_or(false)
-    }
-
-    /// Return true if the value is stale (i.e. not fresh)
-    #[inline]
-    pub fn is_stale(&self) -> bool {
-        !self.is_fresh()
+    fn is_fresh(&self) -> bool {
+        self.value.is_some_and(|(last_set, _)| Mono::now()
+                               .checked_duration_since(last_set)
+                               .expect("now() not allowed to wrap")
+                               .to_secs() < STALE_SECS)
     }
 }
 
-impl<VALUE> Format for Fresh<VALUE>
+impl<VALUE, const STALE_SECS: u32> Format for Fresh<VALUE, STALE_SECS>
 where
     VALUE: Format + Copy,
 {
