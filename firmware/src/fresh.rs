@@ -12,7 +12,12 @@ where
     value: Option<(Instant, VALUE)>, // (Last Set, Value)
 }
 
-pub trait IsFresh<VALUE> {
+// Using a trait here allows return types to be "impl IsFresh<V>" instead of
+// "Fresh<V, SECS>" which leaks the const parameter out unnecessarily.
+//
+// Making Format a supertrait here is semi-laziness so we can have
+// functions "-> impl IsFresh<V>" instead of "-> impl IsFresh<V> + Format"
+pub trait IsFresh<VALUE>: Format + Copy {
     /// Set the value and update its last set timestamp
     fn set(&mut self, value: VALUE);
 
@@ -46,7 +51,7 @@ where
 
 impl<VALUE, const STALE_SECS: u32> IsFresh<VALUE> for Fresh<VALUE, STALE_SECS>
 where
-    VALUE: Copy,
+    VALUE: Copy + Format,
 {
     fn set(&mut self, value: VALUE) {
         self.value = Some((Mono::now(), value));
@@ -74,7 +79,7 @@ where
 
 impl<VALUE, const STALE_SECS: u32> Format for Fresh<VALUE, STALE_SECS>
 where
-    VALUE: Format + Copy,
+    VALUE: Copy + Format,
 {
     fn format(&self, fmt: defmt::Formatter) {
         match &self.value {

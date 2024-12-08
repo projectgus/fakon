@@ -182,24 +182,17 @@ pub async fn task_lock_charge_port(
 
     drive.set_low().unwrap(); // Stop actuator
 
-    if car.lock(|car| car.charge_port() == direction) {
-        // Success!
-
-        // Note: This state is updated from poll_slow_inputs
-        // (Don't need to log here as will have logged when car state changed.)
-        *cx.local.charge_lock_fails = 0;
-    } else {
+    if car.lock(|car| car.charge_port() != direction) {
         defmt::error!("Charge port lock actuator failed");
-        *cx.local.charge_lock_fails += 1;
     }
 
     // Pausing here prevents another lock/unlock request
     // starting early
     //
-    // 600ms/3s off in a loop will still hammer the actuator a bit, but the OBC
-    // appears to give up and go into a fault state after about ~30s if it
-    // doesn't see the expected result - so relying on this to avoid wearing the
-    // motor out.
+    // 600ms/3s off in a loop will still hammer the actuator a bit if it's
+    // failing, but the OBC appears to give up and go into a fault state after
+    // about ~30s if it doesn't see the expected result - relying on that to
+    // avoid wearing the motor out.
     Mono::delay(pause_time).await;
 }
 

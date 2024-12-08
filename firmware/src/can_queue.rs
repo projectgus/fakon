@@ -98,9 +98,10 @@ impl<I: fdcan::Instance> Control<I> {
         )
     }
 
-    pub fn on_irq<M>(&mut self, mut m_tx: M)
+    pub fn on_irq<M, F>(&mut self, mut m_tx: M, flag_bus_off: F)
     where
         M: Mutex<T = Tx<I>>,
+        F: FnOnce(),
     {
         // This is kind of annoying that we have to poll the
         // interrupt register on each check
@@ -122,7 +123,8 @@ impl<I: fdcan::Instance> Control<I> {
         }
         if self.hw.has_interrupt(Interrupt::BusOff) {
             self.hw.clear_interrupt(Interrupt::BusOff);
-            panic!("CAN peripheral in Bus Off");
+            defmt::error!("CAN peripheral in Bus Off");
+            flag_bus_off();
         }
     }
 

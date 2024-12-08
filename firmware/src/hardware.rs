@@ -1,9 +1,9 @@
 // "Board level" hardware abstractions, ie pin assignments, etc.
 
-use can_bit_timings;
 use defmt::info;
 use fdcan::ConfigMode;
 use fdcan::FdCan;
+use fugit::ExtU32;
 use fugit::RateExtU32;
 use hal::gpio::gpioa;
 use hal::gpio::gpiob;
@@ -13,6 +13,7 @@ use hal::gpio::Input;
 use hal::gpio::Output;
 use hal::gpio::PushPull;
 use inverted_pin::InvertedPin;
+use rtic_monotonics::Monotonic;
 use stm32g4xx_hal::gpio::gpiod;
 use stm32g4xx_hal::gpio::ExtiPin;
 use stm32g4xx_hal::gpio::SignalEdge;
@@ -70,6 +71,11 @@ pub struct Board {
     pub charge_lock_drive: ChargeLockDriveOutput,
     pub charge_lock_dir: ChargeLockDirOutput,
     pub charge_lock_sensor: ChargeLockSensorInput,
+    pub standby: Standby,
+}
+
+pub struct Standby {
+    scb: cortex_m::peripheral::SCB,
 }
 
 // Systick Based Timer
@@ -99,6 +105,8 @@ pub fn init(core: cortex_m::Peripherals, mut dp: stm32::Peripherals) -> Board {
         .ahb_psc(rcc::Prescaler::NotDivided)
         .apb1_psc(rcc::Prescaler::Div2)
         .apb2_psc(rcc::Prescaler::Div2);
+
+    let standby = Standby::init(&mut dp.PWR, core.SCB);
 
     let pwr = dp.PWR.constrain().freeze();
     let mut rcc = rcc.freeze(clock_config, pwr);
@@ -244,5 +252,73 @@ pub fn init(core: cortex_m::Peripherals, mut dp: stm32::Peripherals) -> Board {
         charge_lock_drive,
         charge_lock_dir,
         charge_lock_sensor,
+        standby,
+    }
+}
+
+impl Standby {
+    /// Do startup configuration for low power Standby mode,
+    /// such that enter_standby_mode() can be called later.
+    fn init(pwr: &mut stm32::PWR, scb: stm32::SCB) -> Self {
+        let was_standby = unsafe {
+            // Set the deep sleep mode for Standby
+            pwr.cr1.modify(|_, w| { w.lpms().bits(0b011) });
+
+            // Read the Standby flag in the status register
+            pwr.sr1.read().sbf().bit_is_set()
+        };
+
+        if was_standby {
+            defmt::info!("Waking up from standby mode");
+        } else {
+            defmt::info!("Starting from hard reset");
+        }
+
+        Standby {
+            scb,
+        }
+    }
+
+    /// Go to standby mode as soon as the rest of the system is idle,
+    /// or panic if 1 second passes without going to standby.
+    pub async fn enter_standby_mode(&mut self) -> ! {
+        defmt::info!("Vehicle appears to be off, going to standby...");
+
+        // Initial standby config is set in Board::init(), this is only the
+        // parts that can't be done at startup.
+
+        // Have either WFI/WFE or exit from ISR start deep sleep
+        self.scb.set_sleepdeep();
+        self.scb.set_sleeponexit();
+
+        // Clear any pending wakeup triggers and the SBF flag
+        //
+        // Currently this is unnecessary as the init function doesn't
+        // configure any wakeup triggers, but eventually it will.
+        //
+        // Safety: PWR_SCR register is write-only.
+        unsafe {
+            let dp = stm32::Peripherals::steal();
+            dp.PWR.scr.write(|w| {
+                w
+                    .csbf().set_bit()
+                    .cwuf1().set_bit()
+                    .cwuf2().set_bit()
+                    .cwuf3().set_bit()
+                    .cwuf4().set_bit()
+                    .cwuf5().set_bit()
+            });
+        }
+
+        // TODO: this currently doesn't go to standby, it just panics
+
+        // The chip should go to standby as soon as there are no pending
+        // interrupts, which we should assume will happen at least once per second
+        Mono::delay(1.secs()).await;
+
+        // Shouldn't make it here as standby exits to a reset, unless one of the
+        // wakeup sources we configured was already active - in which case the
+        // panic will reset us I guess
+        panic!("Failed to go to standby mode.");
     }
 }

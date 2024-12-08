@@ -35,14 +35,14 @@ pub struct CarState {
     // Internal state of pre-charge relay. Used to update 'contactor' field. Updated from BMS.
     last_precharge: Fresh<bool, 3>,
 
-    /// EVSE connected input from OBC. Doubles as tracker for OBC powered on
-    evse_connected: Fresh<bool, 3>,
-
-    /// Timestamp of last "IG3 only" message received from VCU
-    last_vcu_ig3_on: Option<Instant>,
+    /// Connected EVSE detected by OBC. Doubles as tracker for OBC powered on
+    evse_detected: Fresh<bool, 3>,
 
     /// Timestamp of last time a valid CAN message was received via PCAN
     last_pcan_rx: Option<Instant>,
+
+    /// Once CAN bus goes Bus Off, can't really recover
+    pcan_bus_off: bool,
 }
 
 #[derive(Clone, Copy, Debug, Format, PartialEq)]
@@ -122,6 +122,9 @@ impl CarState {
             motor_rpm: Fresh::new(),
 
             last_precharge: Fresh::new(),
+            evse_detected: Fresh::new(),
+            last_pcan_rx: None,
+            pcan_bus_off: false,
         }
     }
 
@@ -156,13 +159,9 @@ impl CarState {
         self.gear
     }
 
-    /// Return true if the vehicle is Ready to drive
-    ///
-    /// WARNING: This will return false if CAN comms are lost with the BMS
     #[inline]
-    pub fn ready(&self) -> bool {
-        // TODO: there probably is a VCU CAN message that gives a clearer indication of this state
-        self.ignition == Ignition::On && self.contactor.get() == Some(Contactor::Closed)
+    pub fn evse_detected(&self) -> impl IsFresh<bool> {
+        self.evse_detected
     }
 
     pub fn set_ignition(&mut self, value: Ignition) {
@@ -200,9 +199,9 @@ impl CarState {
     #[inline]
     pub fn set_ev_ready_input(&mut self, value: bool) {
         if value != self.ev_ready_input {
-              defmt::info!("EV Ready => {}", value);
-              self.ev_ready_input = value;
-          }
+            defmt::info!("EV Ready => {}", value);
+            self.ev_ready_input = value;
+        }
     }
 
     #[inline]
@@ -213,7 +212,7 @@ impl CarState {
     #[inline]
     pub fn set_charge_port(&mut self, value: ChargeLock) {
         if value != self.charge_port {
-            defmt::info!("Charge Port Locked => {}", value);
+            defmt::info!("Charge Port => {}", value);
             self.charge_port = value;
         }
     }
@@ -222,6 +221,35 @@ impl CarState {
     #[inline]
     pub(crate) fn most_on(&self) -> Ignition {
         self.most_on
+    }
+
+    pub fn set_evse_detected(&mut self, value: bool) {
+        self.evse_detected.set(value);
+    }
+
+    /// Update the timestamp of the last "IG3 on" message received from VCU
+    pub fn set_last_pcan_rx(&mut self) {
+        self.last_pcan_rx = Some(Mono::now());
+    }
+
+    /// Until we have IG3 direct monitoring, use "OBC is sending messages" as a proxy
+    pub fn ig3_appears_powered(&self) -> bool {
+        // evse_detected is for OBC
+        self.evse_detected.is_fresh()
+    }
+
+    pub fn pcan_receiving(&self) -> bool {
+        self.last_pcan_rx
+            .is_some_and(|val| (Mono::now() - val).to_secs() < 2)
+    }
+
+    /// Set the flag that PCAN Bus has gone Bus Off
+    pub fn set_pcan_bus_off(&mut self) {
+        self.pcan_bus_off = true;
+    }
+
+    pub fn pcan_bus_off(&self) -> bool {
+        self.pcan_bus_off
     }
 
     // Contactor state only updates in response to BMS CAN messages
@@ -279,7 +307,8 @@ impl CarState {
                     // Don't update the contactor state here, wait for the next Bms5a3 message
                     // and switch it there (this is to avoid races when switching in and out of
                     // pre-charge
-                    self.last_precharge.set(msg.precharge_relay() == BattHvStatusPrechargeRelay::Closed);
+                    self.last_precharge
+                        .set(msg.precharge_relay() == BattHvStatusPrechargeRelay::Closed);
                 }
 
                 // Raw battery stats
@@ -292,21 +321,27 @@ impl CarState {
                 // Recording the "display SoC" not the "real SoC" i.e. as shown on dash
                 self.soc_batt = msg.soc_disp()
             }
+            Messages::Obc58e(msg) => {
+                self.set_evse_detected(msg.evse_detected());
+            }
             Messages::InverterStatus(msg) => {
                 // as these two have the same "freshness" they could conceivably be merged somehow
                 self.v_inverter.set(msg.v_inverter());
                 self.motor_rpm.set(msg.speed_abs() as u16);
-            },
+            }
             Messages::Vcu200(msg) => {
                 if let Ok(gear) = msg.current_gear().try_into() {
                     self.gear.set(gear);
                 } else if self.ignition().ig3_on() {
-                    defmt::warn!("VCU200 message sent invalid gear value {}",
-                                 msg.current_gear_raw());
+                    defmt::warn!(
+                        "VCU200 message sent invalid gear value {}",
+                        msg.current_gear_raw()
+                    );
                 }
-            },
+            }
             _ => (),
         }
+        self.set_last_pcan_rx();
     }
 }
 

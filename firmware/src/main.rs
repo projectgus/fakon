@@ -40,7 +40,7 @@ mod app {
     use crate::hardware::Mono;
     use crate::shift_control;
     use car::ChargeLock;
-    use debouncr::debounce_stateful_10;
+    use debouncr::debounce_stateful_12;
     use debouncr::debounce_stateful_3;
     use debouncr::debounce_stateful_5;
     use debouncr::Edge::Falling;
@@ -83,9 +83,7 @@ mod app {
         charge_lock_drive: hardware::ChargeLockDriveOutput,
         charge_lock_dir: hardware::ChargeLockDirOutput,
         charge_lock_sensor: hardware::ChargeLockSensorInput,
-
-        /// How many times in a row has the charge actuator failed to move?
-        charge_lock_fails: u32,
+        standby: hardware::Standby,
     }
 
     #[init]
@@ -106,6 +104,7 @@ mod app {
             charge_lock_drive,
             charge_lock_dir,
             charge_lock_sensor,
+            standby,
         } = hardware::init(cx.core, cx.device);
 
         let (pcan_control, pcan_rx, pcan_tx) =
@@ -123,6 +122,7 @@ mod app {
         task_scu_can_tx::spawn().unwrap();
         task_scu_pwm_tx::spawn().unwrap();
         log_info::spawn().unwrap();
+        ignition_sequence::spawn().unwrap();
 
         (
             Shared {
@@ -144,7 +144,7 @@ mod app {
                 charge_lock_drive,
                 charge_lock_dir,
                 charge_lock_sensor,
-                charge_lock_fails: 0,
+                standby,
             },
         )
     }
@@ -203,7 +203,7 @@ mod app {
         #[task(shared = [pcan_tx, car], priority = 3)]
         async fn task_igpm(cx: task_igpm::Context);
 
-        #[task(shared = [car], local=[charge_lock_drive, charge_lock_dir, charge_lock_fails], priority = 2)]
+        #[task(shared = [car], local=[charge_lock_drive, charge_lock_dir], priority = 2)]
         async fn task_lock_charge_port(cx: task_lock_charge_port::Context, direction: ChargeLock);
 
         #[task(shared = [pcan_tx, car, park_actuator], priority = 3)]
@@ -218,47 +218,38 @@ mod app {
 
     // FDCAN_INTR0_IT and FDCAN_INTR1_IT are swapped, until stm32g4 crate
     // updates to include https://github.com/stm32-rs/stm32-rs/pull/996
-    #[task(binds = FDCAN1_INTR1_IT, shared = [pcan_tx], local=[pcan_control], priority = 6)]
-    fn pcan_irq(cx: pcan_irq::Context) {
-        cx.local.pcan_control.on_irq(cx.shared.pcan_tx);
+    #[task(binds = FDCAN1_INTR1_IT, shared = [car, pcan_tx], local=[pcan_control], priority = 6)]
+    fn pcan_irq(mut cx: pcan_irq::Context) {
+        let set_bus_off = || { cx.shared.car.lock(|car| car.set_pcan_bus_off()) };
+        cx.local.pcan_control.on_irq(cx.shared.pcan_tx, set_bus_off);
     }
 
     // Power state changes are slow, so poll them in a timed loop with some debounce logic
-    #[task(shared = [car], local = [brake_input, ig1_on_input, led_ignition, relay_ig3, ev_ready, charge_lock_sensor], priority = 5)]
+    #[task(shared = [car], local = [brake_input, ev_ready, charge_lock_sensor], priority = 5)]
     async fn poll_slow_inputs(mut cx: poll_slow_inputs::Context) {
         // Time base for the debouncing delays
         let PERIOD = 10.millis();
         // Debouncers. Each debounce period is (_N * PERIOD)
-        let mut ig1_on = debounce_stateful_5(false);
         let mut brakes_on = debounce_stateful_3(false);
         let mut ev_ready = debounce_stateful_5(false);
         // Note: we track the charge port lock state here not from task_lock_charge_port as it
         // can also be manually unlocked at any time
-        let mut charge_lock = debounce_stateful_10(false);
+        let mut charge_lock = debounce_stateful_12(false);
 
         let mut next = Mono::now() + PERIOD;
         loop {
             Mono::delay_until(next).await;
             next += PERIOD;
 
-            let ig1_edge = ig1_on.update(cx.local.ig1_on_input.is_high().unwrap());
             let brakes_edge = brakes_on.update(cx.local.brake_input.is_high().unwrap());
             let ready_edge = ev_ready.update(cx.local.ev_ready.is_high().unwrap());
             let charge_lock_edge = charge_lock.update(cx.local.charge_lock_sensor.is_high().unwrap());
 
-            if [ig1_edge, brakes_edge, ready_edge, charge_lock_edge]
+            if [brakes_edge, ready_edge, charge_lock_edge]
                 .into_iter()
                 .any(|o| o.is_some())
             {
                 cx.shared.car.lock(|car| {
-                    // TODO: also read external IG3 state and update accordingly
-
-                    if let Some(edge) = ig1_edge {
-                        car.set_ignition(match edge {
-                            Rising => Ignition::On,
-                            Falling => Ignition::Off,
-                        });
-                    };
                     if let Some(edge) = brakes_edge {
                         car.set_is_braking(edge == Rising);
                     }
@@ -273,20 +264,108 @@ mod app {
                     }
                 });
             }
+        }
+    }
 
-            if let Some(edge) = ig1_edge {
-                // FIXME: ignition sequence should be its own task
-                match edge {
-                    Rising => {
-                        cx.local.relay_ig3.set_high().unwrap();
-                        cx.local.led_ignition.set_high().unwrap();
+    /// Tracks the ignition state of the vehicle by monitoring:
+    /// - IG1 power on input
+    /// - CAN messages sent when IG3 powered on (may change to hard-wired in future)
+    /// - Any CAN messages received at all
+    ///
+    /// Will go to Standby (pending a reset) if rest of vehicle is asleep.
+    #[task(shared = [car], local = [ig1_on_input, led_ignition, relay_ig3, standby], priority = 4)]
+    async fn ignition_sequence(cx: ignition_sequence::Context) {
+        let mut car = cx.shared.car;
+        let mut ig1_on = debounce_stateful_5(false);
+        let mut idle_count = 0;
+
+        loop {
+            let ignition = car.lock(|car| car.ignition());
+
+            let ig1_edge = ig1_on.update(cx.local.ig1_on_input.is_high().unwrap());
+
+            let ig3_alive = car.lock(|car| car.ig3_appears_powered());
+
+            let pcan_bus_off = car.lock(|car| car.pcan_bus_off());
+
+            // PCAN Bus should be functioning *unless* ignition is off
+            // and we're about to go to standby anyway
+            //
+            // TODO: handle this in a better way than panicking
+            assert!(!pcan_bus_off || ignition == Ignition::Off);
+
+            let next_ignition = match ignition {
+                Ignition::Off => {
+                    if ig1_edge == Some(Rising) {
+                        Some(Ignition::On)
                     }
-                    Falling => {
-                        cx.local.relay_ig3.set_low().unwrap();
-                        cx.local.led_ignition.set_low().unwrap();
+                    else if ig3_alive {
+                        Some(Ignition::IG3)
                     }
+                    else if pcan_bus_off || !car.lock(|car| car.pcan_receiving()) {
+                        // FIXME: Hacky check while we don't have wakeup sources
+                        // to automatically get back out of standby mode: wait
+                        // at least 10 more seconds before going into standby to
+                        // give the rest of the vehicle a chance to start up if
+                        // we just powered on
+                        idle_count += 1;
+                        if idle_count > 500 {
+                            cx.local.standby.enter_standby_mode().await
+                        } else {
+                            None
+                        }
+                    }
+                    else {
+                        idle_count = 0;
+                        None // No change
+                    }
+                },
+                Ignition::IG3 => {
+                    if ig1_edge == Some(Rising) {
+                        Some(Ignition::On)
+                    }
+                    else if !ig3_alive {
+                        Some(Ignition::Off)
+                    }
+                    else {
+                        None // No change
+                    }
+
+                },
+                Ignition::On => {
+                    if ig1_edge == Some(Falling) {
+                        if ig3_alive {
+                            Some(Ignition::IG3)
+                        } else {
+                            // This starts a shutdown sequence that last
+                            // slightly over 3 minutes before the VCU and other
+                            // modules stop sending messages (if ignition stays off).
+                            //
+                            // Can possibly make this time out faster by telling it the
+                            // doors are locked, or stopping some of our own IGPM messages.
+                            Some(Ignition::Off)
+                        }
+                    }
+                    else {
+                        None // No change
+                    }
+                },
+            };
+
+            if let Some(next) = next_ignition {
+                car.lock(|car| car.set_ignition(next));
+
+                // Update the IG3 external power on relay, if needed
+                if next == Ignition::On {
+                    cx.local.relay_ig3.set_high().unwrap();
+                    cx.local.led_ignition.set_high().unwrap();
+                } else {
+                    cx.local.relay_ig3.set_low().unwrap();
+                    cx.local.led_ignition.set_low().unwrap();
                 }
             }
+
+            Mono::delay(20.millis()).await;
         }
     }
 
@@ -297,8 +376,9 @@ mod app {
 
             cx.shared.car.lock(|car| {
                 defmt::info!(
-                    "Ign: {:?} Con: {:?} Batt: {:05}% Inv: {:?}V RPM: {:?}",
+                    "Ign: {:?} Gear: {:?} Con: {:?} Batt: {:05}% Inv: {:?}V RPM: {:?}",
                     car.ignition(),
+                    car.gear(),
                     car.contactor(),
                     car.soc_batt(),
                     car.v_inverter(),
