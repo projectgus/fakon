@@ -146,7 +146,7 @@ impl TractionControlMed {
 
         // Update checksum
         {
-            res.set_checksum(0).unwrap(); // TODO: needed?
+            res.set_checksum(0).unwrap(); // Was set to FF in raw bytes
 
             // Checksum is the sum of the nibbles of all bytes except the last
             let new_sum = res.raw()[..7]

@@ -150,9 +150,8 @@ impl<I: fdcan::Instance> Control<I> {
 // (FDCAN doesn't have a struct for this, it splits headers and their data up.)
 #[derive(Clone, Debug)]
 pub struct QueuedFrame {
-    // TODO: make both these fields private once all access via embedded_can::Frame
-    pub header: TxFrameHeader, // Note: TxFrameHeader is used for TX and RX directions
-    pub data: [u8; 8],         // Fixed size array, see header.len for 'real' length
+    header: TxFrameHeader, // Note: TxFrameHeader is used for TX and RX directions
+    data: [u8; 8],         // Fixed size array, see header.len for 'real' length
 }
 
 impl defmt::Format for QueuedFrame {
@@ -306,7 +305,6 @@ impl<I: fdcan::Instance> Tx<I> {
     }
 
     fn transmit_frame(&mut self, frame: QueuedFrame) {
-        //defmt::trace!("CAN TX {:?}", msg); // TODO: fix log line
         let maybe_queue = match self.can.transmit_preserve_frame(
             &frame,
             &mut QueuedFrame::from_pending_transmit,
@@ -317,8 +315,8 @@ impl<I: fdcan::Instance> Tx<I> {
             Ok(Some(dequeued)) => Some(dequeued),
             // Rather than blocking on fdcan, queue this message for later transmit
             Err(nb::Error::WouldBlock) => Some(frame),
-            // TODO: Figure out what this means given error type is Infallible here...
-            Err(nb::Error::Other(_)) => panic!("Unexpected CAN TX error"),
+            // Can be replaced once never_patterns stabilises
+            Err(nb::Error::Other(_)) => unreachable!("Result is Infallible"),
         };
         if let Some(to_queue) = maybe_queue {
             match self.queue.push(to_queue) {

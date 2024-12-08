@@ -40,7 +40,7 @@ pub async fn task_igpm(cx: app::task_igpm::Context<'_>) {
     };
 
     // Odometer reading
-    // Currently using the logged reading from the 2022 car. TODO: check if needs to exceed value set in the 2019 VCU?
+    // Currently using the logged reading from the 2022 car.
     let odometer = Odometer::new(14452.5).unwrap();
 
     // this messages is mostly all zeroes but in some logs it's FFFFFFFFFFFFFF0F instead...?
