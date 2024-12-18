@@ -17,6 +17,7 @@ use rtic_monotonics::Monotonic;
 use stm32g4xx_hal::gpio::gpiod;
 use stm32g4xx_hal::gpio::ExtiPin;
 use stm32g4xx_hal::gpio::SignalEdge;
+use stm32g4xx_hal::prelude::OutputPin;
 use stm32g4xx_hal as hal;
 use stm32g4xx_hal::can::CanExt;
 use stm32g4xx_hal::gpio::GpioExt;
@@ -86,9 +87,6 @@ rtic_monotonics::systick_monotonic!(Mono, MONOTONIC_FREQUENCY);
 pub fn init(core: cortex_m::Peripherals, mut dp: stm32::Peripherals) -> Board {
     info!("hardware init");
 
-    let mut syscfg = dp.SYSCFG.constrain();
-    let rcc = dp.RCC.constrain();
-
     // Sysclock is based on PLL_R
     let pll_config = PllConfig {
         mux: rcc::PllSrc::HSE(24_u32.MHz()), // Nucleo board X3 OSC
@@ -106,8 +104,11 @@ pub fn init(core: cortex_m::Peripherals, mut dp: stm32::Peripherals) -> Board {
         .apb1_psc(rcc::Prescaler::Div2)
         .apb2_psc(rcc::Prescaler::Div2);
 
-    let standby = Standby::init(&mut dp.PWR, core.SCB);
+    let standby = Standby::init(&mut dp, core.SCB);
 
+    // Split & constrain device peripherals
+    let mut syscfg = dp.SYSCFG.constrain();
+    let rcc = dp.RCC.constrain();
     let pwr = dp.PWR.constrain().freeze();
     let mut rcc = rcc.freeze(clock_config, pwr);
 
@@ -192,8 +193,11 @@ pub fn init(core: cortex_m::Peripherals, mut dp: stm32::Peripherals) -> Board {
     // LEDs, all green, all active high
     let led1 = gpiob.pb10.into_push_pull_output();
     let _led2 = gpiob.pb5.into_push_pull_output();
-    let _led3 = gpioa.pa10.into_push_pull_output();
+    let mut led3 = gpioa.pa10.into_push_pull_output();
     // led4 accidentally shared with pin_coil_l2
+
+    // Use LED3 as a "firmware not asleep" status light
+    led3.set_high().unwrap();
 
     // Functions assigned to pins
 
@@ -259,17 +263,20 @@ pub fn init(core: cortex_m::Peripherals, mut dp: stm32::Peripherals) -> Board {
 impl Standby {
     /// Do startup configuration for low power Standby mode,
     /// such that enter_standby_mode() can be called later.
-    fn init(pwr: &mut stm32::PWR, scb: stm32::SCB) -> Self {
-        let was_standby = unsafe {
-            // Set the deep sleep mode for Standby
-            pwr.cr1.modify(|_, w| { w.lpms().bits(0b011) });
+    fn init(dp: &mut stm32::Peripherals, scb: stm32::SCB) -> Self {
+        dp.RCC.apb1enr1.modify(|_, w| w.pwren().set_bit());
 
-            // Read the Standby flag in the status register
-            pwr.sr1.read().sbf().bit_is_set()
-        };
+        // Safety: Best choice as current stm32g4xx-hal has no safe
+        // interface to select Standby mode
+        unsafe {
+            dp.PWR.cr1.modify(|_, w| { w.lpms().bits(0b011) });
+        }
 
+        let was_standby = dp.PWR.sr1.read().sbf().bit_is_set();
         if was_standby {
             defmt::info!("Waking up from standby mode");
+            // External reset doesn't clear the SBF bit, so clear it now
+            dp.PWR.scr.write(|w| w.csbf().set_bit());
         } else {
             defmt::info!("Starting from hard reset");
         }
@@ -282,6 +289,8 @@ impl Standby {
     /// Go to standby mode as soon as the rest of the system is idle,
     /// or panic if 1 second passes without going to standby.
     pub async fn enter_standby_mode(&mut self) -> ! {
+        // Note this log message doesn't get delivered in time,
+        // could add a short delay here I guess?
         defmt::info!("Vehicle appears to be off, going to standby...");
 
         // Initial standby config is set in Board::init(), this is only the
@@ -310,10 +319,9 @@ impl Standby {
             });
         }
 
-        // TODO: this currently doesn't go to standby, it just panics
-
         // The chip should go to standby as soon as there are no pending
-        // interrupts, which we should assume will happen at least once per second
+        // interrupts. This may not happen immediately but should happen
+        // at least once per second.
         Mono::delay(1.secs()).await;
 
         // Shouldn't make it here as standby exits to a reset, unless one of the
