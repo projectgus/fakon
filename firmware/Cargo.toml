@@ -1,6 +1,6 @@
 [package]
 name = "fakon"
-
+license = "MPL-2.0"
 authors = [ "Angus Gratton <gus@projectgus.com" ]
 edition = "2021"
 version = "0.1.0"
